@@ -1,0 +1,339 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 30 4% 8%;
+    --card: 0 0% 97%;
+    --card-foreground: 30 4% 8%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 38%;
+    --border: 0 0% 88%;
+    --accent: 40 100% 50%;
+    --accent-foreground: 0 0% 4%;
+  }
+
+  .dark {
+    /* Very slightly warm black — adds depth without being obvious */
+    --background: 30 4% 3%;
+    --foreground: 30 5% 91%;
+    --card: 30 4% 6%;
+    --card-foreground: 30 5% 91%;
+    --muted: 30 3% 10%;
+    --muted-foreground: 0 0% 40%;
+    --border: 30 3% 12%;
+    --accent: 40 100% 50%;
+    --accent-foreground: 0 0% 4%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Animated grain texture overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 160px 160px;
+    animation: grain-shift 8s steps(10, end) infinite;
+  }
+
+  .dark body::before {
+    opacity: 0.045;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent) / 0.5);
+  }
+
+  /* Text selection */
+  ::selection {
+    background: hsl(var(--accent) / 0.22);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* ─── Custom cursor ─────────────────────────────────────────── */
+@media (pointer: fine) {
+  html,
+  html * {
+    cursor: none !important;
+  }
+
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    background: hsl(var(--accent));
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.25s;
+  }
+
+  .cursor-dot.hidden {
+    opacity: 0;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid hsl(var(--accent) / 0.28);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    will-change: transform;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.4s,
+                border-radius 0.4s;
+  }
+
+  .cursor-ring.hovered {
+    width: 56px;
+    height: 56px;
+    border-color: hsl(var(--accent) / 0.55);
+  }
+
+  .cursor-ring.clicking {
+    width: 28px;
+    height: 28px;
+    border-color: hsl(var(--accent) / 0.8);
+  }
+}
+
+/* ─── Prose styles for blog posts ───────────────────────────── */
+.prose {
+  @apply text-foreground leading-relaxed;
+}
+.prose h1 {
+  @apply text-3xl font-semibold tracking-tight mt-10 mb-4;
+}
+.prose h2 {
+  @apply text-2xl font-semibold tracking-tight mt-10 mb-4;
+}
+.prose h3 {
+  @apply text-xl font-semibold tracking-tight mt-8 mb-3;
+}
+.prose p {
+  @apply mb-5 text-muted-foreground leading-relaxed;
+}
+.prose a {
+  @apply text-accent underline underline-offset-4 hover:opacity-80 transition-opacity;
+}
+.prose strong {
+  @apply font-semibold text-foreground;
+}
+.prose ul {
+  @apply list-disc pl-6 mb-5 space-y-2;
+}
+.prose ol {
+  @apply list-decimal pl-6 mb-5 space-y-2;
+}
+.prose li {
+  @apply text-muted-foreground;
+}
+.prose blockquote {
+  @apply border-l-2 border-accent/50 pl-4 italic text-muted-foreground my-6;
+}
+.prose code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+}
+.prose pre {
+  @apply bg-muted rounded-lg p-4 overflow-x-auto my-6;
+}
+.prose pre code {
+  @apply bg-transparent p-0;
+}
+.prose hr {
+  @apply border-border my-8;
+}
+.prose img {
+  @apply rounded-lg my-6;
+}
+
+/* ─── Link underline animations ─────────────────────────────── */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: hsl(var(--foreground));
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left;
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+
+.link-underline-accent::after {
+  background: hsl(var(--accent));
+}
+
+/* ─── Accent glow button effect ─────────────────────────────── */
+.btn-accent-glow {
+  position: relative;
+  overflow: hidden;
+}
+.btn-accent-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, hsl(var(--accent) / 0.25) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.btn-accent-glow:hover::after {
+  opacity: 1;
+}
+
+/* ─── Card lift effect ───────────────────────────────────────── */
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px -12px hsl(var(--accent) / 0.08),
+              0 8px 24px -4px hsl(0 0% 0% / 0.3);
+}
+
+/* ─── Corner crosshair marks ────────────────────────────────── */
+.corner-mark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+.corner-mark::before,
+.corner-mark::after {
+  content: "";
+  position: absolute;
+  background: hsl(var(--foreground) / 0.15);
+}
+.corner-mark::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+.corner-mark::after {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+/* ─── Section reveal animation ──────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Marquee ────────────────────────────────────────────────── */
+.marquee-track {
+  display: flex;
+  width: max-content;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Skill tag hover ────────────────────────────────────────── */
+.skill-tag {
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+.skill-tag:hover {
+  color: hsl(var(--accent));
+  border-color: hsl(var(--accent) / 0.4);
+  background-color: hsl(var(--accent) / 0.05);
+}
+
+/* ─── Accent number display ─────────────────────────────────── */
+.section-number {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ─── Focus styles ───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid hsl(var(--accent) / 0.6);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─── View transition for page changes ──────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: 300ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
+  }
+  ::view-transition-new(root) {
+    animation: 400ms cubic-bezier(0, 0, 0.2, 1) 80ms both fade-in-transition;
+  }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes fade-in-transition {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
