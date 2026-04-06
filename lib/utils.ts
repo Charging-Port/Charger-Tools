@@ -6,7 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("en-US", {
+  // Parse date parts manually to avoid UTC-midnight timezone shift.
+  // `new Date("YYYY-MM-DD")` is treated as UTC, which displays one day
+  // earlier for users west of UTC (most of the US).
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",

@@ -170,7 +170,7 @@ export function Navbar() {
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       "group flex items-center justify-between py-5 border-b border-border/20 transition-colors",
-                      pathname.startsWith(link.href) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                      pathname === link.href || pathname.startsWith(link.href + "/") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <span className="font-display text-4xl font-bold group-hover:text-accent transition-colors">
