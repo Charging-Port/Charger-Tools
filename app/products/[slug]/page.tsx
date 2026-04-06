@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { getProductBySlug, getProductSlugs } from "@/lib/products";
 import { formatDate } from "@/lib/utils";
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
+
 interface Props {
   params: { slug: string };
 }
@@ -33,9 +36,24 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Props): Metadata {
   const product = getProductBySlug(params.slug);
   if (!product) return {};
+  const url = `${BASE_URL}/products/${product.slug}`;
   return {
     title: product.name,
     description: product.shortDescription,
+    openGraph: {
+      title: product.name,
+      description: product.shortDescription,
+      url,
+      type: "website",
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription,
+      images: ["/og-image.png"],
+    },
+    alternates: { canonical: url },
   };
 }
 

@@ -5,6 +5,9 @@ import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { getPostBySlug, getPostSlugs, renderMarkdown } from "@/lib/blog";
 import { formatDate } from "@/lib/utils";
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
+
 interface Props {
   params: { slug: string };
 }
@@ -17,9 +20,37 @@ export function generateMetadata({ params }: Props): Metadata {
   const post = getPostBySlug(params.slug);
   if (!post) return {};
 
+  const url = `${BASE_URL}/blog/${post.slug}`;
+
   return {
     title: post.title,
     description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url,
+      type: "article",
+      publishedTime: new Date(post.date).toISOString(),
+      authors: ["Kaden"],
+      tags: [post.category],
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: ["/og-image.png"],
+    },
+    alternates: {
+      canonical: url,
+    },
   };
 }
 
@@ -46,7 +77,9 @@ export default async function BlogPostPage({ params }: Props) {
             </span>
             <span className="flex items-center gap-1.5">
               <Calendar size={14} />
-              {formatDate(post.date)}
+              <time dateTime={new Date(post.date).toISOString()}>
+                {formatDate(post.date)}
+              </time>
             </span>
             <span className="flex items-center gap-1.5">
               <Clock size={14} />
@@ -62,6 +95,16 @@ export default async function BlogPostPage({ params }: Props) {
           className="prose"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
+
+        {/* Back link at bottom for long posts */}
+        <div className="mt-16 pt-8 border-t border-border/30">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={14} /> Back to all posts
+          </Link>
+        </div>
       </div>
     </div>
   );

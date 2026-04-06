@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Keyframe: grain shift ──────────────────────────────────
+   Defined here (not just in tailwind.config.ts) because the
+   grain animation is applied via raw CSS on body::before.
+   Tailwind only emits @keyframes when the animate-* utility
+   class is referenced in a component; since body::before is
+   authored directly in CSS it would never get the keyframe.
+   ────────────────────────────────────────────────────────── */
+@keyframes grain-shift {
+  0%,
+  100% { transform: translate(0, 0); }
+  10%  { transform: translate(-2%, -3%); }
+  20%  { transform: translate(3%, 1%); }
+  30%  { transform: translate(-1%, 4%); }
+  40%  { transform: translate(4%, -2%); }
+  50%  { transform: translate(-3%, 3%); }
+  60%  { transform: translate(2%, -4%); }
+  70%  { transform: translate(-4%, 2%); }
+  80%  { transform: translate(3%, -1%); }
+  90%  { transform: translate(-2%, 4%); }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -336,4 +357,53 @@
 @keyframes fade-in-transition {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Skip-to-content ────────────────────────────────────────
+   Hidden off-screen until focused by keyboard. Lets screen
+   reader and keyboard users skip the nav and jump to content.
+   ─────────────────────────────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  padding: 0.6rem 1.25rem;
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0 0 0.75rem 0.75rem;
+  text-decoration: none;
+  transition: top 0.2s ease;
+  white-space: nowrap;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid hsl(var(--accent-foreground) / 0.4);
+  outline-offset: 2px;
+}
+
+/* ─── Reduced-motion: respect user preference ────────────────
+   Collapse all animation and transition durations to near-zero
+   for users who prefer minimal motion.  The view-transition
+   block above already guards page transitions; this handles
+   CSS animations/transitions and removes Framer Motion lag.
+   ─────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable the grain overlay entirely — it exists for
+     visual depth only and provides no informational value */
+  body::before {
+    display: none;
+  }
 }

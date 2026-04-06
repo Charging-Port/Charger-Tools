@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -18,22 +18,23 @@ export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [visible, setVisible] = useState(true);
-  const [lastY, setLastY] = useState(0);
+  // Use a ref so the scroll handler never needs to be re-registered;
+  // reading/writing a ref is synchronous and doesn't cause re-renders.
+  const lastYRef = useRef(0);
 
-  // Hide on scroll down, show on scroll up
+  // Hide on scroll down, show on scroll up.
+  // The handler is registered once (empty dep array) and uses the ref
+  // to avoid the stale-closure issue that plagued the previous useState
+  // approach (which re-added/removed the listener on every scroll event).
   useEffect(() => {
     const handler = () => {
       const y = window.scrollY;
-      if (y < 60) {
-        setVisible(true);
-      } else {
-        setVisible(y < lastY);
-      }
-      setLastY(y);
+      setVisible(y < 60 || y < lastYRef.current);
+      lastYRef.current = y;
     };
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
-  }, [lastY]);
+  }, []);
 
   // Lock body scroll when mobile menu open
   useEffect(() => {
