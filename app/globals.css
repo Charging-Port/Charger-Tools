@@ -362,13 +362,14 @@
 /* ─── Skip-to-content ────────────────────────────────────────
    Hidden off-screen until focused by keyboard. Lets screen
    reader and keyboard users skip the nav and jump to content.
+   pointer-events: none keeps it non-interactive while off-screen.
    ─────────────────────────────────────────────────────────── */
 .skip-link {
   position: fixed;
-  top: -100%;
+  top: -9999px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 99999;
+  z-index: 100000;
   padding: 0.6rem 1.25rem;
   background: hsl(var(--accent));
   color: hsl(var(--accent-foreground));
@@ -376,34 +377,37 @@
   font-weight: 600;
   border-radius: 0 0 0.75rem 0.75rem;
   text-decoration: none;
-  transition: top 0.2s ease;
   white-space: nowrap;
+  pointer-events: none;
 }
 .skip-link:focus {
   top: 0;
+  pointer-events: auto;
   outline: 2px solid hsl(var(--accent-foreground) / 0.4);
   outline-offset: 2px;
 }
 
 /* ─── Reduced-motion: respect user preference ────────────────
-   Collapse all animation and transition durations to near-zero
-   for users who prefer minimal motion.  The view-transition
-   block above already guards page transitions; this handles
-   CSS animations/transitions and removes Framer Motion lag.
+   IMPORTANT: Only disable OUR custom CSS animations, not
+   Framer Motion or component-level transitions.  The broad
+   `* { animation-duration: 0.01ms !important }` pattern breaks
+   Framer Motion's initial-state resolution and makes elements
+   stay invisible at their opacity:0 initial state.
    ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  /* Disable the grain overlay entirely — it exists for
-     visual depth only and provides no informational value */
+  /* Disable the grain texture — purely decorative */
   body::before {
     display: none;
+  }
+
+  /* Stop the marquee ticker */
+  .marquee-track {
+    animation: none !important;
+  }
+
+  /* Disable status dot pulse/ping — purely decorative */
+  .animate-ping {
+    animation: none !important;
+    opacity: 0;
   }
 }
