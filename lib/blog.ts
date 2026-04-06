@@ -46,6 +46,9 @@ export function getPostSlugs(): string[] {
 }
 
 export async function renderMarkdown(content: string): Promise<string> {
-  const result = await remark().use(html).process(content);
+  // Explicitly pass sanitize: true (the remark-html@16 default) so that any
+  // future API changes or dependency upgrades cannot silently disable sanitization.
+  // The default schema strips script tags, on* handlers, javascript: hrefs, etc.
+  const result = await remark().use(html, { sanitize: true }).process(content);
   return result.toString();
 }
