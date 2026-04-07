@@ -29,6 +29,8 @@ const productAccents: Record<string, { glow: string; number: string }> = {
   },
 };
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return getProductSlugs().map((slug) => ({ slug }));
 }

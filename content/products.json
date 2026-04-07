@@ -1,0 +1,187 @@
+[
+  {
+    "id": "hyperform-fitness",
+    "name": "Hyperform Fitness",
+    "slug": "hyperform-fitness",
+    "shortDescription": "Real-time computer vision platform tracking human movement at 30fps with sub-100ms corrective feedback during live workouts.",
+    "description": "Hyperform Fitness is a computer vision startup I co-founded that's reshaping how athletes and gym members get coached. The platform uses multi-camera 3D pose estimation to track human movement in real time at 30fps, delivering sub-100ms corrective feedback to lifters during their actual sets — not minutes later in a video review, but right then, in the moment, while the bar is still on their back.\n\nThe architecture is edge-first by design. Every frame of inference runs locally on dedicated hardware at the gym, with zero cloud dependency. This matters for two reasons: latency (you can't coach a squat from a server in another state) and privacy (no one wants their body video uploaded to someone else's data center). The system has analyzed over 1 million reps across pilot installations in commercial gyms, rehabilitation centers, and sports medicine programs.\n\nAs Co-Founder and Engineering Lead, I architect the inference pipeline, manage a team of interns across software, hardware integration, and client-facing deployment, and actively close deals with fitness facilities and school athletic programs.\n\nThe next frontier we're exploring is detecting changes in sleep patterns and vitamin processing through subtle shifts in movement quality — the idea that how you move on a given day reveals far more about your physiological state than wearables can capture.",
+    "images": [],
+    "techStack": [
+      "Python",
+      "Computer Vision",
+      "3D Pose Estimation",
+      "Multi-Camera Sync",
+      "Edge Inference",
+      "Real-time ML",
+      "Hardware Integration"
+    ],
+    "status": "in-development",
+    "links": {
+      "website": "https://hyperformfit.com"
+    },
+    "features": [
+      "30fps real-time human movement tracking",
+      "Multi-camera 3D pose estimation",
+      "Sub-100ms corrective feedback during live sets",
+      "Edge-first architecture — zero cloud dependency",
+      "1M+ reps analyzed across pilot installations",
+      "Deployed in gyms, rehab centers, and sports medicine",
+      "Beta capabilities for sleep & vitamin processing detection"
+    ],
+    "dateCreated": "2025-01-01",
+    "order": 1,
+    "gradient": "from-emerald-600/20 via-teal-600/20 to-cyan-500/20"
+  },
+  {
+    "id": "ar-glasses",
+    "name": "AR/Computer Glasses",
+    "slug": "ar-glasses",
+    "shortDescription": "Wearable AR system with chord-based glove input, collimating optics, and real-time AI processing.",
+    "description": "A fully custom augmented reality system built from the ground up. The AR/Computer Glasses combine a lightweight wearable display with chord-based glove input, allowing hands-free interaction through finger combinations mapped to a full character set.\n\nThe optical system uses collimating lenses to focus a micro OLED display at optical infinity, creating a heads-up overlay that doesn't strain the eyes. The glasses connect via Bluetooth Low Energy to an iPhone, which handles the heavy compute — running AI models, processing camera input, and managing the glove's chord interpreter.\n\nKey innovations include a colorblindness correction mode that applies real-time color filters through the display pipeline, and an AI assistant layer that can process what the wearer sees and respond through the HUD.\n\nThe glove input system uses an ESP32 microcontroller with capacitive touch sensors on each finger. Chord combinations (multiple fingers pressed simultaneously) map to characters, numbers, and commands — similar to a stenotype but designed for wearable use.",
+    "images": [],
+    "techStack": [
+      "Swift",
+      "CoreBluetooth",
+      "ESP32",
+      "Arduino",
+      "OLED",
+      "Collimating Optics",
+      "Python",
+      "OpenCV",
+      "Anthropic API"
+    ],
+    "status": "prototype",
+    "links": {},
+    "features": [
+      "Chord-based glove input with full character mapping",
+      "Collimating optics for eye-safe HUD display",
+      "Real-time AI processing via iPhone companion app",
+      "Colorblindness correction filters",
+      "Bluetooth Low Energy connectivity",
+      "Custom ESP32 firmware for glove sensors",
+      "Camera passthrough with computer vision"
+    ],
+    "dateCreated": "2025-09-01",
+    "order": 2,
+    "gradient": "from-violet-600/20 via-blue-600/20 to-cyan-500/20"
+  },
+  {
+    "id": "charger-agent",
+    "name": "ChargerAgent",
+    "slug": "charger-agent",
+    "shortDescription": "Native macOS AI agent with SwiftUI + AppKit, Anthropic API streaming, and real tool use (terminal, files, directories).",
+    "description": "ChargerAgent is a native macOS AI agent built in SwiftUI + AppKit that lives in a Raycast-style minimal interface. It connects to Anthropic's Claude API with full Server-Sent Events streaming, and extends the model with real tools — terminal command execution, file I/O, and directory operations.\n\nThe tool system is built on Claude's native tool use protocol, with each tool defined as a Swift struct conforming to a common protocol. The terminal tool can execute arbitrary shell commands and return the output to the AI, enabling workflows like \"check my git status and summarize what I've been working on\" or \"find all TODO comments in my project.\" The file tools provide read/write/list capabilities for editing configs, generating boilerplate, or scanning a project structure.\n\nThe interface is minimal by design — one keyboard shortcut away, no browser, no electron, no friction. It feels like an extension of the OS rather than another app to manage.",
+    "images": [],
+    "techStack": [
+      "SwiftUI",
+      "AppKit",
+      "Anthropic API",
+      "Server-Sent Events",
+      "Swift Concurrency",
+      "Tool Use Protocol"
+    ],
+    "status": "in-development",
+    "links": {},
+    "features": [
+      "Native SwiftUI + AppKit macOS application",
+      "Full SSE streaming responses from Claude",
+      "Terminal command execution tool",
+      "File read/write/list tools",
+      "Directory operations and project scanning",
+      "Raycast-style minimal interface",
+      "Conversation history with local persistence"
+    ],
+    "dateCreated": "2025-12-01",
+    "order": 3,
+    "gradient": "from-amber-600/20 via-orange-600/20 to-red-500/20"
+  },
+  {
+    "id": "charger-mail",
+    "name": "Charger Mail",
+    "slug": "charger-mail",
+    "shortDescription": "Native macOS unified inbox with OAuth2/PKCE auth and local AI-powered email management via Ollama.",
+    "description": "Charger Mail is a native macOS email client built to replace the need for multiple email apps. It features a unified inbox that aggregates accounts using OAuth2/PKCE authentication via ASWebAuthenticationSession — no third-party auth proxies, no credential storage outside the system keychain.\n\nWhat sets it apart is the local AI integration. Instead of sending your emails to a cloud service, Charger Mail connects to Ollama running locally on your machine. This means AI-powered features like email summarization, smart reply drafting, and priority sorting all happen on-device with zero data leaving your computer.\n\nThe interface is built entirely in SwiftUI with a focus on speed — instant search, keyboard shortcuts for every action, and a minimal design that stays out of the way. The goal is an email experience that's fast, private, and intelligent.",
+    "images": [],
+    "techStack": [
+      "SwiftUI",
+      "AppKit",
+      "OAuth2/PKCE",
+      "ASWebAuthenticationSession",
+      "Ollama",
+      "Local LLM",
+      "Core Data"
+    ],
+    "status": "in-development",
+    "links": {},
+    "features": [
+      "Unified inbox across multiple accounts",
+      "OAuth2/PKCE auth via ASWebAuthenticationSession",
+      "Local AI via Ollama (no cloud dependency)",
+      "AI email summarization and smart replies",
+      "Keyboard-driven Superhuman-style interface",
+      "Instant full-text search",
+      "Privacy-first architecture"
+    ],
+    "dateCreated": "2026-01-15",
+    "order": 4,
+    "gradient": "from-blue-600/20 via-indigo-600/20 to-purple-500/20"
+  },
+  {
+    "id": "optics-simulator",
+    "name": "Optics Simulator",
+    "slug": "optics-simulator",
+    "shortDescription": "Interactive ray-tracing simulator for concave/convex mirrors and lenses — built from scratch.",
+    "description": "An interactive optics simulator built from scratch that visualizes how light interacts with curved mirrors and lenses through real ray tracing. You can place concave or convex mirrors, biconvex or biconcave lenses, drag light sources around, and watch the rays refract and reflect in real time.\n\nThe simulator handles the actual physics — Snell's law for refraction, the law of reflection for mirrors, and proper handling of focal points and image formation. It was originally built as a learning tool for understanding the optical system in the AR glasses project, and grew into a standalone visualization that's genuinely useful for anyone learning optics.\n\nIt became the testbed for the collimating lens design that ended up in the AR glasses prototype — being able to drag a virtual lens around and immediately see where the rays converge made the design iteration loop ten times faster than doing the math by hand.",
+    "images": [],
+    "techStack": [
+      "Python",
+      "Ray Tracing",
+      "Snell's Law",
+      "Real-time Rendering",
+      "Optical Physics"
+    ],
+    "status": "released",
+    "links": {},
+    "features": [
+      "Real-time ray tracing for mirrors and lenses",
+      "Concave and convex mirror support",
+      "Biconvex / biconcave / plano lens types",
+      "Interactive drag-and-drop light sources",
+      "Snell's law refraction handling",
+      "Focal point and image formation visualization",
+      "Used as a design tool for the AR glasses"
+    ],
+    "dateCreated": "2024-11-01",
+    "order": 5,
+    "gradient": "from-sky-600/20 via-cyan-600/20 to-teal-500/20"
+  },
+  {
+    "id": "rf-radar-simulator",
+    "name": "RF Radar Simulator",
+    "slug": "rf-radar-simulator",
+    "shortDescription": "3D volumetric RF propagation simulator with realistic penetration physics through materials.",
+    "description": "A radio frequency radar simulator that models RF wave propagation through 3D space with full volumetric penetration physics. Unlike most radar visualizers that treat the world as a flat 2D plane, this simulates how RF actually behaves — passing through some materials, reflecting off others, attenuating with distance, and creating real interference patterns when waves overlap.\n\nThe penetration model accounts for material dielectric properties, so the same RF signal will pass cleanly through drywall but get heavily attenuated by concrete or completely reflected by metal. You can place a transmitter, watch the wavefront propagate outward in 3D, and see how building materials affect the coverage map.\n\nBuilt originally to understand the RF environment for the AR glasses' Bluetooth link in cluttered spaces, but the engine is general — it could simulate WiFi coverage in a building, a marine radar scan, or any RF propagation problem.",
+    "images": [],
+    "techStack": [
+      "Python",
+      "3D Physics",
+      "RF Propagation",
+      "Volumetric Rendering",
+      "Material Modeling"
+    ],
+    "status": "released",
+    "links": {},
+    "features": [
+      "3D volumetric RF wave propagation",
+      "Realistic material penetration physics",
+      "Dielectric property modeling",
+      "Distance attenuation and interference patterns",
+      "Coverage map visualization",
+      "Configurable transmitter placement",
+      "General-purpose RF simulation engine"
+    ],
+    "dateCreated": "2024-08-01",
+    "order": 6,
+    "gradient": "from-rose-600/20 via-pink-600/20 to-fuchsia-500/20"
+  }
+]

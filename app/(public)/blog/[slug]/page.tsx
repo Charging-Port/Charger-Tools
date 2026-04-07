@@ -12,6 +12,8 @@ interface Props {
   params: { slug: string };
 }
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return getPostSlugs().map((slug) => ({ slug }));
 }

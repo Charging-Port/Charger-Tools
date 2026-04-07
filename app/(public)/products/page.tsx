@@ -3,6 +3,8 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { ProjectGrid } from "@/components/project-grid";
 import { getAllProducts } from "@/lib/products";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Work",
   description: "Hardware and software projects built by ChargerTools.",

@@ -3,6 +3,8 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { BlogCard } from "@/components/blog-card";
 import { getAllPosts } from "@/lib/blog";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Writing",
   description: "Notes on building, learning, and shipping from ChargerTools.",

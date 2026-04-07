@@ -9,8 +9,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Block Next.js internals from indexing
-        disallow: ["/_next/", "/api/"],
+        // Block Next.js internals and the admin panel from indexing
+        disallow: ["/_next/", "/api/", "/admin", "/admin/"],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,

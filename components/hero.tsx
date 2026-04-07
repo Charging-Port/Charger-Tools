@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
+/**
+ * Cycling words are rendered as a vertical stack inside an `overflow-hidden`
+ * container. A pure CSS keyframe animation (`animate-word-cycle`) slides the
+ * stack upward through each word in sequence. The first word is duplicated at
+ * the end so the loop resets seamlessly.
+ *
+ * This is intentionally JS-free: it works even if React hydration never runs.
+ */
 const CYCLING_WORDS = [
   "hardware.",
   "software.",
@@ -13,12 +20,14 @@ const CYCLING_WORDS = [
   "AI tools.",
   "the future.",
 ];
+// NOTE: word-cycle Tailwind keyframe is hardcoded to 6 words. If this list
+// changes length, update tailwind.config.ts → keyframes['word-cycle'].
 
 const STATS = [
-  { label: "Active projects", value: "3" },
-  { label: "Primary stack", value: "Swift · Python · TS" },
-  { label: "Current focus", value: "AR wearables + AI" },
-  { label: "Based in", value: "San Jose, CA" },
+  { label: "Active projects", value: "6" },
+  { label: "Primary stack", value: "Swift · Python · CV" },
+  { label: "Current focus", value: "Hyperform Fitness" },
+  { label: "Based in", value: "Soquel, CA" },
 ];
 
 function CornerMark({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
@@ -35,24 +44,10 @@ function CornerMark({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
 }
 
 export function Hero() {
-  const [wordIndex, setWordIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const targetPos = useRef({ x: 50, y: 50 });
   const currentPos = useRef({ x: 50, y: 50 });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Word cycling
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setWordIndex((i) => (i + 1) % CYCLING_WORDS.length);
-    }, 2400);
-    return () => clearInterval(interval);
-  }, []);
 
   // Mouse spotlight — smooth lerp
   const onMouseMove = useCallback((e: MouseEvent) => {
@@ -111,11 +106,9 @@ export function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-6 py-24 w-full">
         {/* Top status row */}
-        <motion.div
-          className="flex items-center gap-4 mb-14"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+        <div
+          className="flex items-center gap-4 mb-14 animate-fade-in"
+          style={{ animationDelay: "0.1s" }}
         >
           <div className="flex items-center gap-2">
             <span className="relative flex h-1.5 w-1.5">
@@ -132,47 +125,40 @@ export function Hero() {
           </span>
           <span className="text-border/60">·</span>
           <span className="font-mono text-[11px] text-muted-foreground/50 tracking-widest uppercase">
-            San Jose, CA
+            Soquel, CA
           </span>
-        </motion.div>
+        </div>
 
         {/* Main headline block */}
         <div className="mb-8">
-          <motion.h1
-            className="font-display font-bold tracking-tight leading-[0.88]"
-            style={{ fontSize: "clamp(4rem, 11.5vw, 11.5rem)" }}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          <h1
+            className="font-display font-bold tracking-tight leading-[0.88] animate-fade-in-up"
+            style={{ fontSize: "clamp(4rem, 11.5vw, 11.5rem)", animationDelay: "0.2s" }}
           >
             <span className="block text-foreground">Kaden.</span>
             <span className="block text-muted-foreground/30">Building</span>
-            {/* Slot-machine word */}
-            <span className="block overflow-hidden" style={{ height: "1.05em" }}>
-              {mounted && (
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={wordIndex}
-                    className="block text-accent"
-                    initial={{ y: "110%" }}
-                    animate={{ y: 0 }}
-                    exit={{ y: "-110%" }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    {CYCLING_WORDS[wordIndex]}
-                  </motion.span>
-                </AnimatePresence>
-              )}
+
+            {/* Pure-CSS cycling words — no JavaScript required */}
+            <span className="block overflow-hidden" style={{ height: "1.1em" }}>
+              <span className="block animate-word-cycle text-accent will-change-transform">
+                {CYCLING_WORDS.map((word, i) => (
+                  <span key={i} className="block" style={{ height: "1.1em" }}>
+                    {word}
+                  </span>
+                ))}
+                {/* Duplicate of first word for a seamless loop */}
+                <span className="block" style={{ height: "1.1em" }}>
+                  {CYCLING_WORDS[0]}
+                </span>
+              </span>
             </span>
-          </motion.h1>
+          </h1>
         </div>
 
         {/* Thin metadata separator bar */}
-        <motion.div
-          className="flex items-center gap-4 py-4 border-t border-b border-border/25 mb-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.35 }}
+        <div
+          className="flex items-center gap-4 py-4 border-t border-b border-border/25 mb-12 animate-fade-in"
+          style={{ animationDelay: "0.4s" }}
         >
           <span className="font-mono text-[10px] text-muted-foreground/40 uppercase tracking-[0.2em]">
             High school junior
@@ -189,16 +175,12 @@ export function Hero() {
           <span className="font-mono text-[10px] text-muted-foreground/40 uppercase tracking-[0.2em] hidden md:block">
             ChargerTools LLC
           </span>
-        </motion.div>
+        </div>
 
         {/* Bottom two-column: bio + stats */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-end">
           {/* Left: Bio + CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mb-8">
               Building at the intersection of hardware and software — wearable AR
               systems, native macOS tools, and AI applications under{" "}
@@ -223,22 +205,16 @@ export function Hero() {
                 About me
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right: Stats spec sheet */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div className="animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
             <div className="space-y-0">
               {STATS.map((item, i) => (
-                <motion.div
+                <div
                   key={item.label}
-                  className="flex items-baseline justify-between py-3.5 border-b border-border/30 group last:border-0"
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex items-baseline justify-between py-3.5 border-b border-border/30 group last:border-0 animate-fade-in"
+                  style={{ animationDelay: `${0.7 + i * 0.07}s` }}
                 >
                   <span className="text-[11px] font-mono text-muted-foreground/50 uppercase tracking-widest">
                     {item.label}
@@ -246,25 +222,23 @@ export function Hero() {
                   <span className="text-sm text-foreground/80 font-medium font-mono group-hover:text-foreground transition-colors">
                     {item.value}
                   </span>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 1.4 }}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in"
+        style={{ animationDelay: "1.4s" }}
       >
         <div className="w-px h-10 bg-gradient-to-b from-transparent via-muted-foreground/20 to-transparent" />
         <span className="text-[9px] font-mono text-muted-foreground/30 tracking-[0.3em] uppercase">
           scroll
         </span>
-      </motion.div>
+      </div>
     </section>
   );
 }

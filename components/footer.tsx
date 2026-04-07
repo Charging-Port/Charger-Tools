@@ -103,7 +103,7 @@ export function Footer() {
             <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] mb-5">
               Location
             </p>
-            <p className="text-sm text-muted-foreground/55">San Jose, CA</p>
+            <p className="text-sm text-muted-foreground/55">Soquel, CA</p>
             <p className="text-xs font-mono text-muted-foreground/35 mt-1.5">
               UTC −8 / −7
             </p>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { BlogPost } from "@/types";
 import { formatDate } from "@/lib/utils";
@@ -13,11 +12,9 @@ interface BlogCardProps {
 
 export function BlogCard({ post, index }: BlogCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+    <div
+      className="animate-fade-in-up"
+      style={{ animationDelay: `${0.1 + index * 0.08}s` }}
     >
       <Link href={`/blog/${post.slug}`} className="group block">
         <article className="py-7 border-b border-border/30 transition-all duration-300 hover:border-border/60 relative">
@@ -59,6 +56,6 @@ export function BlogCard({ post, index }: BlogCardProps) {
           </div>
         </article>
       </Link>
-    </motion.div>
+    </div>
   );
 }

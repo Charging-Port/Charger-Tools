@@ -74,21 +74,29 @@ export default function Home() {
               <SectionHeader number="02" title="About me" className="mb-8" />
               <div className="space-y-4 text-muted-foreground/70 leading-relaxed">
                 <p className="text-foreground text-lg leading-relaxed font-medium">
-                  I&apos;m Kaden — a high school junior building at the
-                  intersection of hardware and software.
+                  I&apos;m Kaden MacLean — a junior at Bellarmine College Prep
+                  building at the intersection of hardware, software, and human
+                  movement.
                 </p>
                 <p>
-                  I started ChargerTools LLC to formalize the projects I was
-                  already building. The name comes from the approach: take an
-                  idea, charge at it, build the tools to make it real. FRC Team
-                  254 taught me that the best engineering happens under
-                  constraints.
+                  I co-founded{" "}
+                  <span className="text-foreground font-medium">
+                    Hyperform Fitness
+                  </span>
+                  , a computer vision startup that delivers real-time corrective
+                  feedback to athletes during their actual sets — over 1M reps
+                  analyzed across pilot installations. I run{" "}
+                  <span className="text-foreground font-medium">
+                    ChargerTools LLC
+                  </span>{" "}
+                  for native macOS and personal R&amp;D, and I&apos;m on FRC
+                  Team 254 (The Cheesy Poofs) for manufacturing, wiring, and
+                  Human Player.
                 </p>
                 <p>
-                  I&apos;m most alive when a project doesn&apos;t exist
-                  yet — designing optics for AR glasses, writing firmware for
-                  glove input systems, or shipping a native macOS app from
-                  scratch.
+                  Outside engineering: piano since age four, principal bassist
+                  of BCP Chamber Orchestra, FIRST Hall of Fame Student Advisory
+                  Council member, former CyberPatriot team captain.
                 </p>
               </div>
               <Link
@@ -108,16 +116,18 @@ export default function Home() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {[
+                    "Computer Vision",
+                    "3D Pose Estimation",
                     "Wearable Computing",
                     "Augmented Reality",
                     "macOS Development",
                     "AI / ML",
-                    "Computer Vision",
                     "Robotics",
-                    "Optics",
+                    "Optics & RF",
                     "Embedded Systems",
-                    "Directed Energy",
-                    "Biomechanics",
+                    "Cybersecurity",
+                    "Manufacturing",
+                    "PCB Design",
                   ].map((skill) => (
                     <span
                       key={skill}
@@ -132,10 +142,10 @@ export default function Home() {
               {/* Quick credentials */}
               <div className="rounded-2xl border border-border/35 bg-card/40 p-5 space-y-0">
                 {[
-                  { icon: "◈", label: "FRC Team", value: "254 — The Cheesy Poofs" },
-                  { icon: "◈", label: "Current build", value: "AR glasses from scratch" },
-                  { icon: "◈", label: "Platform", value: "Native macOS & Swift" },
-                  { icon: "◈", label: "Approach", value: "AI-powered, privacy-first" },
+                  { icon: "◈", label: "Startup", value: "Hyperform Fitness" },
+                  { icon: "◈", label: "FRC Team", value: "254 — Cheesy Poofs" },
+                  { icon: "◈", label: "School", value: "Bellarmine '27" },
+                  { icon: "◈", label: "Music", value: "Piano · Cello · Bass" },
                 ].map((item, i) => (
                   <div
                     key={item.label}

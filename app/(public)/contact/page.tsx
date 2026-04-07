@@ -30,11 +30,11 @@ export default function ContactPage() {
                 Direct email
               </p>
               <a
-                href="mailto:hello@chargertools.com"
+                href="mailto:kadenmac0077@gmail.com"
                 className="inline-flex items-center gap-2 text-foreground hover:text-accent transition-colors group"
               >
                 <Mail size={15} className="text-muted-foreground" />
-                <span className="text-sm">hello@chargertools.com</span>
+                <span className="text-sm">kadenmac0077@gmail.com</span>
                 <ArrowUpRight
                   size={12}
                   className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { Cursor } from "@/components/cursor";
 import "./globals.css";
 
 const inter = Inter({
@@ -100,17 +97,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Skip-to-content: accessible keyboard shortcut to bypass nav */}
-          <a href="#main-content" className="skip-link">
-            Skip to content
-          </a>
-
-          <Cursor />
-          <Navbar />
-          <main id="main-content" className="min-h-screen pt-20">
-            {children}
-          </main>
-          <Footer />
+          {/*
+            Public pages (in app/(public)/) and admin pages (in app/admin/)
+            each provide their own chrome via their own layouts. The root
+            layout stays bare so React's hydration tree shape is identical
+            for all pages — no conditional rendering, no mismatch.
+          */}
+          {children}
         </ThemeProvider>
       </body>
     </html>

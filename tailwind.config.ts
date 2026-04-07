@@ -98,12 +98,24 @@ const config: Config = {
         "border-spin": {
           "100%": { transform: "rotate(360deg)" },
         },
+        /* Pure CSS cycling word animation — 6 words + 1 duplicate for seamless loop.
+           Each word is 1.1em tall, so translateY uses em units (not %) because
+           % would reference the whole 7.7em track, not a single word. */
+        "word-cycle": {
+          "0%, 13.33%":   { transform: "translateY(0)" },
+          "16.67%, 30%":  { transform: "translateY(-1.1em)" },
+          "33.33%, 46.67%": { transform: "translateY(-2.2em)" },
+          "50%, 63.33%":  { transform: "translateY(-3.3em)" },
+          "66.67%, 80%":  { transform: "translateY(-4.4em)" },
+          "83.33%, 96.67%": { transform: "translateY(-5.5em)" },
+          "100%":         { transform: "translateY(-6.6em)" },
+        },
       },
       animation: {
-        "fade-in": "fade-in 0.6s ease-out forwards",
-        "fade-in-up": "fade-in-up 0.7s cubic-bezier(0.16,1,0.3,1) forwards",
-        "slide-in-left": "slide-in-left 0.6s ease-out forwards",
-        "scale-in": "scale-in 0.5s cubic-bezier(0.16,1,0.3,1) forwards",
+        "fade-in": "fade-in 0.6s ease-out both",
+        "fade-in-up": "fade-in-up 0.7s cubic-bezier(0.16,1,0.3,1) both",
+        "slide-in-left": "slide-in-left 0.6s ease-out both",
+        "scale-in": "scale-in 0.5s cubic-bezier(0.16,1,0.3,1) both",
         blink: "blink 1.1s step-end infinite",
         float: "float 4s ease-in-out infinite",
         "spin-slow": "spin-slow 20s linear infinite",
@@ -112,6 +124,7 @@ const config: Config = {
         "grain-shift": "grain-shift 8s steps(10, end) infinite",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         "line-grow": "line-grow 0.8s cubic-bezier(0.16,1,0.3,1) forwards",
+        "word-cycle": "word-cycle 15s cubic-bezier(0.76, 0, 0.24, 1) infinite",
       },
     },
   },

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Product } from "@/types";
@@ -55,12 +54,9 @@ export function ProductCard({ product, index, featured = false }: ProductCardPro
   const theme = THEMES[product.slug] ?? DEFAULT_THEME;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className={cn(featured && "lg:col-span-2")}
+    <div
+      className={cn("animate-fade-in-up", featured && "lg:col-span-2")}
+      style={{ animationDelay: `${0.1 + index * 0.1}s` }}
     >
       <Link href={`/products/${product.slug}`} className="group block h-full">
         <article
@@ -163,6 +159,6 @@ export function ProductCard({ product, index, featured = false }: ProductCardPro
           </div>
         </article>
       </Link>
-    </motion.div>
+    </div>
   );
 }

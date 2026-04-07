@@ -108,61 +108,92 @@
   }
 }
 
-/* ─── Custom cursor ─────────────────────────────────────────── */
-@media (pointer: fine) {
-  html,
-  html * {
-    cursor: none !important;
-  }
+/* ─── Custom cursor ─────────────────────────────────────────────
+   Pure CSS — positioned via CSS variables (--mx, --my) updated by an
+   inline <script> in the public layout. No React, no useEffect, no
+   hydration dependency. The script also toggles classes on <html> for
+   hover/click states and to hide on touch devices. */
 
-  .cursor-dot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 5px;
-    background: hsl(var(--accent));
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 99999;
-    will-change: transform;
-    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.25s;
-  }
+/* Hide the native cursor only AFTER the init script has confirmed a fine
+   pointer is present and added .has-fine-pointer to <html>. If the script
+   never runs (CSP error, JS disabled, browser bug), the native cursor
+   stays visible — never strand the user with no cursor at all. */
+html.has-fine-pointer,
+html.has-fine-pointer * {
+  cursor: none !important;
+}
 
-  .cursor-dot.hidden {
-    opacity: 0;
-  }
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  will-change: transform;
+}
 
-  .cursor-ring {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 36px;
-    height: 36px;
-    border: 1.5px solid hsl(var(--accent) / 0.28);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 99998;
-    will-change: transform;
-    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.4s,
-                border-radius 0.4s;
-  }
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: hsl(var(--accent));
+  box-shadow: 0 0 14px hsl(var(--accent) / 0.85);
+  z-index: 99999;
+  /* Snaps instantly to mouse — no transition */
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 4px),
+    calc(var(--my, 50vh) - 4px),
+    0
+  );
+}
 
-  .cursor-ring.hovered {
-    width: 56px;
-    height: 56px;
-    border-color: hsl(var(--accent) / 0.55);
-  }
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid hsl(var(--accent) / 0.5);
+  z-index: 99998;
+  /* Lerps via CSS transition for smooth trailing effect */
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 20px),
+    calc(var(--my, 50vh) - 20px),
+    0
+  );
+  transition:
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease;
+}
 
-  .cursor-ring.clicking {
-    width: 28px;
-    height: 28px;
-    border-color: hsl(var(--accent) / 0.8);
-  }
+/* Hide both elements on touch devices (script adds `.has-fine-pointer`
+   to <html> when matchMedia confirms a fine pointer is available) */
+html:not(.has-fine-pointer) .cursor-dot,
+html:not(.has-fine-pointer) .cursor-ring {
+  display: none;
+}
+
+/* Grow the ring when hovering interactive elements */
+html.cursor-hovered .cursor-ring {
+  width: 64px;
+  height: 64px;
+  border-color: hsl(var(--accent) / 0.85);
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 32px),
+    calc(var(--my, 50vh) - 32px),
+    0
+  );
+}
+
+/* Shrink the ring on click for tactile feedback */
+html.cursor-clicking .cursor-ring {
+  width: 30px;
+  height: 30px;
+  border-color: hsl(var(--accent));
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 15px),
+    calc(var(--my, 50vh) - 15px),
+    0
+  );
 }
 
 /* ─── Prose styles for blog posts ───────────────────────────── */
