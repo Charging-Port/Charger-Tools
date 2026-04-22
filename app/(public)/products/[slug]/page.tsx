@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getProductBySlug, getProductSlugs } from "@/lib/products";
+import { getProductBySlug, getProductSlugs, getAllProducts } from "@/lib/products";
 import { formatDate } from "@/lib/utils";
+import { ProductGlyph } from "@/components/product-glyph";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
@@ -12,22 +13,6 @@ const BASE_URL =
 interface Props {
   params: { slug: string };
 }
-
-// Per-product accent colors for detail pages
-const productAccents: Record<string, { glow: string; number: string }> = {
-  "ar-glasses": {
-    glow: "from-violet-600/10 via-blue-600/6 to-transparent",
-    number: "text-violet-500/15",
-  },
-  "charger-agent": {
-    glow: "from-amber-500/10 via-orange-600/6 to-transparent",
-    number: "text-amber-500/15",
-  },
-  "charger-mail": {
-    glow: "from-teal-500/10 via-cyan-600/6 to-transparent",
-    number: "text-teal-500/15",
-  },
-};
 
 export const dynamic = "force-dynamic";
 
@@ -63,24 +48,23 @@ export default function ProductPage({ params }: Props) {
   const product = getProductBySlug(params.slug);
   if (!product) notFound();
 
+  const allProducts = getAllProducts();
+  const currentIdx = allProducts.findIndex((p) => p.slug === product.slug);
+  const prev = allProducts[(currentIdx - 1 + allProducts.length) % allProducts.length];
+  const next = allProducts[(currentIdx + 1) % allProducts.length];
+
   const hasLinks = Object.values(product.links).some(Boolean);
-  const accent = productAccents[product.slug] ?? {
-    glow: "from-accent/6 to-transparent",
-    number: "text-foreground/8",
-  };
 
   return (
-    <div className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+    <div className="pt-32 md:pt-40 pb-24 md:pb-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         {/* Back */}
         <Link
           href="/products"
-          className="inline-flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-foreground transition-colors mb-12 group"
+          data-cursor-hover
+          className="inline-flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-accent transition-colors mb-12 group"
         >
-          <ArrowLeft
-            size={14}
-            className="transition-transform group-hover:-translate-x-0.5"
-          />
+          <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
           All work
         </Link>
 
@@ -88,39 +72,36 @@ export default function ProductPage({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-20">
           <div className="lg:col-span-7">
             <div className="flex items-center gap-3 mb-6">
+              <span className="font-mono text-[11px] text-accent tracking-[0.22em]">
+                ◆ #{String(currentIdx + 1).padStart(3, "0")}
+              </span>
               <Badge status={product.status} />
-              <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground/60">
-                <Calendar size={12} />
+              <span className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground/60">
+                <Calendar size={11} />
                 {formatDate(product.dateCreated)}
               </span>
             </div>
 
-            <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl tracking-tight text-foreground leading-tight mb-5">
+            <h1
+              className="font-display font-bold tracking-tighter leading-[0.92] mb-6"
+              style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)" }}
+            >
               {product.name}
             </h1>
 
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
+            <p className="font-editorial text-xl md:text-2xl text-foreground/75 leading-snug max-w-xl">
               {product.shortDescription}
             </p>
 
             {hasLinks && (
-              <div className="mt-8 flex flex-wrap gap-3">
-                {product.links.github && (
-                  <a
-                    href={product.links.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground border border-border/60 px-5 py-2.5 rounded-xl hover:bg-muted/30 hover:border-border transition-colors"
-                  >
-                    GitHub <ArrowUpRight size={13} />
-                  </a>
-                )}
+              <div className="mt-10 flex flex-wrap gap-3">
                 {product.links.demo && (
                   <a
                     href={product.links.demo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-semibold bg-accent text-accent-foreground px-5 py-2.5 rounded-xl hover:bg-accent/90 transition-colors"
+                    data-cursor-magnet
+                    className="magnet-zone inline-flex items-center gap-2 text-sm font-semibold bg-accent text-accent-foreground px-6 py-3 rounded-full hover:bg-accent/90 transition-colors shadow-[0_0_20px_-4px_hsl(var(--accent)/0.5)]"
                   >
                     Live Demo <ArrowUpRight size={13} />
                   </a>
@@ -130,9 +111,19 @@ export default function ProductPage({ params }: Props) {
                     href={product.links.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground border border-border/60 px-5 py-2.5 rounded-xl hover:bg-muted/30 transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground border border-border/70 px-6 py-3 rounded-full hover:bg-muted/30 hover:border-accent/40 transition-colors"
                   >
                     Website <ArrowUpRight size={13} />
+                  </a>
+                )}
+                {product.links.github && (
+                  <a
+                    href={product.links.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground border border-border/70 px-6 py-3 rounded-full hover:bg-muted/30 hover:border-accent/40 transition-colors"
+                  >
+                    GitHub <ArrowUpRight size={13} />
                   </a>
                 )}
                 {product.links.download && (
@@ -140,7 +131,7 @@ export default function ProductPage({ params }: Props) {
                     href={product.links.download}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground border border-border/60 px-5 py-2.5 rounded-xl hover:bg-muted/30 transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground border border-border/70 px-6 py-3 rounded-full hover:bg-muted/30 hover:border-accent/40 transition-colors"
                   >
                     Download <ArrowUpRight size={13} />
                   </a>
@@ -149,32 +140,21 @@ export default function ProductPage({ params }: Props) {
             )}
           </div>
 
-          {/* Visual card */}
+          {/* Visual glyph */}
           <div className="lg:col-span-5">
-            <div
-              className={`aspect-square rounded-2xl bg-gradient-to-br ${accent.glow} border border-border/40 relative overflow-hidden flex items-center justify-center`}
-            >
-              <span
-                className={`font-display font-bold select-none leading-none ${accent.number}`}
-                style={{ fontSize: "clamp(6rem, 16vw, 12rem)" }}
-                aria-hidden="true"
-              >
-                {product.name.charAt(0)}
-              </span>
-            </div>
+            <ProductGlyph slug={product.slug} name={product.name} />
           </div>
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 border-t border-border/30 pt-16">
-          {/* Description */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 border-t border-border/40 pt-16">
           <div className="lg:col-span-7">
-            <h2 className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest mb-6">
-              Overview
+            <h2 className="font-mono text-[11px] text-accent uppercase tracking-[0.2em] mb-6">
+              [ 01 ] Overview
             </h2>
-            <div className="space-y-5 text-muted-foreground leading-relaxed">
+            <div className="space-y-6 text-foreground/75 leading-[1.75]">
               {product.description.split("\n\n").map((paragraph, i) => (
-                <p key={i} className="text-base">
+                <p key={i} className="text-base md:text-[17px]">
                   {paragraph}
                 </p>
               ))}
@@ -182,34 +162,32 @@ export default function ProductPage({ params }: Props) {
           </div>
 
           <div className="lg:col-span-5 space-y-10">
-            {/* Features */}
             <div>
-              <h2 className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest mb-5">
-                Key Features
+              <h2 className="font-mono text-[11px] text-accent uppercase tracking-[0.2em] mb-5">
+                [ 02 ] Features
               </h2>
               <ul className="space-y-3">
                 {product.features.map((feature) => (
                   <li
                     key={feature}
-                    className="text-sm text-muted-foreground flex items-start gap-3"
+                    className="text-sm text-foreground/75 flex items-start gap-3 leading-relaxed"
                   >
-                    <span className="text-accent mt-1 shrink-0">→</span>
+                    <span className="text-accent mt-0.5 shrink-0">▸</span>
                     {feature}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Tech stack */}
             <div>
-              <h2 className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest mb-5">
-                Tech Stack
+              <h2 className="font-mono text-[11px] text-accent uppercase tracking-[0.2em] mb-5">
+                [ 03 ] Stack
               </h2>
               <div className="flex flex-wrap gap-2">
                 {product.techStack.map((tech) => (
                   <span
                     key={tech}
-                    className="text-xs font-mono text-muted-foreground bg-muted/30 border border-border/40 px-3 py-1.5 rounded-lg"
+                    className="text-[11px] font-mono text-foreground/75 bg-muted/30 border border-border/50 px-3 py-1.5 rounded-lg hover:border-accent/40 hover:text-accent transition-colors"
                   >
                     {tech}
                   </span>
@@ -217,6 +195,37 @@ export default function ProductPage({ params }: Props) {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Prev / Next */}
+        <div className="mt-24 grid grid-cols-2 gap-4 border-t border-border/40 pt-8">
+          <Link
+            href={`/products/${prev.slug}`}
+            className="group flex flex-col gap-1 p-4 rounded-xl hover:bg-muted/30 transition-colors"
+          >
+            <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest inline-flex items-center gap-1.5">
+              <ArrowLeft size={11} className="transition-transform group-hover:-translate-x-0.5" />
+              Previous
+            </span>
+            <span className="font-display text-lg text-foreground/90 group-hover:text-accent transition-colors">
+              {prev.name}
+            </span>
+          </Link>
+          <Link
+            href={`/products/${next.slug}`}
+            className="group flex flex-col gap-1 p-4 rounded-xl hover:bg-muted/30 transition-colors text-right"
+          >
+            <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest inline-flex items-center gap-1.5 justify-end">
+              Next
+              <ArrowUpRight
+                size={11}
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </span>
+            <span className="font-display text-lg text-foreground/90 group-hover:text-accent transition-colors">
+              {next.name}
+            </span>
+          </Link>
         </div>
       </div>
     </div>

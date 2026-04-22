@@ -14,12 +14,13 @@ export default function ProductsPage() {
   const products = getAllProducts();
 
   return (
-    <div className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+    <div className="pt-32 md:pt-40 pb-24 md:pb-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         <SectionHeader
-          number="01"
+          number="00"
           title="Work"
-          description="Hardware and software built from scratch — wearable AR to native macOS tools."
+          italic="every thread"
+          description="Hardware and software built from scratch — wearable AR systems, native macOS tools, AI agents, and the simulators that helped me design them."
         />
         <ProjectGrid products={products} />
       </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { BlogPost } from "@/types";
 import { formatDate } from "@/lib/utils";
 
@@ -12,50 +13,52 @@ interface BlogCardProps {
 
 export function BlogCard({ post, index }: BlogCardProps) {
   return (
-    <div
-      className="animate-fade-in-up"
-      style={{ animationDelay: `${0.1 + index * 0.08}s` }}
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
     >
       <Link href={`/blog/${post.slug}`} className="group block">
-        <article className="py-7 border-b border-border/30 transition-all duration-300 hover:border-border/60 relative">
-          {/* Background hover fill */}
-          <div className="absolute inset-x-0 inset-y-0 bg-muted/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none -mx-4 px-4" />
+        <article className="relative grid grid-cols-12 gap-4 md:gap-8 py-7 md:py-9 border-b border-border/50 transition-colors hover:border-border">
+          {/* Index */}
+          <div className="col-span-2 md:col-span-1 flex items-start pt-1">
+            <span className="font-mono text-[10px] text-accent/70 tracking-[0.2em]">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+          </div>
 
-          <div className="relative flex items-start justify-between gap-6">
-            <div className="flex-1 min-w-0">
-              {/* Meta row */}
-              <div className="flex items-center gap-2.5 mb-3">
-                <span className="text-[10px] font-mono text-accent/70 uppercase tracking-[0.15em] border border-accent/20 bg-accent/5 px-2 py-0.5 rounded">
-                  {post.category}
-                </span>
-                <span className="w-1 h-1 rounded-full bg-border" />
-                <span className="text-[11px] font-mono text-muted-foreground/50">
-                  {formatDate(post.date)}
-                </span>
-                <span className="w-1 h-1 rounded-full bg-border" />
-                <span className="text-[11px] font-mono text-muted-foreground/50">
-                  {post.readingTime} min read
-                </span>
-              </div>
+          {/* Meta */}
+          <div className="col-span-10 md:col-span-3 flex flex-col gap-1.5">
+            <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-[0.18em] inline-flex items-center gap-1.5 w-fit border border-border/60 px-2 py-0.5 rounded">
+              <span className="w-1 h-1 bg-accent rounded-full" />
+              {post.category}
+            </span>
+            <span className="text-[11px] font-mono text-muted-foreground/55">
+              {formatDate(post.date)} · {post.readingTime} min
+            </span>
+          </div>
 
-              <h3 className="font-display text-lg md:text-xl font-bold text-foreground group-hover:text-accent/90 transition-colors duration-300 leading-snug mb-2">
-                {post.title}
-              </h3>
-              <p className="text-sm text-muted-foreground/65 leading-relaxed line-clamp-2">
-                {post.excerpt}
-              </p>
-            </div>
+          {/* Title */}
+          <div className="col-span-12 md:col-span-7 lg:col-span-7">
+            <h3 className="font-editorial text-2xl md:text-3xl lg:text-4xl leading-[1.1] text-foreground/90 group-hover:text-accent transition-colors">
+              {post.title}
+            </h3>
+            <p className="mt-3 text-sm text-foreground/55 leading-relaxed line-clamp-2 max-w-prose">
+              {post.excerpt}
+            </p>
+          </div>
 
-            {/* Arrow icon in a subtle box */}
-            <div className="shrink-0 w-8 h-8 mt-0.5 rounded-xl border border-border/30 flex items-center justify-center group-hover:border-border/70 group-hover:bg-muted/30 transition-all duration-300">
+          {/* Arrow */}
+          <div className="hidden md:flex md:col-span-1 items-start justify-end pt-1">
+            <div className="w-9 h-9 rounded-full border border-border/40 grid place-items-center transition-all group-hover:bg-accent group-hover:border-accent">
               <ArrowUpRight
-                size={13}
-                className="text-muted-foreground/40 transition-all duration-300 group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                size={14}
+                className="text-muted-foreground/60 group-hover:text-accent-foreground transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               />
             </div>
           </div>
         </article>
       </Link>
-    </div>
+    </motion.div>
   );
 }

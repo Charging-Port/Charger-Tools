@@ -1,22 +1,19 @@
 import { Cursor } from "@/components/cursor";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { SmoothScroll } from "@/components/smooth-scroll";
+import { CommandPalette } from "@/components/command-palette";
+import { ScanLine } from "@/components/scan-line";
+import { TerminalKonami } from "@/components/terminal-konami";
+import { PageTransition } from "@/components/page-transition";
 
 /**
- * Layout for the public site.
+ * Public layout — wraps everything with custom cursor, smooth scroll,
+ * command palette (cmd+k), navbar, footer, and the easter egg console.
  *
- * Lives inside a route group so it ONLY wraps non-admin pages without
- * affecting URLs (the (public) segment is invisible in the URL). Admin
- * routes (app/admin/*) sit outside this group and never see the navbar,
- * footer, or custom cursor — keeping the React tree shape stable for both
- * sections so client-side hydration works reliably.
+ * Admin routes (app/admin/*) sit outside this layout and stay bare.
  */
 
-// Inline script that drives the custom cursor. Runs as soon as the browser
-// parses it — no React, no hydration, no waiting for chunks. Sets CSS
-// variables --mx/--my from mousemove and toggles classes on <html> for
-// hover/click states. CSS in globals.css uses these variables to position
-// the cursor elements with `transform: translate3d(calc(...))`.
 const CURSOR_INIT_SCRIPT = `
 (function() {
   if (typeof window === 'undefined') return;
@@ -25,7 +22,6 @@ const CURSOR_INIT_SCRIPT = `
   var doc = document.documentElement;
   doc.classList.add('has-fine-pointer');
 
-  // Seed at viewport center so the cursor is visible BEFORE the first move
   doc.style.setProperty('--mx', (window.innerWidth / 2) + 'px');
   doc.style.setProperty('--my', (window.innerHeight / 2) + 'px');
 
@@ -41,18 +37,28 @@ const CURSOR_INIT_SCRIPT = `
     doc.classList.remove('cursor-clicking');
   });
 
-  var INTERACTIVE = "a, button, [role='button'], input, select, textarea, label, [data-cursor-hover]";
+  var INTERACTIVE = "a, button, [role='button'], select, label, [data-cursor-hover]";
+  var MAGNET = "[data-cursor-magnet]";
+  var TEXT = "input:not([type='button']):not([type='submit']):not([type='checkbox']):not([type='radio']), textarea, [contenteditable='true']";
+
   document.addEventListener('mouseover', function(e) {
     var t = e.target;
-    if (t && t.closest && t.closest(INTERACTIVE)) {
+    if (!t || !t.closest) return;
+    if (t.closest(MAGNET)) {
+      doc.classList.add('cursor-magnet');
+    } else if (t.closest(TEXT)) {
+      doc.classList.add('cursor-text');
+    } else if (t.closest(INTERACTIVE)) {
       doc.classList.add('cursor-hovered');
     }
   }, { passive: true });
+
   document.addEventListener('mouseout', function(e) {
     var t = e.target;
-    if (t && t.closest && t.closest(INTERACTIVE)) {
-      doc.classList.remove('cursor-hovered');
-    }
+    if (!t || !t.closest) return;
+    if (t.closest(MAGNET)) doc.classList.remove('cursor-magnet');
+    if (t.closest(TEXT)) doc.classList.remove('cursor-text');
+    if (t.closest(INTERACTIVE)) doc.classList.remove('cursor-hovered');
   }, { passive: true });
 })();
 `;
@@ -64,17 +70,18 @@ export default function PublicLayout({
 }) {
   return (
     <>
-      {/* Cursor init script — runs before React hydrates */}
-      <script
-        dangerouslySetInnerHTML={{ __html: CURSOR_INIT_SCRIPT }}
-      />
+      <script dangerouslySetInnerHTML={{ __html: CURSOR_INIT_SCRIPT }} />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
+      <SmoothScroll />
       <Cursor />
+      <ScanLine />
       <Navbar />
-      <main id="main-content" className="min-h-screen pt-20">
-        {children}
+      <CommandPalette />
+      <TerminalKonami />
+      <main id="main-content" className="relative min-h-screen">
+        <PageTransition>{children}</PageTransition>
       </main>
       <Footer />
     </>

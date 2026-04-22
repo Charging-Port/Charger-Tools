@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -21,7 +22,6 @@ export function NewsletterSignup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-
       if (!res.ok) throw new Error();
       setStatus("sent");
       (e.target as HTMLFormElement).reset();
@@ -30,47 +30,71 @@ export function NewsletterSignup() {
     }
   }
 
-  if (status === "sent") {
-    return (
-      <div className="flex items-center gap-3 py-4">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-        </span>
-        <p className="text-sm text-emerald-400/80 font-mono">
-          You&apos;re in. Thanks.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="your@email.com"
-          className="flex-1 rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent/40 transition-all font-mono"
-        />
-        <button
-          type="submit"
-          disabled={status === "sending"}
-          className="shrink-0 btn-accent-glow bg-accent text-accent-foreground text-sm font-semibold px-5 py-3 rounded-xl hover:bg-accent/90 active:scale-[0.97] transition-all disabled:opacity-50 flex items-center gap-2"
-        >
-          {status === "sending" ? (
-            <span className="w-4 h-4 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
-          ) : (
-            <ArrowRight size={14} />
-          )}
-        </button>
-      </form>
-      {status === "error" && (
-        <p className="mt-2.5 text-xs text-red-400/80 font-mono">
-          Something went wrong. Try again.
-        </p>
-      )}
+      <AnimatePresence mode="wait">
+        {status === "sent" ? (
+          <motion.div
+            key="sent"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-3 py-4 px-5 rounded-full border border-accent/40 bg-accent/8 w-fit"
+          >
+            <Check size={14} className="text-accent" />
+            <p className="text-sm text-accent font-mono">
+              You&apos;re in. Welcome to the signal.
+            </p>
+          </motion.div>
+        ) : (
+          <motion.form
+            key="form"
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="relative group"
+          >
+            <div className="relative flex gap-2 rounded-full border border-border/60 bg-muted/15 p-1.5 backdrop-blur-sm transition-colors focus-within:border-accent/60">
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="your@email.com"
+                className="flex-1 bg-transparent px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none font-mono"
+              />
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                data-cursor-magnet
+                aria-label="Subscribe"
+                className="shrink-0 bg-accent text-accent-foreground px-5 py-2.5 rounded-full hover:bg-accent/90 active:scale-[0.97] transition-all disabled:opacity-50 flex items-center gap-2 text-sm font-semibold"
+              >
+                {status === "sending" ? (
+                  <span className="w-4 h-4 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
+                ) : (
+                  <>
+                    Subscribe
+                    <ArrowRight size={13} />
+                  </>
+                )}
+              </button>
+            </div>
+            <AnimatePresence>
+              {status === "error" && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-2.5 px-3 text-xs text-red-400/85 font-mono"
+                >
+                  Something went wrong. Try again.
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.form>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

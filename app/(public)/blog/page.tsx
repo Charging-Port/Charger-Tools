@@ -14,12 +14,13 @@ export default function BlogPage() {
   const posts = getAllPosts();
 
   return (
-    <div className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+    <div className="pt-32 md:pt-40 pb-24 md:pb-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         <SectionHeader
-          number="01"
+          number="00"
           title="Writing"
-          description="Notes on building, learning, and shipping."
+          italic="& thinking"
+          description="Notes on building, learning, and shipping. No SEO bait — just things I actually wanted to write down."
         />
 
         {posts.length === 0 ? (
@@ -27,7 +28,7 @@ export default function BlogPage() {
             Nothing here yet. Check back soon.
           </p>
         ) : (
-          <div className="max-w-3xl">
+          <div className="border-t border-border/40">
             {posts.map((post, i) => (
               <BlogCard key={post.slug} post={post} index={i} />
             ))}

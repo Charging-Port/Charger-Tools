@@ -2,16 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Keyframe: grain shift ──────────────────────────────────
-   Defined here (not just in tailwind.config.ts) because the
-   grain animation is applied via raw CSS on body::before.
-   Tailwind only emits @keyframes when the animate-* utility
-   class is referenced in a component; since body::before is
-   authored directly in CSS it would never get the keyframe.
+/* ─── Design system: "Signal" ─────────────────────────────────
+   Deep navy base with electric cyan / amber / magenta accents.
+   Layered z-axis through tinted surfaces, not just opacity.
    ────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --background: 40 20% 97%;
+    --foreground: 220 25% 8%;
+    --card: 40 15% 94%;
+    --card-foreground: 220 25% 8%;
+    --muted: 220 15% 88%;
+    --muted-foreground: 220 10% 35%;
+    --border: 220 15% 84%;
+
+    --accent: 170 95% 42%;
+    --accent-foreground: 220 30% 6%;
+    --secondary: 32 100% 52%;
+    --tertiary: 320 95% 60%;
+
+    --grid: 220 15% 50%;
+  }
+
+  .dark {
+    --background: 222 32% 4%;
+    --foreground: 40 25% 96%;
+    --card: 222 28% 7%;
+    --card-foreground: 40 25% 96%;
+    --muted: 222 22% 12%;
+    --muted-foreground: 220 15% 60%;
+    --border: 222 20% 14%;
+
+    --accent: 168 100% 55%;
+    --accent-foreground: 222 35% 5%;
+    --secondary: 38 100% 60%;
+    --tertiary: 320 100% 70%;
+
+    --grid: 222 25% 30%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    /* lenis manages scroll-behavior; native smooth conflicts */
+    scroll-behavior: auto;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    font-feature-settings: "ss01", "cv01", "cv02";
+  }
+
+  /* Animated grain — subtle film texture */
+  body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px 180px;
+    animation: grain-shift 8s steps(10, end) infinite;
+    mix-blend-mode: overlay;
+  }
+  .dark body::before {
+    opacity: 0.04;
+  }
+
+  /* Faint engineering grid baked into the page */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, hsl(var(--grid) / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--grid) / 0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--accent) / 0.25);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent) / 0.55);
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.35);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* ─── Keyframes ───────────────────────────────────────────── */
 @keyframes grain-shift {
-  0%,
-  100% { transform: translate(0, 0); }
+  0%, 100% { transform: translate(0, 0); }
   10%  { transform: translate(-2%, -3%); }
   20%  { transform: translate(3%, 1%); }
   30%  { transform: translate(-1%, 4%); }
@@ -23,101 +130,42 @@
   90%  { transform: translate(-2%, 4%); }
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 30 4% 8%;
-    --card: 0 0% 97%;
-    --card-foreground: 30 4% 8%;
-    --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 38%;
-    --border: 0 0% 88%;
-    --accent: 40 100% 50%;
-    --accent-foreground: 0 0% 4%;
-  }
-
-  .dark {
-    /* Very slightly warm black — adds depth without being obvious */
-    --background: 30 4% 3%;
-    --foreground: 30 5% 91%;
-    --card: 30 4% 6%;
-    --card-foreground: 30 5% 91%;
-    --muted: 30 3% 10%;
-    --muted-foreground: 0 0% 40%;
-    --border: 30 3% 12%;
-    --accent: 40 100% 50%;
-    --accent-foreground: 0 0% 4%;
-  }
-
-  * {
-    border-color: hsl(var(--border));
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
-
-  /* Animated grain texture overlay */
-  body::before {
-    content: "";
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.028;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 160px 160px;
-    animation: grain-shift 8s steps(10, end) infinite;
-  }
-
-  .dark body::before {
-    opacity: 0.045;
-  }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 3px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--accent) / 0.5);
-  }
-
-  /* Text selection */
-  ::selection {
-    background: hsl(var(--accent) / 0.22);
-    color: hsl(var(--foreground));
-  }
+@keyframes scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(100vh); opacity: 0; }
 }
 
-/* ─── Custom cursor ─────────────────────────────────────────────
-   Pure CSS — positioned via CSS variables (--mx, --my) updated by an
-   inline <script> in the public layout. No React, no useEffect, no
-   hydration dependency. The script also toggles classes on <html> for
-   hover/click states and to hide on touch devices. */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
-/* Hide the native cursor only AFTER the init script has confirmed a fine
-   pointer is present and added .has-fine-pointer to <html>. If the script
-   never runs (CSP error, JS disabled, browser bug), the native cursor
-   stays visible — never strand the user with no cursor at all. */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes ticker {
+  0%, 100% { transform: translateY(0); }
+  20%, 30% { transform: translateY(-25%); }
+  45%, 55% { transform: translateY(-50%); }
+  70%, 80% { transform: translateY(-75%); }
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -2px); }
+  80% { transform: translate(1px, 2px); }
+}
+
+/* ─── Layered cursor ──────────────────────────────────────────
+   Two elements: a snappy dot (vital signal) and a trailing
+   ring (lerped). Both grow / shift on hover & click via classes
+   on <html>. */
 html.has-fine-pointer,
 html.has-fine-pointer * {
   cursor: none !important;
@@ -134,212 +182,277 @@ html.has-fine-pointer * {
 }
 
 .cursor-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: hsl(var(--accent));
-  box-shadow: 0 0 14px hsl(var(--accent) / 0.85);
+  box-shadow:
+    0 0 10px hsl(var(--accent) / 0.9),
+    0 0 24px hsl(var(--accent) / 0.4);
   z-index: 99999;
-  /* Snaps instantly to mouse — no transition */
   transform: translate3d(
-    calc(var(--mx, 50vw) - 4px),
-    calc(var(--my, 50vh) - 4px),
+    calc(var(--mx, 50vw) - 3px),
+    calc(var(--my, 50vh) - 3px),
     0
   );
+  transition: width 0.2s, height 0.2s, background 0.2s;
 }
 
 .cursor-ring {
-  width: 40px;
-  height: 40px;
-  border: 1.5px solid hsl(var(--accent) / 0.5);
+  width: 36px;
+  height: 36px;
+  border: 1px solid hsl(var(--accent) / 0.45);
   z-index: 99998;
-  /* Lerps via CSS transition for smooth trailing effect */
   transform: translate3d(
-    calc(var(--mx, 50vw) - 20px),
-    calc(var(--my, 50vh) - 20px),
+    calc(var(--mx, 50vw) - 18px),
+    calc(var(--my, 50vh) - 18px),
     0
   );
   transition:
-    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
     width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
     height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    background-color 0.3s ease;
 }
 
-/* Hide both elements on touch devices (script adds `.has-fine-pointer`
-   to <html> when matchMedia confirms a fine pointer is available) */
 html:not(.has-fine-pointer) .cursor-dot,
 html:not(.has-fine-pointer) .cursor-ring {
   display: none;
 }
 
-/* Grow the ring when hovering interactive elements */
+/* Hovered: ring grows + fills slightly */
 html.cursor-hovered .cursor-ring {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-color: hsl(var(--accent) / 0.85);
+  background: hsl(var(--accent) / 0.06);
   transform: translate3d(
-    calc(var(--mx, 50vw) - 32px),
-    calc(var(--my, 50vh) - 32px),
+    calc(var(--mx, 50vw) - 28px),
+    calc(var(--my, 50vh) - 28px),
+    0
+  );
+}
+html.cursor-hovered .cursor-dot {
+  width: 4px;
+  height: 4px;
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 2px),
+    calc(var(--my, 50vh) - 2px),
     0
   );
 }
 
-/* Shrink the ring on click for tactile feedback */
+/* Click: snap inward */
 html.cursor-clicking .cursor-ring {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   border-color: hsl(var(--accent));
   transform: translate3d(
-    calc(var(--mx, 50vw) - 15px),
-    calc(var(--my, 50vh) - 15px),
+    calc(var(--mx, 50vw) - 12px),
+    calc(var(--my, 50vh) - 12px),
     0
   );
 }
 
-/* ─── Prose styles for blog posts ───────────────────────────── */
+/* "Magnetic" hover — for special interactive elements with [data-cursor-magnet] */
+html.cursor-magnet .cursor-ring {
+  width: 80px;
+  height: 80px;
+  border-color: hsl(var(--secondary) / 0.85);
+  background: hsl(var(--secondary) / 0.08);
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 40px),
+    calc(var(--my, 50vh) - 40px),
+    0
+  );
+}
+html.cursor-magnet .cursor-dot {
+  background: hsl(var(--secondary));
+  box-shadow:
+    0 0 12px hsl(var(--secondary) / 0.9),
+    0 0 30px hsl(var(--secondary) / 0.4);
+}
+
+/* "Text" cursor — over input / textarea / [contenteditable] */
+html.cursor-text .cursor-ring {
+  width: 4px;
+  height: 28px;
+  border-radius: 1px;
+  border: none;
+  background: hsl(var(--accent) / 0.7);
+  transform: translate3d(
+    calc(var(--mx, 50vw) - 2px),
+    calc(var(--my, 50vh) - 14px),
+    0
+  );
+}
+html.cursor-text .cursor-dot {
+  opacity: 0;
+}
+
+/* ─── Editorial typography ───────────────────────────────── */
+.font-editorial {
+  font-family: var(--font-editorial), Georgia, "Times New Roman", serif;
+  font-feature-settings: "liga", "dlig", "kern";
+}
+
+/* ─── Iridescent / shimmer text ─────────────────────────── */
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--accent)) 25%,
+    hsl(var(--secondary)) 50%,
+    hsl(var(--accent)) 75%,
+    hsl(var(--foreground)) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+.text-iridescent {
+  background: linear-gradient(
+    115deg,
+    hsl(var(--accent)) 0%,
+    hsl(var(--secondary)) 35%,
+    hsl(var(--tertiary)) 70%,
+    hsl(var(--accent)) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+/* ─── Prose styles for blog posts ───────────────────────── */
 .prose {
   @apply text-foreground leading-relaxed;
+  font-size: 1.0625rem;
 }
 .prose h1 {
-  @apply text-3xl font-semibold tracking-tight mt-10 mb-4;
+  @apply font-editorial text-4xl tracking-tight mt-12 mb-5;
 }
 .prose h2 {
-  @apply text-2xl font-semibold tracking-tight mt-10 mb-4;
+  @apply font-editorial text-3xl tracking-tight mt-12 mb-4;
 }
 .prose h3 {
-  @apply text-xl font-semibold tracking-tight mt-8 mb-3;
+  @apply font-display text-xl font-semibold tracking-tight mt-8 mb-3;
 }
 .prose p {
-  @apply mb-5 text-muted-foreground leading-relaxed;
+  @apply mb-6 text-foreground/80 leading-[1.75];
 }
 .prose a {
-  @apply text-accent underline underline-offset-4 hover:opacity-80 transition-opacity;
+  @apply text-accent border-b border-accent/40 hover:border-accent transition-colors;
+  text-decoration: none;
 }
 .prose strong {
   @apply font-semibold text-foreground;
 }
 .prose ul {
-  @apply list-disc pl-6 mb-5 space-y-2;
+  @apply list-none pl-0 mb-6 space-y-2;
+}
+.prose ul li {
+  @apply pl-6 relative text-foreground/80;
+}
+.prose ul li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: hsl(var(--accent));
+  font-size: 0.9em;
 }
 .prose ol {
-  @apply list-decimal pl-6 mb-5 space-y-2;
+  @apply list-decimal pl-6 mb-6 space-y-2;
 }
-.prose li {
-  @apply text-muted-foreground;
+.prose ol li {
+  @apply text-foreground/80;
 }
 .prose blockquote {
-  @apply border-l-2 border-accent/50 pl-4 italic text-muted-foreground my-6;
+  @apply border-l-2 border-accent pl-5 italic text-foreground/70 my-8 font-editorial text-xl leading-snug;
 }
 .prose code {
-  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  @apply bg-muted/60 px-1.5 py-0.5 rounded text-[0.9em] font-mono text-accent;
 }
 .prose pre {
-  @apply bg-muted rounded-lg p-4 overflow-x-auto my-6;
+  @apply bg-muted/40 border border-border/60 rounded-xl p-5 overflow-x-auto my-6 text-sm;
 }
 .prose pre code {
-  @apply bg-transparent p-0;
+  @apply bg-transparent p-0 text-foreground;
 }
 .prose hr {
-  @apply border-border my-8;
+  @apply border-border/40 my-10;
 }
 .prose img {
-  @apply rounded-lg my-6;
+  @apply rounded-xl my-8 border border-border/60;
 }
 
-/* ─── Link underline animations ─────────────────────────────── */
-.link-underline {
+/* ─── Magnetic / interactive utilities ───────────────────── */
+.magnet-zone {
   position: relative;
-  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
-.link-underline::after {
+
+/* Rotating border around a card — uses conic-gradient */
+.spotlight-border {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight-border::before {
   content: "";
   position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: hsl(var(--foreground));
-  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: left;
-}
-.link-underline:hover::after {
-  width: 100%;
-}
-
-.link-underline-accent::after {
-  background: hsl(var(--accent));
-}
-
-/* ─── Accent glow button effect ─────────────────────────────── */
-.btn-accent-glow {
-  position: relative;
-  overflow: hidden;
-}
-.btn-accent-glow::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 0%, hsl(var(--accent) / 0.25) 0%, transparent 70%);
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0deg,
+    hsl(var(--accent) / 0.6) 30deg,
+    transparent 80deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   opacity: 0;
-  transition: opacity 0.4s;
-  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: -1;
 }
-.btn-accent-glow:hover::after {
+.group:hover .spotlight-border::before,
+.spotlight-border:hover::before {
   opacity: 1;
 }
 
-/* ─── Card lift effect ───────────────────────────────────────── */
-.card-lift {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.card-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 60px -12px hsl(var(--accent) / 0.08),
-              0 8px 24px -4px hsl(0 0% 0% / 0.3);
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
-/* ─── Corner crosshair marks ────────────────────────────────── */
-.corner-mark {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  pointer-events: none;
-}
-.corner-mark::before,
-.corner-mark::after {
-  content: "";
-  position: absolute;
-  background: hsl(var(--foreground) / 0.15);
-}
-.corner-mark::before {
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  transform: translateY(-50%);
-}
-.corner-mark::after {
-  left: 50%;
-  top: 0;
-  height: 100%;
-  width: 1px;
-  transform: translateX(-50%);
-}
-
-/* ─── Section reveal animation ──────────────────────────────── */
+/* ─── Section reveal animation ──────────────────────────── */
 .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* ─── Marquee ────────────────────────────────────────────────── */
+/* ─── Marquee track ──────────────────────────────────────── */
 .marquee-track {
   display: flex;
   width: max-content;
@@ -348,53 +461,14 @@ html.cursor-clicking .cursor-ring {
   animation-play-state: paused;
 }
 
-/* ─── Skill tag hover ────────────────────────────────────────── */
-.skill-tag {
-  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
-}
-.skill-tag:hover {
-  color: hsl(var(--accent));
-  border-color: hsl(var(--accent) / 0.4);
-  background-color: hsl(var(--accent) / 0.05);
-}
-
-/* ─── Accent number display ─────────────────────────────────── */
-.section-number {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
-
-/* ─── Focus styles ───────────────────────────────────────────── */
+/* ─── Focus styles ──────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid hsl(var(--accent) / 0.6);
+  outline: 2px solid hsl(var(--accent) / 0.7);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
-/* ─── View transition for page changes ──────────────────────── */
-@media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root) {
-    animation: 300ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
-  }
-  ::view-transition-new(root) {
-    animation: 400ms cubic-bezier(0, 0, 0.2, 1) 80ms both fade-in-transition;
-  }
-}
-
-@keyframes fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
-@keyframes fade-in-transition {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ─── Skip-to-content ────────────────────────────────────────
-   Hidden off-screen until focused by keyboard. Lets screen
-   reader and keyboard users skip the nav and jump to content.
-   pointer-events: none keeps it non-interactive while off-screen.
-   ─────────────────────────────────────────────────────────── */
+/* ─── Skip-to-content ───────────────────────────────────── */
 .skip-link {
   position: fixed;
   top: -9999px;
@@ -418,27 +492,63 @@ html.cursor-clicking .cursor-ring {
   outline-offset: 2px;
 }
 
-/* ─── Reduced-motion: respect user preference ────────────────
-   IMPORTANT: Only disable OUR custom CSS animations, not
-   Framer Motion or component-level transitions.  The broad
-   `* { animation-duration: 0.01ms !important }` pattern breaks
-   Framer Motion's initial-state resolution and makes elements
-   stay invisible at their opacity:0 initial state.
-   ─────────────────────────────────────────────────────────── */
+/* ─── Reduced motion ────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  /* Disable the grain texture — purely decorative */
   body::before {
     display: none;
   }
-
-  /* Stop the marquee ticker */
   .marquee-track {
     animation: none !important;
   }
-
-  /* Disable status dot pulse/ping — purely decorative */
-  .animate-ping {
+  .text-shimmer,
+  .text-iridescent {
     animation: none !important;
-    opacity: 0;
+    background-size: 100% 100%;
   }
+}
+
+/* ─── Scanlines (CRT effect, optional) ───────────────────── */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    hsl(0 0% 0% / 0.06) 2px,
+    hsl(0 0% 0% / 0.06) 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* ─── Glitch hover ──────────────────────────────────────── */
+.glitch-hover {
+  position: relative;
+  display: inline-block;
+}
+.glitch-hover:hover {
+  animation: glitch 0.4s ease-in-out;
+}
+.glitch-hover:hover::before,
+.glitch-hover:hover::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.glitch-hover:hover::before {
+  color: hsl(var(--accent));
+  transform: translate(-1px, 0);
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+.glitch-hover:hover::after {
+  color: hsl(var(--tertiary));
+  transform: translate(1px, 0);
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
 }

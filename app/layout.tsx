@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk, Instrument_Serif } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -22,45 +22,48 @@ const display = Space_Grotesk({
   display: "swap",
 });
 
+const editorial = Instrument_Serif({
+  subsets: ["latin"],
+  variable: "--font-editorial",
+  weight: ["400"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-
   title: {
-    default: "ChargerTools — Building tools that matter",
+    default: "ChargerTools — Signal in the noise",
     template: "%s — ChargerTools",
   },
   description:
-    "Personal technology company focused on wearable computing, native macOS applications, and AI-powered tools.",
-
+    "Kaden MacLean — building wearable computing, native macOS, and on-device AI under ChargerTools LLC.",
   openGraph: {
     title: "ChargerTools",
     description:
-      "Personal technology company focused on wearable computing, native macOS applications, and AI-powered tools.",
+      "Wearable computing, native macOS, and on-device AI from Kaden MacLean.",
     url: BASE_URL,
     siteName: "ChargerTools",
     type: "website",
     locale: "en_US",
-    // Place a 1200×630 image at public/og-image.png to activate OG cards
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "ChargerTools — Building tools that matter",
+        alt: "ChargerTools",
       },
     ],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "ChargerTools",
     description:
-      "Personal technology company focused on wearable computing, native macOS applications, and AI-powered tools.",
+      "Wearable computing, native macOS, and on-device AI from Kaden MacLean.",
     images: ["/og-image.png"],
   },
-
   robots: {
     index: true,
     follow: true,
@@ -72,9 +75,7 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-
   icons: {
-    // Place favicon files in public/ to activate
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
@@ -89,7 +90,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${mono.variable} ${display.variable} font-sans`}
+        className={`${inter.variable} ${mono.variable} ${display.variable} ${editorial.variable} font-sans antialiased`}
       >
         <ThemeProvider
           attribute="class"
@@ -97,12 +98,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/*
-            Public pages (in app/(public)/) and admin pages (in app/admin/)
-            each provide their own chrome via their own layouts. The root
-            layout stays bare so React's hydration tree shape is identical
-            for all pages — no conditional rendering, no mismatch.
-          */}
           {children}
         </ThemeProvider>
       </body>
