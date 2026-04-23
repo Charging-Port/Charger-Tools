@@ -59,9 +59,10 @@ export default function ProductPage({ params }: Props) {
   const next = idx < allProducts.length - 1 ? allProducts[idx + 1] : null;
 
   const hasLinks = Object.values(product.links).some(Boolean);
+  const numberLabel = String(idx + 1).padStart(2, "0");
 
   return (
-    <div className="pt-32 md:pt-40 pb-24">
+    <div className="pt-28 md:pt-36 pb-24">
       <article className="mx-auto max-w-3xl px-6">
         <Link
           href="/products"
@@ -71,94 +72,109 @@ export default function ProductPage({ params }: Props) {
           All work
         </Link>
 
-        <header className="mb-10">
-          <p className="font-mono text-xs text-muted-foreground mb-4">
-            {STATUS_LABEL[product.status]}{" "}
-            <span className="text-border">·</span>{" "}
-            {formatDate(product.dateCreated)}
-          </p>
-          <h1 className="font-serif text-4xl md:text-5xl tracking-tight text-foreground leading-[1.05]">
-            {product.name}
-          </h1>
-          <p className="mt-5 text-lg text-foreground/75 leading-relaxed max-w-prose">
-            {product.shortDescription}
-          </p>
-
-          {hasLinks && (
-            <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-sm">
-              {product.links.demo && (
-                <a
-                  href={product.links.demo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 font-medium text-foreground link-underline"
-                >
-                  Live demo <ArrowUpRight size={13} />
-                </a>
-              )}
-              {product.links.website && (
-                <a
-                  href={product.links.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                >
-                  Website <ArrowUpRight size={13} />
-                </a>
-              )}
-              {product.links.github && (
-                <a
-                  href={product.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                >
-                  GitHub <ArrowUpRight size={13} />
-                </a>
-              )}
-              {product.links.download && (
-                <a
-                  href={product.links.download}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                >
-                  Download <ArrowUpRight size={13} />
-                </a>
-              )}
-            </div>
-          )}
+        {/* Chapter header */}
+        <header className="mb-12 grid grid-cols-12 gap-4 md:gap-6">
+          <div className="col-span-12 md:col-span-2">
+            <span
+              aria-hidden="true"
+              className="font-serif italic text-[5rem] md:text-8xl text-accent leading-none block"
+            >
+              {product.name.charAt(0)}
+            </span>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              No. {numberLabel}
+            </p>
+          </div>
+          <div className="col-span-12 md:col-span-10">
+            <p className="font-mono text-xs text-muted-foreground mb-3">
+              {STATUS_LABEL[product.status]}{" "}
+              <span className="text-border">·</span>{" "}
+              {formatDate(product.dateCreated)}
+            </p>
+            <h1 className="font-serif text-4xl md:text-[3.5rem] tracking-tight text-foreground leading-[1.02]">
+              {product.name}
+            </h1>
+            <p className="mt-5 font-serif italic text-lg md:text-xl text-foreground/75 leading-snug max-w-xl">
+              {product.shortDescription}
+            </p>
+            {hasLinks && (
+              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-sm">
+                {product.links.demo && (
+                  <a
+                    href={product.links.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 font-medium text-foreground link-underline"
+                  >
+                    Live demo <ArrowUpRight size={13} />
+                  </a>
+                )}
+                {product.links.website && (
+                  <a
+                    href={product.links.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
+                  >
+                    Website <ArrowUpRight size={13} />
+                  </a>
+                )}
+                {product.links.github && (
+                  <a
+                    href={product.links.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
+                  >
+                    GitHub <ArrowUpRight size={13} />
+                  </a>
+                )}
+                {product.links.download && (
+                  <a
+                    href={product.links.download}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
+                  >
+                    Download <ArrowUpRight size={13} />
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         </header>
 
-        <div className="border-t border-border pt-10 space-y-6 text-foreground/80 leading-[1.7]">
+        {/* Body */}
+        <div className="border-t border-border pt-10 space-y-6 text-foreground/80 leading-[1.75] text-[17px]">
           {product.description.split("\n\n").map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}
         </div>
 
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-border pt-10">
-          <div>
-            <h2 className="text-sm font-medium text-foreground mb-4">
+        {/* Features + stack */}
+        <div className="mt-14 grid grid-cols-1 sm:grid-cols-12 gap-8 border-t border-border pt-10">
+          <div className="sm:col-span-7">
+            <h2 className="font-serif text-xl tracking-tight text-foreground mb-5">
               Features
             </h2>
-            <ul className="space-y-2.5 text-sm text-foreground/75">
+            <ul className="space-y-2.5 text-[15px] text-foreground/80 leading-relaxed">
               {product.features.map((feature) => (
-                <li key={feature} className="flex gap-2">
-                  <span className="text-accent">–</span>
-                  {feature}
+                <li key={feature} className="flex gap-3">
+                  <span className="text-accent shrink-0">→</span>
+                  <span>{feature}</span>
                 </li>
               ))}
             </ul>
           </div>
-          <div>
-            <h2 className="text-sm font-medium text-foreground mb-4">
+          <div className="sm:col-span-5 sm:border-l sm:border-border sm:pl-8">
+            <h2 className="font-serif text-xl tracking-tight text-foreground mb-5">
               Stack
             </h2>
-            <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-sm font-mono text-muted-foreground">
+            <ul className="space-y-1.5 text-sm font-mono text-muted-foreground">
               {product.techStack.map((tech) => (
-                <span key={tech}>{tech}</span>
+                <li key={tech}>{tech}</li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
 

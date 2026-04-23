@@ -3,13 +3,19 @@ import { ProductCard } from "./product-card";
 
 interface ProjectGridProps {
   products: Product[];
+  featureFirst?: boolean;
 }
 
-export function ProjectGrid({ products }: ProjectGridProps) {
+export function ProjectGrid({ products, featureFirst = false }: ProjectGridProps) {
   return (
-    <div className="border-t border-border">
+    <div className={featureFirst ? "" : "border-t border-border"}>
       {products.map((product, index) => (
-        <ProductCard key={product.id} product={product} index={index} />
+        <ProductCard
+          key={product.id}
+          product={product}
+          index={index}
+          featured={featureFirst && index === 0}
+        />
       ))}
     </div>
   );

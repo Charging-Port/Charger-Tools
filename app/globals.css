@@ -44,6 +44,34 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     font-feature-settings: "ss01", "cv01", "cv02";
+    position: relative;
+  }
+
+  /* Paper warmth — a single soft pool of accent light, not a gimmick */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        circle at 85% -10%,
+        hsl(var(--accent) / 0.08),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 15% 110%,
+        hsl(var(--accent) / 0.04),
+        transparent 40%
+      );
+  }
+
+  main,
+  header,
+  footer {
+    position: relative;
+    z-index: 1;
   }
 
   ::-webkit-scrollbar {

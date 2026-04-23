@@ -1,11 +1,11 @@
 import { Hero } from "@/components/hero";
+import { Currently } from "@/components/currently";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { getAllProducts } from "@/lib/products";
 import { getAllPosts } from "@/lib/blog";
 import { BlogCard } from "@/components/blog-card";
 import { ProjectGrid } from "@/components/project-grid";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   const products = getAllProducts();
@@ -15,10 +15,12 @@ export default function Home() {
     <>
       <Hero />
 
-      {/* Selected work — all projects */}
-      <section className="py-20 md:py-28 border-t border-border">
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="flex items-baseline justify-between mb-10">
+      <Currently />
+
+      {/* Selected work — featured first, then the rest */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
+          <header className="flex items-baseline justify-between mb-10">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">
               Selected work
             </h2>
@@ -26,18 +28,19 @@ export default function Home() {
               href="/products"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors link-underline"
             >
-              All projects
+              All {products.length} projects →
             </Link>
-          </div>
-          <ProjectGrid products={products} />
+          </header>
+
+          <ProjectGrid products={products.slice(0, 6)} featureFirst />
         </div>
       </section>
 
       {/* Writing */}
       {posts.length > 0 && (
-        <section className="py-20 md:py-28 border-t border-border">
-          <div className="mx-auto max-w-3xl px-6">
-            <div className="flex items-baseline justify-between mb-10">
+        <section className="border-t border-border">
+          <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
+            <header className="flex items-baseline justify-between mb-10">
               <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">
                 Recent writing
               </h2>
@@ -45,9 +48,9 @@ export default function Home() {
                 href="/blog"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors link-underline"
               >
-                All posts
+                Archive →
               </Link>
-            </div>
+            </header>
             <div className="border-t border-border">
               {posts.map((post) => (
                 <BlogCard key={post.slug} post={post} />
@@ -57,34 +60,44 @@ export default function Home() {
         </section>
       )}
 
-      {/* Newsletter + contact */}
-      <section className="py-20 md:py-28 border-t border-border">
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-            <div>
-              <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground mb-3">
-                Stay in touch
-              </h2>
-              <p className="text-sm text-foreground/65 leading-relaxed mb-5">
-                Occasional updates on new projects and writing. No noise.
+      {/* Letter-format closer */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
+            <div className="md:col-span-7">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4">
+                Get in touch
               </p>
-              <NewsletterSignup />
-            </div>
-            <div>
-              <h2 className="font-serif text-2xl md:text-3xl tracking-tight text-foreground mb-3">
-                Say hi
+              <h2 className="font-serif text-3xl md:text-4xl tracking-tight text-foreground leading-[1.1] mb-5">
+                The fastest way to make me smile is an{" "}
+                <em className="text-accent">interesting email</em>.
               </h2>
-              <p className="text-sm text-foreground/65 leading-relaxed mb-5">
-                Have an idea, question, or just want to chat about hardware,
-                software, or computer vision? I read everything.
+              <p className="text-foreground/75 leading-relaxed mb-6 max-w-prose">
+                I read every message — projects you&apos;re building, problems
+                you&apos;re stuck on, dumb ideas that might actually work. If
+                you want to chat about hardware, computer vision, native macOS,
+                or what it&apos;s like to run a startup as a high schooler,
+                let&apos;s talk.
               </p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 text-sm font-medium text-foreground link-underline"
               >
-                Get in touch
-                <ArrowRight size={14} />
+                Send a message →
               </Link>
+              <p className="mt-8 font-serif italic text-foreground/60">
+                — Kaden
+              </p>
+            </div>
+            <div className="md:col-span-5 md:border-l md:border-border md:pl-10">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4">
+                Newsletter
+              </p>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-5 max-w-sm">
+                Occasional notes when I ship something new. No noise, no schedule,
+                no &ldquo;hey friends 👋&rdquo;.
+              </p>
+              <NewsletterSignup />
             </div>
           </div>
         </div>
