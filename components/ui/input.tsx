@@ -9,9 +9,12 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, id, ...props }, ref) => {
     return (
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {label && (
-          <label htmlFor={id} className="block text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.18em]">
+          <label
+            htmlFor={id}
+            className="block text-xs font-medium text-foreground"
+          >
             {label}
           </label>
         )}
@@ -19,13 +22,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={id}
           className={cn(
-            "w-full rounded-xl border border-border/45 bg-muted/15 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent/40 transition-all font-mono",
-            error && "border-red-500/60 focus:ring-red-500/30",
+            "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-accent transition-colors",
+            error && "border-red-500/60 focus:border-red-500",
             className
           )}
           {...props}
         />
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
   }
@@ -40,9 +43,12 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, id, ...props }, ref) => {
     return (
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {label && (
-          <label htmlFor={id} className="block text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.18em]">
+          <label
+            htmlFor={id}
+            className="block text-xs font-medium text-foreground"
+          >
             {label}
           </label>
         )}
@@ -50,13 +56,13 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={id}
           className={cn(
-            "w-full rounded-xl border border-border/45 bg-muted/15 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent/40 transition-all resize-y min-h-[140px]",
-            error && "border-red-500/60 focus:ring-red-500/30",
+            "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-accent transition-colors resize-y min-h-[140px]",
+            error && "border-red-500/60 focus:border-red-500",
             className
           )}
           {...props}
         />
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk, Instrument_Serif } from "next/font/google";
+import { Inter, JetBrains_Mono, Fraunces } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -15,17 +15,10 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
-const display = Space_Grotesk({
+const serif = Fraunces({
   subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const editorial = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-editorial",
-  weight: ["400"],
+  variable: "--font-serif",
+  weight: ["400", "500"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -35,13 +28,13 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "ChargerTools — Signal in the noise",
+    default: "Kaden MacLean — ChargerTools",
     template: "%s — ChargerTools",
   },
   description:
     "Kaden MacLean — building wearable computing, native macOS, and on-device AI under ChargerTools LLC.",
   openGraph: {
-    title: "ChargerTools",
+    title: "Kaden MacLean — ChargerTools",
     description:
       "Wearable computing, native macOS, and on-device AI from Kaden MacLean.",
     url: BASE_URL,
@@ -49,17 +42,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "ChargerTools",
-      },
+      { url: "/og-image.png", width: 1200, height: 630, alt: "ChargerTools" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ChargerTools",
+    title: "Kaden MacLean — ChargerTools",
     description:
       "Wearable computing, native macOS, and on-device AI from Kaden MacLean.",
     images: ["/og-image.png"],
@@ -90,7 +78,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${mono.variable} ${display.variable} ${editorial.variable} font-sans antialiased`}
+        className={`${inter.variable} ${mono.variable} ${serif.variable} font-sans antialiased`}
       >
         <ThemeProvider
           attribute="class"

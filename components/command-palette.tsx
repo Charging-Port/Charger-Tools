@@ -12,17 +12,13 @@ import {
   Sun,
   Moon,
   Github,
-  Cpu,
-  Glasses,
-  BotMessageSquare,
-  Inbox,
   Sparkles,
-  Radar,
-  Command as CommandIcon,
-  CornerDownLeft,
   type LucideIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import type { Product } from "@/types";
+// Import JSON directly so the client bundle doesn't pull in fs via lib/products.
+import productsJson from "@/content/products.json";
 
 type Item = {
   id: string;
@@ -34,6 +30,10 @@ type Item = {
   keywords?: string[];
 };
 
+const PRODUCTS = (productsJson as Product[])
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -44,29 +44,37 @@ export function CommandPalette() {
 
   const items: Item[] = useMemo(
     () => [
-      // Navigate
-      { id: "home", label: "Home", group: "navigate", icon: Sparkles, action: () => router.push("/"), keywords: ["start", "index"] },
+      { id: "home", label: "Home", group: "navigate", icon: Sparkles, action: () => router.push("/"), keywords: ["start"] },
       { id: "work", label: "Work", group: "navigate", icon: Briefcase, action: () => router.push("/products"), keywords: ["projects", "portfolio"] },
       { id: "about", label: "About", group: "navigate", icon: User, action: () => router.push("/about"), keywords: ["bio", "kaden"] },
       { id: "writing", label: "Writing", group: "navigate", icon: PenTool, action: () => router.push("/blog"), keywords: ["blog", "posts"] },
-      { id: "contact", label: "Contact", group: "navigate", icon: Mail, action: () => router.push("/contact"), keywords: ["email", "get in touch"] },
-      // Projects
-      { id: "p-hyperform", label: "Hyperform Fitness", hint: "Computer vision", group: "projects", icon: Cpu, action: () => router.push("/products/hyperform-fitness") },
-      { id: "p-ar", label: "AR / Computer Glasses", hint: "Wearable HUD", group: "projects", icon: Glasses, action: () => router.push("/products/ar-glasses") },
-      { id: "p-agent", label: "ChargerAgent", hint: "macOS AI", group: "projects", icon: BotMessageSquare, action: () => router.push("/products/charger-agent") },
-      { id: "p-mail", label: "Charger Mail", hint: "Local-AI email", group: "projects", icon: Inbox, action: () => router.push("/products/charger-mail") },
-      { id: "p-optics", label: "Optics Simulator", hint: "Ray tracing", group: "projects", icon: Sparkles, action: () => router.push("/products/optics-simulator") },
-      { id: "p-radar", label: "RF Radar Simulator", hint: "Volumetric RF", group: "projects", icon: Radar, action: () => router.push("/products/rf-radar-simulator") },
-      // Actions
+      { id: "contact", label: "Contact", group: "navigate", icon: Mail, action: () => router.push("/contact"), keywords: ["email"] },
+
+      ...PRODUCTS.map((p): Item => ({
+        id: `p-${p.slug}`,
+        label: p.name,
+        hint: p.shortDescription.slice(0, 48) + (p.shortDescription.length > 48 ? "…" : ""),
+        group: "projects",
+        icon: Briefcase,
+        action: () => router.push(`/products/${p.slug}`),
+        keywords: p.techStack,
+      })),
+
       {
         id: "theme",
         label: resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode",
         group: "actions",
         icon: resolvedTheme === "dark" ? Sun : Moon,
         action: () => setTheme(resolvedTheme === "dark" ? "light" : "dark"),
-        keywords: ["theme", "color", "appearance"],
+        keywords: ["theme", "appearance"],
       },
-      { id: "github", label: "Open GitHub", group: "external", icon: Github, action: () => window.open("https://github.com/chargertools", "_blank", "noopener") },
+      {
+        id: "github",
+        label: "Open GitHub",
+        group: "external",
+        icon: Github,
+        action: () => window.open("https://github.com/chargertools", "_blank", "noopener"),
+      },
     ],
     [router, setTheme, resolvedTheme]
   );
@@ -80,7 +88,6 @@ export function CommandPalette() {
     });
   }, [items, query]);
 
-  // Group filtered items
   const grouped = useMemo(() => {
     const groups: Record<Item["group"], Item[]> = {
       navigate: [],
@@ -97,7 +104,6 @@ export function CommandPalette() {
     [grouped]
   );
 
-  // Cmd+K to open
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -114,17 +120,14 @@ export function CommandPalette() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Reset on open
   useEffect(() => {
     if (open) {
       setQuery("");
       setActive(0);
-      // Focus input on next frame
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
 
-  // Keep active index in range
   useEffect(() => {
     if (active >= flatList.length) setActive(Math.max(0, flatList.length - 1));
   }, [flatList, active]);
@@ -150,26 +153,25 @@ export function CommandPalette() {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100000] flex items-start justify-center px-4 pt-[12vh]"
+          className="fixed inset-0 z-[100000] flex items-start justify-center px-4 pt-[14vh]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
           onClick={() => setOpen(false)}
         >
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-md" />
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
           <motion.div
-            initial={{ y: -12, opacity: 0, scale: 0.98 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -8, opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-xl rounded-2xl border border-border/80 bg-card/90 backdrop-blur-2xl shadow-2xl shadow-black/40 overflow-hidden"
+            initial={{ y: -8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -6, opacity: 0 }}
+            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-lg rounded-lg border border-border bg-card shadow-xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={onPaletteKey}
           >
-            {/* Search input */}
-            <div className="flex items-center gap-3 px-4 border-b border-border/50">
-              <Search size={16} className="text-muted-foreground/70 shrink-0" />
+            <div className="flex items-center gap-3 px-4 border-b border-border">
+              <Search size={15} className="text-muted-foreground shrink-0" />
               <input
                 ref={inputRef}
                 value={query}
@@ -177,20 +179,19 @@ export function CommandPalette() {
                   setQuery(e.target.value);
                   setActive(0);
                 }}
-                placeholder="Type a command or search…"
-                className="flex-1 bg-transparent py-4 outline-none text-sm placeholder:text-muted-foreground/50"
+                placeholder="Search or type a command…"
+                className="flex-1 bg-transparent py-3.5 outline-none text-sm placeholder:text-muted-foreground"
                 autoComplete="off"
                 spellCheck={false}
               />
-              <kbd className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-muted-foreground/60 border border-border/60 bg-muted/40 rounded px-1.5 py-0.5">
+              <kbd className="hidden sm:inline-flex text-[10px] font-mono text-muted-foreground border border-border bg-muted/40 rounded px-1.5 py-0.5">
                 ESC
               </kbd>
             </div>
 
-            {/* Results */}
-            <div className="max-h-[50vh] overflow-y-auto py-2">
+            <div className="max-h-[50vh] overflow-y-auto py-1">
               {flatList.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-muted-foreground/60">
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
                   No results for &ldquo;{query}&rdquo;
                 </div>
               ) : (
@@ -204,8 +205,8 @@ export function CommandPalette() {
                     external: "External",
                   };
                   return (
-                    <div key={group} className="mb-1">
-                      <div className="px-4 py-1.5 text-[10px] font-mono text-muted-foreground/50 uppercase tracking-[0.2em]">
+                    <div key={group} className="py-1">
+                      <div className="px-4 py-1 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                         {labels[group]}
                       </div>
                       {list.map((item) => {
@@ -220,20 +221,19 @@ export function CommandPalette() {
                               item.action();
                               setOpen(false);
                             }}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${
                               isActive
-                                ? "bg-accent/10 text-foreground"
-                                : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                                ? "bg-muted/60 text-foreground"
+                                : "text-foreground/75 hover:bg-muted/30"
                             }`}
                           >
-                            <Icon size={15} className={isActive ? "text-accent" : ""} />
-                            <span className="text-sm flex-1">{item.label}</span>
+                            <Icon size={14} className="shrink-0 text-muted-foreground" />
+                            <span className="text-sm flex-1 truncate">{item.label}</span>
                             {item.hint && (
-                              <span className="text-[11px] font-mono text-muted-foreground/50">
+                              <span className="text-xs text-muted-foreground truncate max-w-[40%]">
                                 {item.hint}
                               </span>
                             )}
-                            {isActive && <CornerDownLeft size={12} className="text-accent" />}
                           </button>
                         );
                       })}
@@ -243,18 +243,9 @@ export function CommandPalette() {
               )}
             </div>
 
-            {/* Footer hint */}
-            <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/50 bg-background/40 text-[11px] font-mono text-muted-foreground/50">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1">
-                  <CommandIcon size={10} /> K
-                </span>
-                <span>·</span>
-                <span>↑↓ to navigate</span>
-                <span>·</span>
-                <span>↵ to select</span>
-              </div>
-              <span className="hidden sm:inline">ChargerTools / cmd-bar</span>
+            <div className="flex items-center justify-between px-4 py-2 border-t border-border text-[11px] text-muted-foreground">
+              <span>↑↓ to navigate · ↵ to select</span>
+              <span>⌘K</span>
             </div>
           </motion.div>
         </motion.div>

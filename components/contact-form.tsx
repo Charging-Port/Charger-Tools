@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Send, AlertCircle, Loader2 } from "lucide-react";
 import { Input, Textarea } from "./ui/input";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
@@ -42,112 +41,65 @@ export function ContactForm() {
     }
   }
 
+  if (status === "sent") {
+    return (
+      <div className="border border-border rounded-lg p-8">
+        <h3 className="font-serif text-2xl text-foreground mb-2">
+          Message received.
+        </h3>
+        <p className="text-sm text-foreground/70 leading-relaxed">
+          Thanks for reaching out. I&apos;ll respond within 24–48 hours.
+        </p>
+        <button
+          onClick={() => setStatus("idle")}
+          className="mt-5 text-sm text-muted-foreground hover:text-foreground transition-colors link-underline"
+        >
+          Send another →
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <AnimatePresence mode="wait">
-      {status === "sent" ? (
-        <motion.div
-          key="sent"
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.96 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-2xl border border-accent/40 bg-accent/5 p-10 text-center overflow-hidden"
-        >
-          <div className="absolute -top-20 -right-20 w-56 h-56 bg-accent/15 rounded-full blur-3xl pointer-events-none" />
-          <CheckCircle className="mx-auto mb-4 text-accent" size={36} />
-          <h3 className="font-editorial text-3xl text-foreground">
-            Message <span className="italic text-accent">received.</span>
-          </h3>
-          <p className="mt-3 text-sm text-foreground/70 max-w-xs mx-auto">
-            Thanks for reaching out. I&apos;ll respond within 24–48h.
-          </p>
-          <button
-            onClick={() => setStatus("idle")}
-            className="mt-6 inline-flex text-xs font-mono text-accent border border-accent/40 px-4 py-2 rounded-full hover:bg-accent/10 transition-colors"
-          >
-            ← Send another
-          </button>
-        </motion.div>
-      ) : (
-        <motion.form
-          key="form"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Input
-              id="name"
-              name="name"
-              label="◆ Name"
-              placeholder="Your name"
-              required
-            />
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="◆ Email"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          <Input
-            id="company"
-            name="company"
-            label="○ Company (optional)"
-            placeholder="Your company"
-          />
-          <Textarea
-            id="message"
-            name="message"
-            label="◆ Message"
-            placeholder="Tell me about your project, idea, or just say hi…"
-            rows={6}
-            required
-          />
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <Input id="name" name="name" label="Name" placeholder="Your name" required />
+        <Input id="email" name="email" type="email" label="Email" placeholder="you@example.com" required />
+      </div>
+      <Input id="company" name="company" label="Company (optional)" placeholder="Your company" />
+      <Textarea
+        id="message"
+        name="message"
+        label="Message"
+        placeholder="Tell me about your project, idea, or just say hi…"
+        rows={6}
+        required
+      />
 
-          <AnimatePresence>
-            {status === "error" && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2 text-sm text-red-400 border border-red-500/30 bg-red-500/5 rounded-xl px-4 py-3"
-              >
-                <AlertCircle size={15} />
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex items-center justify-between gap-4 pt-2">
-            <p className="text-[10px] font-mono text-muted-foreground/55 hidden sm:block">
-              Encrypted in transit. Goes directly to my inbox.
-            </p>
-            <button
-              type="submit"
-              disabled={status === "sending"}
-              data-cursor-magnet
-              className="magnet-zone inline-flex items-center gap-3 bg-accent text-accent-foreground text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-accent/90 transition-colors shadow-[0_0_24px_-4px_hsl(var(--accent)/0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {status === "sending" ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  Transmitting…
-                </>
-              ) : (
-                <>
-                  Send message
-                  <Send size={14} />
-                </>
-              )}
-            </button>
-          </div>
-        </motion.form>
+      {status === "error" && (
+        <div className="flex items-center gap-2 text-sm text-red-500 border border-red-500/30 bg-red-500/5 rounded-lg px-4 py-3">
+          <AlertCircle size={14} />
+          {error}
+        </div>
       )}
-    </AnimatePresence>
+
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className="inline-flex items-center gap-2 bg-foreground text-background text-sm font-medium px-5 py-2.5 rounded hover:bg-foreground/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {status === "sending" ? (
+          <>
+            <Loader2 size={14} className="animate-spin" />
+            Sending…
+          </>
+        ) : (
+          <>
+            Send message
+            <Send size={13} />
+          </>
+        )}
+      </button>
+    </form>
   );
 }

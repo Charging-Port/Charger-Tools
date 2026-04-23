@@ -2,43 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Design system: "Signal" ─────────────────────────────────
-   Deep navy base with electric cyan / amber / magenta accents.
-   Layered z-axis through tinted surfaces, not just opacity.
-   ────────────────────────────────────────────────────────── */
+/* ─── Tokens ─────────────────────────────────────────────── */
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 220 25% 8%;
-    --card: 40 15% 94%;
-    --card-foreground: 220 25% 8%;
-    --muted: 220 15% 88%;
-    --muted-foreground: 220 10% 35%;
-    --border: 220 15% 84%;
-
-    --accent: 170 95% 42%;
-    --accent-foreground: 220 30% 6%;
-    --secondary: 32 100% 52%;
-    --tertiary: 320 95% 60%;
-
-    --grid: 220 15% 50%;
+    --background: 38 22% 97%;
+    --foreground: 30 14% 12%;
+    --card: 38 18% 94%;
+    --card-foreground: 30 14% 12%;
+    --muted: 30 12% 90%;
+    --muted-foreground: 30 8% 38%;
+    --border: 30 10% 86%;
+    --accent: 18 78% 52%;
+    --accent-foreground: 38 22% 97%;
   }
 
   .dark {
-    --background: 222 32% 4%;
-    --foreground: 40 25% 96%;
-    --card: 222 28% 7%;
-    --card-foreground: 40 25% 96%;
-    --muted: 222 22% 12%;
-    --muted-foreground: 220 15% 60%;
-    --border: 222 20% 14%;
-
-    --accent: 168 100% 55%;
-    --accent-foreground: 222 35% 5%;
-    --secondary: 38 100% 60%;
-    --tertiary: 320 100% 70%;
-
-    --grid: 222 25% 30%;
+    --background: 30 8% 6%;
+    --foreground: 30 12% 92%;
+    --card: 30 8% 9%;
+    --card-foreground: 30 12% 92%;
+    --muted: 30 6% 14%;
+    --muted-foreground: 30 6% 60%;
+    --border: 30 6% 18%;
+    --accent: 18 80% 62%;
+    --accent-foreground: 30 14% 8%;
   }
 
   * {
@@ -46,8 +33,8 @@
   }
 
   html {
-    /* lenis manages scroll-behavior; native smooth conflicts */
     scroll-behavior: auto;
+    text-rendering: optimizeLegibility;
   }
 
   body {
@@ -59,113 +46,27 @@
     font-feature-settings: "ss01", "cv01", "cv02";
   }
 
-  /* Animated grain — subtle film texture */
-  body::before {
-    content: "";
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 180px 180px;
-    animation: grain-shift 8s steps(10, end) infinite;
-    mix-blend-mode: overlay;
-  }
-  .dark body::before {
-    opacity: 0.04;
-  }
-
-  /* Faint engineering grid baked into the page */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-image:
-      linear-gradient(to right, hsl(var(--grid) / 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--grid) / 0.06) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%);
-  }
-
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--accent) / 0.25);
+    background: hsl(var(--border));
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--accent) / 0.55);
+    background: hsl(var(--muted-foreground) / 0.4);
   }
 
   ::selection {
-    background: hsl(var(--accent) / 0.35);
+    background: hsl(var(--accent) / 0.25);
     color: hsl(var(--foreground));
   }
 }
 
-/* ─── Keyframes ───────────────────────────────────────────── */
-@keyframes grain-shift {
-  0%, 100% { transform: translate(0, 0); }
-  10%  { transform: translate(-2%, -3%); }
-  20%  { transform: translate(3%, 1%); }
-  30%  { transform: translate(-1%, 4%); }
-  40%  { transform: translate(4%, -2%); }
-  50%  { transform: translate(-3%, 3%); }
-  60%  { transform: translate(2%, -4%); }
-  70%  { transform: translate(-4%, 2%); }
-  80%  { transform: translate(3%, -1%); }
-  90%  { transform: translate(-2%, 4%); }
-}
-
-@keyframes scan-line {
-  0% { transform: translateY(-100%); opacity: 0; }
-  10% { opacity: 0.4; }
-  90% { opacity: 0.4; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-@keyframes ticker {
-  0%, 100% { transform: translateY(0); }
-  20%, 30% { transform: translateY(-25%); }
-  45%, 55% { transform: translateY(-50%); }
-  70%, 80% { transform: translateY(-75%); }
-}
-
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 1px); }
-  40% { transform: translate(2px, -1px); }
-  60% { transform: translate(-1px, -2px); }
-  80% { transform: translate(1px, 2px); }
-}
-
-/* ─── Layered cursor ──────────────────────────────────────────
-   Two elements: a snappy dot (vital signal) and a trailing
-   ring (lerped). Both grow / shift on hover & click via classes
-   on <html>. */
+/* ─── Cursor ────────────────────────────────────────────── */
 html.has-fine-pointer,
 html.has-fine-pointer * {
   cursor: none !important;
@@ -182,37 +83,33 @@ html.has-fine-pointer * {
 }
 
 .cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: hsl(var(--accent));
-  box-shadow:
-    0 0 10px hsl(var(--accent) / 0.9),
-    0 0 24px hsl(var(--accent) / 0.4);
+  width: 5px;
+  height: 5px;
+  background: hsl(var(--foreground));
   z-index: 99999;
   transform: translate3d(
-    calc(var(--mx, 50vw) - 3px),
-    calc(var(--my, 50vh) - 3px),
+    calc(var(--mx, 50vw) - 2.5px),
+    calc(var(--my, 50vh) - 2.5px),
     0
   );
-  transition: width 0.2s, height 0.2s, background 0.2s;
+  transition: opacity 0.2s, background 0.2s;
 }
 
 .cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 1px solid hsl(var(--accent) / 0.45);
+  width: 28px;
+  height: 28px;
+  border: 1px solid hsl(var(--foreground) / 0.35);
   z-index: 99998;
   transform: translate3d(
-    calc(var(--mx, 50vw) - 18px),
-    calc(var(--my, 50vh) - 18px),
+    calc(var(--mx, 50vw) - 14px),
+    calc(var(--my, 50vh) - 14px),
     0
   );
   transition:
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.3s ease,
-    background-color 0.3s ease;
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease;
 }
 
 html:not(.has-fine-pointer) .cursor-dot,
@@ -220,112 +117,31 @@ html:not(.has-fine-pointer) .cursor-ring {
   display: none;
 }
 
-/* Hovered: ring grows + fills slightly */
 html.cursor-hovered .cursor-ring {
-  width: 56px;
-  height: 56px;
-  border-color: hsl(var(--accent) / 0.85);
-  background: hsl(var(--accent) / 0.06);
+  width: 44px;
+  height: 44px;
+  border-color: hsl(var(--foreground) / 0.7);
   transform: translate3d(
-    calc(var(--mx, 50vw) - 28px),
-    calc(var(--my, 50vh) - 28px),
-    0
-  );
-}
-html.cursor-hovered .cursor-dot {
-  width: 4px;
-  height: 4px;
-  transform: translate3d(
-    calc(var(--mx, 50vw) - 2px),
-    calc(var(--my, 50vh) - 2px),
+    calc(var(--mx, 50vw) - 22px),
+    calc(var(--my, 50vh) - 22px),
     0
   );
 }
 
-/* Click: snap inward */
-html.cursor-clicking .cursor-ring {
-  width: 24px;
-  height: 24px;
-  border-color: hsl(var(--accent));
-  transform: translate3d(
-    calc(var(--mx, 50vw) - 12px),
-    calc(var(--my, 50vh) - 12px),
-    0
-  );
-}
-
-/* "Magnetic" hover — for special interactive elements with [data-cursor-magnet] */
-html.cursor-magnet .cursor-ring {
-  width: 80px;
-  height: 80px;
-  border-color: hsl(var(--secondary) / 0.85);
-  background: hsl(var(--secondary) / 0.08);
-  transform: translate3d(
-    calc(var(--mx, 50vw) - 40px),
-    calc(var(--my, 50vh) - 40px),
-    0
-  );
-}
-html.cursor-magnet .cursor-dot {
-  background: hsl(var(--secondary));
-  box-shadow:
-    0 0 12px hsl(var(--secondary) / 0.9),
-    0 0 30px hsl(var(--secondary) / 0.4);
-}
-
-/* "Text" cursor — over input / textarea / [contenteditable] */
 html.cursor-text .cursor-ring {
-  width: 4px;
-  height: 28px;
+  width: 2px;
+  height: 22px;
   border-radius: 1px;
   border: none;
-  background: hsl(var(--accent) / 0.7);
+  background: hsl(var(--foreground) / 0.6);
   transform: translate3d(
-    calc(var(--mx, 50vw) - 2px),
-    calc(var(--my, 50vh) - 14px),
+    calc(var(--mx, 50vw) - 1px),
+    calc(var(--my, 50vh) - 11px),
     0
   );
 }
 html.cursor-text .cursor-dot {
   opacity: 0;
-}
-
-/* ─── Editorial typography ───────────────────────────────── */
-.font-editorial {
-  font-family: var(--font-editorial), Georgia, "Times New Roman", serif;
-  font-feature-settings: "liga", "dlig", "kern";
-}
-
-/* ─── Iridescent / shimmer text ─────────────────────────── */
-.text-shimmer {
-  background: linear-gradient(
-    90deg,
-    hsl(var(--foreground)) 0%,
-    hsl(var(--accent)) 25%,
-    hsl(var(--secondary)) 50%,
-    hsl(var(--accent)) 75%,
-    hsl(var(--foreground)) 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 6s linear infinite;
-}
-
-.text-iridescent {
-  background: linear-gradient(
-    115deg,
-    hsl(var(--accent)) 0%,
-    hsl(var(--secondary)) 35%,
-    hsl(var(--tertiary)) 70%,
-    hsl(var(--accent)) 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 8s ease-in-out infinite;
 }
 
 /* ─── Prose styles for blog posts ───────────────────────── */
@@ -334,138 +150,68 @@ html.cursor-text .cursor-dot {
   font-size: 1.0625rem;
 }
 .prose h1 {
-  @apply font-editorial text-4xl tracking-tight mt-12 mb-5;
+  @apply text-3xl font-semibold tracking-tight mt-12 mb-5 text-foreground;
+  letter-spacing: -0.02em;
 }
 .prose h2 {
-  @apply font-editorial text-3xl tracking-tight mt-12 mb-4;
+  @apply text-2xl font-semibold tracking-tight mt-12 mb-4 text-foreground;
+  letter-spacing: -0.02em;
 }
 .prose h3 {
-  @apply font-display text-xl font-semibold tracking-tight mt-8 mb-3;
+  @apply text-lg font-semibold tracking-tight mt-8 mb-3 text-foreground;
 }
 .prose p {
-  @apply mb-6 text-foreground/80 leading-[1.75];
+  @apply mb-6 text-foreground/80 leading-[1.7];
 }
 .prose a {
-  @apply text-accent border-b border-accent/40 hover:border-accent transition-colors;
-  text-decoration: none;
+  @apply text-foreground underline underline-offset-4 decoration-accent/60 hover:decoration-accent transition-colors;
 }
 .prose strong {
   @apply font-semibold text-foreground;
 }
 .prose ul {
-  @apply list-none pl-0 mb-6 space-y-2;
-}
-.prose ul li {
-  @apply pl-6 relative text-foreground/80;
-}
-.prose ul li::before {
-  content: "▸";
-  position: absolute;
-  left: 0;
-  color: hsl(var(--accent));
-  font-size: 0.9em;
+  @apply list-disc pl-5 mb-6 space-y-2 marker:text-accent/70;
 }
 .prose ol {
-  @apply list-decimal pl-6 mb-6 space-y-2;
+  @apply list-decimal pl-5 mb-6 space-y-2 marker:text-foreground/50;
 }
-.prose ol li {
-  @apply text-foreground/80;
+.prose li {
+  @apply text-foreground/80 leading-[1.7];
 }
 .prose blockquote {
-  @apply border-l-2 border-accent pl-5 italic text-foreground/70 my-8 font-editorial text-xl leading-snug;
+  @apply border-l-2 border-accent/60 pl-5 text-foreground/70 my-6;
 }
 .prose code {
-  @apply bg-muted/60 px-1.5 py-0.5 rounded text-[0.9em] font-mono text-accent;
+  @apply bg-muted/70 px-1.5 py-0.5 rounded text-[0.9em] font-mono;
 }
 .prose pre {
-  @apply bg-muted/40 border border-border/60 rounded-xl p-5 overflow-x-auto my-6 text-sm;
+  @apply bg-muted/50 border border-border rounded-lg p-5 overflow-x-auto my-6 text-sm;
 }
 .prose pre code {
-  @apply bg-transparent p-0 text-foreground;
+  @apply bg-transparent p-0;
 }
 .prose hr {
-  @apply border-border/40 my-10;
-}
-.prose img {
-  @apply rounded-xl my-8 border border-border/60;
+  @apply border-border my-10;
 }
 
-/* ─── Magnetic / interactive utilities ───────────────────── */
-.magnet-zone {
-  position: relative;
-  display: inline-block;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
+/* ─── Underline link ─────────────────────────────────────── */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+.link-underline:hover {
+  background-size: 100% 1px;
 }
 
-/* Rotating border around a card — uses conic-gradient */
-.spotlight-border {
-  position: relative;
-  isolation: isolate;
-}
-.spotlight-border::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(
-    from var(--angle, 0deg),
-    transparent 0deg,
-    hsl(var(--accent) / 0.6) 30deg,
-    transparent 80deg,
-    transparent 360deg
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: -1;
-}
-.group:hover .spotlight-border::before,
-.spotlight-border:hover::before {
-  opacity: 1;
-}
-
-@property --angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-/* ─── Section reveal animation ──────────────────────────── */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ─── Marquee track ──────────────────────────────────────── */
-.marquee-track {
-  display: flex;
-  width: max-content;
-}
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-/* ─── Focus styles ──────────────────────────────────────── */
+/* ─── Focus ──────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid hsl(var(--accent) / 0.7);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 /* ─── Skip-to-content ───────────────────────────────────── */
@@ -480,7 +226,7 @@ html.cursor-text .cursor-dot {
   color: hsl(var(--accent-foreground));
   font-size: 0.8125rem;
   font-weight: 600;
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 0.5rem 0.5rem;
   text-decoration: none;
   white-space: nowrap;
   pointer-events: none;
@@ -488,67 +234,4 @@ html.cursor-text .cursor-dot {
 .skip-link:focus {
   top: 0;
   pointer-events: auto;
-  outline: 2px solid hsl(var(--accent-foreground) / 0.4);
-  outline-offset: 2px;
-}
-
-/* ─── Reduced motion ────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  body::before {
-    display: none;
-  }
-  .marquee-track {
-    animation: none !important;
-  }
-  .text-shimmer,
-  .text-iridescent {
-    animation: none !important;
-    background-size: 100% 100%;
-  }
-}
-
-/* ─── Scanlines (CRT effect, optional) ───────────────────── */
-.scanlines {
-  position: relative;
-  overflow: hidden;
-}
-.scanlines::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 2px,
-    hsl(0 0% 0% / 0.06) 2px,
-    hsl(0 0% 0% / 0.06) 3px
-  );
-  pointer-events: none;
-  mix-blend-mode: multiply;
-}
-
-/* ─── Glitch hover ──────────────────────────────────────── */
-.glitch-hover {
-  position: relative;
-  display: inline-block;
-}
-.glitch-hover:hover {
-  animation: glitch 0.4s ease-in-out;
-}
-.glitch-hover:hover::before,
-.glitch-hover:hover::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.glitch-hover:hover::before {
-  color: hsl(var(--accent));
-  transform: translate(-1px, 0);
-  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-}
-.glitch-hover:hover::after {
-  color: hsl(var(--tertiary));
-  transform: translate(1px, 0);
-  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
 }
