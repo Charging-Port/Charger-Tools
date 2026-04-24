@@ -172,28 +172,54 @@ export default function ProductPage({ params }: Props) {
         </div>
 
         {(prev || next) && (
-          <nav className="mt-20 pt-8 border-t border-border grid grid-cols-2 gap-4 text-sm">
+          <nav className="mt-20 pt-10 border-t border-border grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
             <div>
               {prev && (
-                <Link href={`/products/${prev.slug}`} className="group block">
-                  <span className="font-mono text-xs text-muted-foreground block mb-1">
+                <Link
+                  href={`/products/${prev.slug}`}
+                  className="group block rounded-lg border border-border p-4 hover:border-accent/40 hover:bg-card/40 transition-colors"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground block mb-3">
                     ← Previous
                   </span>
-                  <span className="font-serif text-lg text-foreground group-hover:text-accent transition-colors">
-                    {prev.name}
-                  </span>
+                  <div className="grid grid-cols-[1fr_90px] gap-3 items-start">
+                    <div>
+                      <span className="font-serif text-xl text-foreground group-hover:text-accent transition-colors leading-tight block">
+                        {prev.name}
+                      </span>
+                      <p className="mt-1 font-mono text-[10px] text-muted-foreground">
+                        {prev.status === "released" ? "Released" : prev.status === "in-development" ? "In development" : prev.status === "prototype" ? "Prototype" : "Concept"}
+                      </p>
+                    </div>
+                    <div className="scale-[0.55] origin-top-right">
+                      <ProductMockup slug={prev.slug} />
+                    </div>
+                  </div>
                 </Link>
               )}
             </div>
-            <div className="text-right">
+            <div>
               {next && (
-                <Link href={`/products/${next.slug}`} className="group block">
-                  <span className="font-mono text-xs text-muted-foreground block mb-1">
+                <Link
+                  href={`/products/${next.slug}`}
+                  className="group block rounded-lg border border-border p-4 hover:border-accent/40 hover:bg-card/40 transition-colors md:text-right"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground block mb-3">
                     Next →
                   </span>
-                  <span className="font-serif text-lg text-foreground group-hover:text-accent transition-colors">
-                    {next.name}
-                  </span>
+                  <div className="grid grid-cols-[90px_1fr] gap-3 items-start">
+                    <div className="scale-[0.55] origin-top-left">
+                      <ProductMockup slug={next.slug} />
+                    </div>
+                    <div>
+                      <span className="font-serif text-xl text-foreground group-hover:text-accent transition-colors leading-tight block">
+                        {next.name}
+                      </span>
+                      <p className="mt-1 font-mono text-[10px] text-muted-foreground">
+                        {next.status === "released" ? "Released" : next.status === "in-development" ? "In development" : next.status === "prototype" ? "Prototype" : "Concept"}
+                      </p>
+                    </div>
+                  </div>
                 </Link>
               )}
             </div>

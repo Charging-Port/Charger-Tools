@@ -82,9 +82,16 @@ export function Footer() {
 
         <div className="mt-14 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted-foreground/70">
           <p>© {year} ChargerTools LLC.</p>
-          <p>
-            <span className="font-mono text-muted-foreground/60">⌘K</span>{" "}
-            to navigate.
+          <p className="flex items-center gap-3 flex-wrap">
+            <span>
+              <span className="font-mono text-muted-foreground/60">⌘K</span>{" "}
+              to navigate
+            </span>
+            <span className="text-muted-foreground/40">·</span>
+            <span>
+              <span className="font-mono text-muted-foreground/60">?</span>{" "}
+              for shortcuts
+            </span>
           </p>
         </div>
       </div>

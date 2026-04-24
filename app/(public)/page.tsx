@@ -1,5 +1,6 @@
 import { Hero } from "@/components/hero";
 import { FeaturedWork } from "@/components/featured-work";
+import { ShippingLog } from "@/components/shipping-log";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { getAllProducts } from "@/lib/products";
 import { getAllPosts } from "@/lib/blog";
@@ -50,6 +51,8 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      <ShippingLog />
 
       {/* Writing */}
       {posts.length > 0 && (

@@ -3,6 +3,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { CommandPalette } from "@/components/command-palette";
+import { KeyboardHints } from "@/components/keyboard-hints";
 
 const CURSOR_INIT_SCRIPT = `
 (function() {
@@ -54,6 +55,7 @@ export default function PublicLayout({
       <Cursor />
       <Navbar />
       <CommandPalette />
+      <KeyboardHints />
       <main id="main-content" className="relative">
         {children}
       </main>
