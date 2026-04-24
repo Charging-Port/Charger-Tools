@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Product } from "@/types";
+import { ProjectGlyph } from "./project-glyph";
 
 interface ProductCardProps {
   product: Product;
@@ -31,19 +32,22 @@ export function ProductCard({ product, index, featured = false }: ProductCardPro
         className="group block border-y border-border py-10 md:py-14 -mx-2 px-2 hover:bg-accent/[0.025] transition-colors"
       >
         <div className="grid grid-cols-12 gap-4 md:gap-8">
-          <div className="col-span-12 md:col-span-2">
+          <div className="col-span-12 md:col-span-3">
+            <div className="text-accent/80 group-hover:text-accent transition-colors mb-4">
+              <ProjectGlyph slug={product.slug} size={88} />
+            </div>
             <span
               aria-hidden="true"
-              className="font-serif italic text-7xl md:text-8xl text-accent/80 leading-none block"
+              className="font-serif italic text-5xl text-accent/70 group-hover:text-accent transition-colors leading-none block"
             >
               {product.name.charAt(0)}
             </span>
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               Featured · 01
             </p>
           </div>
-          <div className="col-span-12 md:col-span-9">
-            <h3 className="font-serif text-3xl md:text-5xl tracking-tight text-foreground group-hover:text-accent transition-colors leading-[1.05]">
+          <div className="col-span-12 md:col-span-8">
+            <h3 className="font-serif text-3xl md:text-5xl tracking-tightest text-foreground group-hover:text-accent transition-colors leading-[1.02]">
               {product.name}
             </h3>
             <p className="mt-2 font-mono text-xs text-muted-foreground">
@@ -81,13 +85,10 @@ export function ProductCard({ product, index, featured = false }: ProductCardPro
       href={`/products/${product.slug}`}
       className="group block border-b border-border py-7"
     >
-      <div className="grid grid-cols-12 gap-4 md:gap-6 items-baseline">
-        <span
-          aria-hidden="true"
-          className="hidden md:block md:col-span-1 font-serif italic text-3xl text-accent/70 leading-none group-hover:text-accent transition-colors"
-        >
-          {product.name.charAt(0)}
-        </span>
+      <div className="grid grid-cols-12 gap-4 md:gap-6 items-center">
+        <div className="hidden md:flex md:col-span-1 text-accent/70 group-hover:text-accent transition-colors items-center justify-center">
+          <ProjectGlyph slug={product.slug} size={36} />
+        </div>
         <div className="col-span-12 md:col-span-4">
           <h3 className="font-serif text-2xl md:text-[1.6rem] tracking-tight text-foreground group-hover:text-accent transition-colors leading-tight">
             {product.name}

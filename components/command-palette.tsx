@@ -47,6 +47,7 @@ export function CommandPalette() {
       { id: "home", label: "Home", group: "navigate", icon: Sparkles, action: () => router.push("/"), keywords: ["start"] },
       { id: "work", label: "Work", group: "navigate", icon: Briefcase, action: () => router.push("/products"), keywords: ["projects", "portfolio"] },
       { id: "about", label: "About", group: "navigate", icon: User, action: () => router.push("/about"), keywords: ["bio", "kaden"] },
+      { id: "now", label: "Now", group: "navigate", icon: Sparkles, action: () => router.push("/now"), keywords: ["currently", "today"] },
       { id: "writing", label: "Writing", group: "navigate", icon: PenTool, action: () => router.push("/blog"), keywords: ["blog", "posts"] },
       { id: "contact", label: "Contact", group: "navigate", icon: Mail, action: () => router.push("/contact"), keywords: ["email"] },
 

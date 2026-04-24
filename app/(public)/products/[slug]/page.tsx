@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getProductBySlug, getProductSlugs, getAllProducts } from "@/lib/products";
 import { formatDate } from "@/lib/utils";
+import { ProjectGlyph } from "@/components/project-glyph";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
@@ -74,18 +75,21 @@ export default function ProductPage({ params }: Props) {
 
         {/* Chapter header */}
         <header className="mb-12 grid grid-cols-12 gap-4 md:gap-6">
-          <div className="col-span-12 md:col-span-2">
+          <div className="col-span-12 md:col-span-3">
+            <div className="text-accent mb-4">
+              <ProjectGlyph slug={product.slug} size={96} />
+            </div>
             <span
               aria-hidden="true"
-              className="font-serif italic text-[5rem] md:text-8xl text-accent leading-none block"
+              className="font-serif italic text-[4rem] md:text-7xl text-accent leading-none block"
             >
               {product.name.charAt(0)}
             </span>
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               No. {numberLabel}
             </p>
           </div>
-          <div className="col-span-12 md:col-span-10">
+          <div className="col-span-12 md:col-span-9">
             <p className="font-mono text-xs text-muted-foreground mb-3">
               {STATUS_LABEL[product.status]}{" "}
               <span className="text-border">·</span>{" "}
