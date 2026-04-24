@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getProductBySlug, getProductSlugs, getAllProducts } from "@/lib/products";
 import { formatDate } from "@/lib/utils";
-import { ProjectGlyph } from "@/components/project-glyph";
+import { ProductMockup } from "@/components/product-mockup";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "https://chargertools.com";
@@ -60,11 +60,10 @@ export default function ProductPage({ params }: Props) {
   const next = idx < allProducts.length - 1 ? allProducts[idx + 1] : null;
 
   const hasLinks = Object.values(product.links).some(Boolean);
-  const numberLabel = String(idx + 1).padStart(2, "0");
 
   return (
     <div className="pt-28 md:pt-36 pb-24">
-      <article className="mx-auto max-w-3xl px-6">
+      <article className="mx-auto max-w-5xl px-6">
         <Link
           href="/products"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
@@ -73,113 +72,103 @@ export default function ProductPage({ params }: Props) {
           All work
         </Link>
 
-        {/* Chapter header */}
-        <header className="mb-12 grid grid-cols-12 gap-4 md:gap-6">
-          <div className="col-span-12 md:col-span-3">
-            <div className="text-accent mb-4">
-              <ProjectGlyph slug={product.slug} size={96} />
+        {/* Header — name + lead, then a wide mockup */}
+        <header className="mb-10">
+          <p className="font-mono text-xs text-muted-foreground mb-3">
+            {STATUS_LABEL[product.status]}{" "}
+            <span className="text-border">·</span>{" "}
+            {formatDate(product.dateCreated)}
+          </p>
+          <h1 className="font-serif text-4xl md:text-[3.5rem] tracking-tightest text-foreground leading-[1.02]">
+            {product.name}
+          </h1>
+          <p className="mt-5 font-serif italic text-xl md:text-2xl text-foreground/75 leading-snug max-w-2xl">
+            {product.shortDescription}
+          </p>
+          {hasLinks && (
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-sm">
+              {product.links.demo && (
+                <a
+                  href={product.links.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 font-medium text-foreground link-underline"
+                >
+                  Live demo <ArrowUpRight size={13} />
+                </a>
+              )}
+              {product.links.website && (
+                <a
+                  href={product.links.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
+                >
+                  Website <ArrowUpRight size={13} />
+                </a>
+              )}
+              {product.links.github && (
+                <a
+                  href={product.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
+                >
+                  GitHub <ArrowUpRight size={13} />
+                </a>
+              )}
+              {product.links.download && (
+                <a
+                  href={product.links.download}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
+                >
+                  Download <ArrowUpRight size={13} />
+                </a>
+              )}
             </div>
-            <span
-              aria-hidden="true"
-              className="font-serif italic text-[4rem] md:text-7xl text-accent leading-none block"
-            >
-              {product.name.charAt(0)}
-            </span>
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              No. {numberLabel}
-            </p>
-          </div>
-          <div className="col-span-12 md:col-span-9">
-            <p className="font-mono text-xs text-muted-foreground mb-3">
-              {STATUS_LABEL[product.status]}{" "}
-              <span className="text-border">·</span>{" "}
-              {formatDate(product.dateCreated)}
-            </p>
-            <h1 className="font-serif text-4xl md:text-[3.5rem] tracking-tight text-foreground leading-[1.02]">
-              {product.name}
-            </h1>
-            <p className="mt-5 font-serif italic text-lg md:text-xl text-foreground/75 leading-snug max-w-xl">
-              {product.shortDescription}
-            </p>
-            {hasLinks && (
-              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-sm">
-                {product.links.demo && (
-                  <a
-                    href={product.links.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-medium text-foreground link-underline"
-                  >
-                    Live demo <ArrowUpRight size={13} />
-                  </a>
-                )}
-                {product.links.website && (
-                  <a
-                    href={product.links.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                  >
-                    Website <ArrowUpRight size={13} />
-                  </a>
-                )}
-                {product.links.github && (
-                  <a
-                    href={product.links.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                  >
-                    GitHub <ArrowUpRight size={13} />
-                  </a>
-                )}
-                {product.links.download && (
-                  <a
-                    href={product.links.download}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                  >
-                    Download <ArrowUpRight size={13} />
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
+          )}
         </header>
 
-        {/* Body */}
-        <div className="border-t border-border pt-10 space-y-6 text-foreground/80 leading-[1.75] text-[17px]">
-          {product.description.split("\n\n").map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
+        <div className="mb-12 max-w-3xl mx-auto">
+          <ProductMockup slug={product.slug} />
         </div>
 
-        {/* Features + stack */}
-        <div className="mt-14 grid grid-cols-1 sm:grid-cols-12 gap-8 border-t border-border pt-10">
-          <div className="sm:col-span-7">
-            <h2 className="font-serif text-xl tracking-tight text-foreground mb-5">
-              Features
-            </h2>
-            <ul className="space-y-2.5 text-[15px] text-foreground/80 leading-relaxed">
-              {product.features.map((feature) => (
-                <li key={feature} className="flex gap-3">
-                  <span className="text-accent shrink-0">→</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
+        {/* Body — two-column layout: prose + sidebar */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-14 border-t border-border pt-10">
+          <div className="md:col-span-8 space-y-6 text-foreground/80 leading-[1.75] text-[17px]">
+            {product.description.split("\n\n").map((paragraph, i) => (
+              <p key={i}>{paragraph}</p>
+            ))}
           </div>
-          <div className="sm:col-span-5 sm:border-l sm:border-border sm:pl-8">
-            <h2 className="font-serif text-xl tracking-tight text-foreground mb-5">
-              Stack
-            </h2>
-            <ul className="space-y-1.5 text-sm font-mono text-muted-foreground">
-              {product.techStack.map((tech) => (
-                <li key={tech}>{tech}</li>
-              ))}
-            </ul>
-          </div>
+
+          <aside className="md:col-span-4 md:border-l md:border-border md:pl-8 space-y-10">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-4">
+                Stack
+              </p>
+              <ul className="space-y-1.5 text-sm font-mono text-foreground/80">
+                {product.techStack.map((tech) => (
+                  <li key={tech}>{tech}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-4">
+                Features
+              </p>
+              <ul className="space-y-2 text-[14px] text-foreground/75 leading-relaxed">
+                {product.features.map((feature) => (
+                  <li key={feature} className="flex gap-2">
+                    <span className="text-accent shrink-0">–</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
         </div>
 
         {(prev || next) && (
