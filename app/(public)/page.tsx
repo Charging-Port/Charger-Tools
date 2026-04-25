@@ -6,6 +6,7 @@ import { getAllProducts } from "@/lib/products";
 import { getAllPosts } from "@/lib/blog";
 import { BlogCard } from "@/components/blog-card";
 import { ProjectGrid } from "@/components/project-grid";
+import { SectionMarker } from "@/components/section-marker";
 import Link from "next/link";
 
 export default function Home() {
@@ -18,8 +19,10 @@ export default function Home() {
     <>
       <Hero />
 
+      <SectionMarker num="01" label="The work" />
+
       {/* Selected work — the centerpiece */}
-      <section className="border-t border-border">
+      <section>
         <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
           <header className="flex items-baseline justify-between mb-12">
             <div>
@@ -54,9 +57,11 @@ export default function Home() {
 
       <ShippingLog />
 
+      {posts.length > 0 && <SectionMarker num="02" label="Writing" />}
+
       {/* Writing */}
       {posts.length > 0 && (
-        <section className="border-t border-border">
+        <section>
           <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
             <header className="flex items-baseline justify-between mb-12">
               <div>
@@ -83,8 +88,10 @@ export default function Home() {
         </section>
       )}
 
+      <SectionMarker num="03" label="Reach out" />
+
       {/* Closer */}
-      <section className="border-t border-border">
+      <section>
         <div className="mx-auto max-w-5xl px-6 py-16 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
             <div className="md:col-span-7">

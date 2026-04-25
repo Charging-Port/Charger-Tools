@@ -42,8 +42,9 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // Next.js hydration requires unsafe-inline for inline script tags
-              "script-src 'self' 'unsafe-inline'",
+              // Next.js hydration requires unsafe-inline for inline script tags.
+              // In dev, webpack's HMR uses eval(), so we allow 'unsafe-eval' only there.
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
               // Tailwind and next-themes inject runtime inline styles
               "style-src 'self' 'unsafe-inline'",
               // next/font self-hosts fonts at /_next/static — no external font CDN needed

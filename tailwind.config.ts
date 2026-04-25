@@ -38,10 +38,20 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(16px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "pulse-soft": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.55", transform: "scale(0.85)" },
+        },
+        "marker-draw": {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.5s cubic-bezier(0.16,1,0.3,1) both",
         "fade-in-up": "fade-in-up 0.6s cubic-bezier(0.16,1,0.3,1) both",
+        "pulse-soft": "pulse-soft 2.4s cubic-bezier(0.4,0,0.6,1) infinite",
+        "marker-draw": "marker-draw 1.2s cubic-bezier(0.16,1,0.3,1) both",
       },
     },
   },

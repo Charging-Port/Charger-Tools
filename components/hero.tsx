@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { HeroCanvas } from "@/components/hero-canvas";
+import { StudioClock } from "@/components/studio-clock";
 
 export function Hero() {
   return (
-    <section className="pt-36 md:pt-44 pb-12 md:pb-16">
-      <div className="mx-auto max-w-5xl px-6">
-        <p className="font-mono text-xs text-muted-foreground mb-8 flex items-center gap-2 animate-fade-in">
-          <span className="inline-block w-6 h-px bg-accent" />
-          Kaden MacLean — Soquel, CA
-        </p>
+    <section className="relative pt-36 md:pt-44 pb-12 md:pb-16 overflow-hidden">
+      <HeroCanvas />
+      <div className="relative mx-auto max-w-5xl px-6">
+        <div className="mb-8 animate-fade-in">
+          <StudioClock />
+        </div>
 
         <h1
           className="font-serif text-4xl sm:text-5xl md:text-[3.75rem] leading-[1.05] tracking-tightest text-foreground max-w-4xl animate-fade-in-up"
