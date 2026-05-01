@@ -78,13 +78,25 @@ export async function POST(req: NextRequest) {
     const { Resend } = await import("resend");
     const resend = new Resend(apiKey);
     const contactEmail = process.env.CONTACT_EMAIL || "hello@chargertools.com";
+    const fromAddress =
+      process.env.CONTACT_FROM || "ChargerTools <onboarding@resend.dev>";
 
-    await resend.emails.send({
-      from: "ChargerTools <onboarding@resend.dev>",
+    // Resend SDK returns { data, error } on API rejection — must inspect.
+    const result = await resend.emails.send({
+      from: fromAddress,
       to: contactEmail,
       subject: "New newsletter signup",
       text: `New subscriber: ${email}`,
     });
+
+    if (result.error) {
+      console.error(
+        "[newsletter] Resend API rejected send:",
+        result.error.name,
+        result.error.message
+      );
+      return err("Failed to subscribe. Please try again.", 502);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
