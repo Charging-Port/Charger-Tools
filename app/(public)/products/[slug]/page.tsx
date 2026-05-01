@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getProductBySlug, getProductSlugs, getAllProducts } from "@/lib/products";
-import { formatDate } from "@/lib/utils";
+import { formatDate, safeUrl } from "@/lib/utils";
 import { ProductMockup } from "@/components/product-mockup";
 
 const BASE_URL =
@@ -59,7 +59,15 @@ export default function ProductPage({ params }: Props) {
   const prev = idx > 0 ? allProducts[idx - 1] : null;
   const next = idx < allProducts.length - 1 ? allProducts[idx + 1] : null;
 
-  const hasLinks = Object.values(product.links).some(Boolean);
+  // Sanitize URLs at the render boundary — defense in depth even though the
+  // admin API now rejects unsafe schemes on write.
+  const safeLinks = {
+    demo: safeUrl(product.links.demo),
+    website: safeUrl(product.links.website),
+    github: safeUrl(product.links.github),
+    download: safeUrl(product.links.download),
+  };
+  const hasLinks = Object.values(safeLinks).some(Boolean);
 
   return (
     <div className="pt-28 md:pt-36 pb-24">
@@ -87,41 +95,41 @@ export default function ProductPage({ params }: Props) {
           </p>
           {hasLinks && (
             <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-sm">
-              {product.links.demo && (
+              {safeLinks.demo && (
                 <a
-                  href={product.links.demo}
+                  href={safeLinks.demo}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow"
                   className="inline-flex items-center gap-1.5 font-medium text-foreground link-underline"
                 >
                   Live demo <ArrowUpRight size={13} />
                 </a>
               )}
-              {product.links.website && (
+              {safeLinks.website && (
                 <a
-                  href={product.links.website}
+                  href={safeLinks.website}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow"
                   className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
                 >
                   Website <ArrowUpRight size={13} />
                 </a>
               )}
-              {product.links.github && (
+              {safeLinks.github && (
                 <a
-                  href={product.links.github}
+                  href={safeLinks.github}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow"
                   className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
                 >
                   GitHub <ArrowUpRight size={13} />
                 </a>
               )}
-              {product.links.download && (
+              {safeLinks.download && (
                 <a
-                  href={product.links.download}
+                  href={safeLinks.download}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow"
                   className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
                 >
                   Download <ArrowUpRight size={13} />

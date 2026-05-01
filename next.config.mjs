@@ -7,6 +7,25 @@ const nextConfig = {
 
   async headers() {
     return [
+      // Admin pages and admin API: never cache. Prevents shared caches (CDN,
+      // browser, intermediate proxies) from holding onto authenticated
+      // responses that could leak across users.
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" },
+          { key: "Pragma", value: "no-cache" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/api/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" },
+          { key: "Pragma", value: "no-cache" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [
