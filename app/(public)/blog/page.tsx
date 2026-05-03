@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { BlogCard } from "@/components/blog-card";
-import { getAllPosts } from "@/lib/blog";
+import { getPosts } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   description: "Notes on building, learning, and shipping from Kaden MacLean.",
 };
 
-export default function BlogPage() {
-  const posts = getAllPosts();
+export default async function BlogPage() {
+  const posts = await getPosts();
 
   return (
     <div className="pt-32 md:pt-40 pb-24">

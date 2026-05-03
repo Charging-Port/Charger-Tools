@@ -15,6 +15,17 @@ import {
   AlertCircle,
 } from "lucide-react";
 
+function readCsrfCookie(): string {
+  if (typeof document === "undefined") return "";
+  const m = document.cookie.match(/(?:^|;\s*)ct_admin_csrf=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : "";
+}
+
+function csrfHeaders(): Record<string, string> {
+  const t = readCsrfCookie();
+  return t ? { "Content-Type": "application/json", "x-csrf-token": t } : { "Content-Type": "application/json" };
+}
+
 interface Post {
   slug: string;
   title: string;
@@ -90,7 +101,7 @@ export function BlogAdmin() {
     try {
       const res = await fetch("/api/admin/posts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: csrfHeaders(),
         body: JSON.stringify({
           ...editing,
           slug: isNew ? "" : editing.slug,
@@ -121,7 +132,7 @@ export function BlogAdmin() {
     try {
       const res = await fetch("/api/admin/posts", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: csrfHeaders(),
         body: JSON.stringify({ slug }),
       });
       if (!res.ok) throw new Error("Delete failed");

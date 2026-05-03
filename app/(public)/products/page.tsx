@@ -1,7 +1,6 @@
 import { Metadata } from "next";
-import { FeaturedWork } from "@/components/featured-work";
-import { ProjectGrid } from "@/components/project-grid";
-import { getAllProducts } from "@/lib/products";
+import { getProducts } from "@/lib/content";
+import { EditableProductsGrid } from "@/components/admin/editable-products-list";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +9,8 @@ export const metadata: Metadata = {
   description: "Hardware and software projects built by Kaden MacLean.",
 };
 
-export default function ProductsPage() {
-  const products = getAllProducts();
+export default async function ProductsPage() {
+  const products = await getProducts();
   const active = products.filter((p) => p.status !== "released");
   const shipped = products.filter((p) => p.status === "released");
 
@@ -44,7 +43,10 @@ export default function ProductsPage() {
                 {active.length}
               </span>
             </div>
-            <FeaturedWork products={active} />
+            <EditableProductsGrid
+              products={active}
+              allProductsForSnapshot={products}
+            />
           </section>
         )}
 
@@ -59,7 +61,10 @@ export default function ProductsPage() {
                 {shipped.length}
               </span>
             </div>
-            <FeaturedWork products={shipped} />
+            <EditableProductsGrid
+              products={shipped}
+              allProductsForSnapshot={products}
+            />
           </section>
         )}
       </div>

@@ -2,22 +2,27 @@ import { Hero } from "@/components/hero";
 import { FeaturedWork } from "@/components/featured-work";
 import { ShippingLog } from "@/components/shipping-log";
 import { NewsletterSignup } from "@/components/newsletter-signup";
-import { getAllProducts } from "@/lib/products";
-import { getAllPosts } from "@/lib/blog";
+import { getProducts, getPosts, getHero } from "@/lib/content";
 import { BlogCard } from "@/components/blog-card";
 import { ProjectGrid } from "@/components/project-grid";
 import { SectionMarker } from "@/components/section-marker";
 import Link from "next/link";
 
-export default function Home() {
-  const products = getAllProducts();
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const [hero, products, allPosts] = await Promise.all([
+    getHero(),
+    getProducts(),
+    getPosts(),
+  ]);
   const featured = products.slice(0, 4);
   const rest = products.slice(4);
-  const posts = getAllPosts().slice(0, 3);
+  const posts = allPosts.slice(0, 3);
 
   return (
     <>
-      <Hero />
+      <Hero initial={hero} />
 
       <SectionMarker num="01" label="The work" />
 

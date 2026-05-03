@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidSession, ADMIN_COOKIE_NAME } from "@/lib/admin-auth";
 import { getAllProducts, writeProducts } from "@/lib/products";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyCsrf } from "@/lib/csrf";
+import { setScope, getProducts } from "@/lib/content";
+import { isStorageWritable } from "@/lib/storage";
 import type { Product, ProductStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -123,12 +126,13 @@ function clampStr(value: unknown, max: number): string {
   return value.trim().slice(0, max);
 }
 
-/** GET — list all products */
+/** GET — list all products (KV-aware so the legacy admin sees the same data) */
 export async function GET(req: NextRequest) {
   if (!checkAuth(req)) return unauthorized();
   const limited = applyAdminRateLimit(req);
   if (limited) return limited;
-  return NextResponse.json(getAllProducts());
+  const products = await getProducts();
+  return NextResponse.json(products);
 }
 
 /** POST — create a new product */
@@ -138,6 +142,9 @@ export async function POST(req: NextRequest) {
   if (limited) return limited;
   if (!isSameOriginWrite(req)) {
     return NextResponse.json({ error: "Bad origin" }, { status: 403 });
+  }
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
   }
   if (!(req.headers.get("content-type") || "").includes("application/json")) {
     return NextResponse.json({ error: "Expected JSON" }, { status: 415 });
@@ -184,7 +191,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const products = getAllProducts();
+  const products = await getProducts();
 
   // Ensure slug is unique
   if (products.some((p) => p.slug === slug)) {
@@ -243,7 +250,7 @@ export async function POST(req: NextRequest) {
   };
 
   products.push(newProduct);
-  writeProducts(products);
+  await persistProducts(products);
 
   return NextResponse.json({ success: true, product: newProduct });
 }
@@ -258,6 +265,9 @@ export async function PATCH(req: NextRequest) {
   if (limited) return limited;
   if (!isSameOriginWrite(req)) {
     return NextResponse.json({ error: "Bad origin" }, { status: 403 });
+  }
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
   }
   if (!(req.headers.get("content-type") || "").includes("application/json")) {
     return NextResponse.json({ error: "Expected JSON" }, { status: 415 });
@@ -283,7 +293,7 @@ export async function PATCH(req: NextRequest) {
     );
   }
 
-  const products = getAllProducts();
+  const products = await getProducts();
   const byId = new Map(products.map((p) => [p.id, p]));
 
   for (const u of body.updates) {
@@ -324,7 +334,7 @@ export async function PATCH(req: NextRequest) {
 
   // Save sorted by current order so JSON file stays readable
   const sorted = Array.from(byId.values()).sort((a, b) => a.order - b.order);
-  writeProducts(sorted);
+  await persistProducts(sorted);
 
   return NextResponse.json({ success: true, products: sorted });
 }
@@ -336,6 +346,9 @@ export async function DELETE(req: NextRequest) {
   if (limited) return limited;
   if (!isSameOriginWrite(req)) {
     return NextResponse.json({ error: "Bad origin" }, { status: 403 });
+  }
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
   }
   if (!(req.headers.get("content-type") || "").includes("application/json")) {
     return NextResponse.json({ error: "Expected JSON" }, { status: 415 });
@@ -352,7 +365,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   }
 
-  const products = getAllProducts();
+  const products = await getProducts();
   const filtered = products.filter((p) => p.id !== body.id);
 
   if (filtered.length === products.length) {
@@ -363,7 +376,29 @@ export async function DELETE(req: NextRequest) {
   filtered.forEach((p, i) => {
     p.order = i + 1;
   });
-  writeProducts(filtered);
+  await persistProducts(filtered);
 
   return NextResponse.json({ success: true });
+}
+
+/**
+ * Write products both to disk (so dev keeps `content/products.json` as the
+ * canonical source) and to KV (so production deployments — where the disk
+ * is read-only — still see the new value on the very next render).
+ */
+async function persistProducts(next: Product[]): Promise<void> {
+  try {
+    writeProducts(next);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[admin/products] disk write failed; relying on KV", err);
+  }
+  if (isStorageWritable()) {
+    try {
+      await setScope("products", next);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[admin/products] KV mirror failed", err);
+    }
+  }
 }

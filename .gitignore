@@ -29,6 +29,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local development KV fallback for the admin content store
+.dev-kv.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

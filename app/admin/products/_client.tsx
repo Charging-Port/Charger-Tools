@@ -15,6 +15,17 @@ import {
 } from "lucide-react";
 import type { Product, ProductStatus } from "@/types";
 
+function readCsrfCookie(): string {
+  if (typeof document === "undefined") return "";
+  const m = document.cookie.match(/(?:^|;\s*)ct_admin_csrf=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : "";
+}
+
+function csrfHeaders(): Record<string, string> {
+  const t = readCsrfCookie();
+  return t ? { "Content-Type": "application/json", "x-csrf-token": t } : { "Content-Type": "application/json" };
+}
+
 const STATUS_OPTIONS: { value: ProductStatus; label: string }[] = [
   { value: "concept", label: "Concept" },
   { value: "prototype", label: "Prototype" },
@@ -94,7 +105,7 @@ export function ProductsAdmin({
     try {
       const res = await fetch("/api/admin/products", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: csrfHeaders(),
         body: JSON.stringify({ updates }),
       });
       if (!res.ok) {
@@ -118,7 +129,7 @@ export function ProductsAdmin({
     try {
       const res = await fetch("/api/admin/products", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: csrfHeaders(),
         body: JSON.stringify({ id }),
       });
       if (!res.ok) {
@@ -163,7 +174,7 @@ export function ProductsAdmin({
     try {
       const res = await fetch("/api/admin/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: csrfHeaders(),
         body: JSON.stringify({
           name: creating.name.trim(),
           shortDescription: creating.shortDescription.trim(),

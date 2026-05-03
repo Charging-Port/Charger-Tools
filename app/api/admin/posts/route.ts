@@ -3,6 +3,10 @@ import fs from "fs";
 import path from "path";
 import { isValidSession, ADMIN_COOKIE_NAME } from "@/lib/admin-auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyCsrf } from "@/lib/csrf";
+import { getPosts, setScope } from "@/lib/content";
+import { isStorageWritable } from "@/lib/storage";
+import { estimateReadingTime } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -185,6 +189,9 @@ export async function POST(req: NextRequest) {
   if (!isSameOriginWrite(req)) {
     return NextResponse.json({ error: "Bad origin" }, { status: 403 });
   }
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
+  }
   if (!(req.headers.get("content-type") || "").includes("application/json")) {
     return NextResponse.json({ error: "Expected JSON" }, { status: 415 });
   }
@@ -272,11 +279,41 @@ excerpt: "${yamlEscape(excerpt)}"
 ${postBody}
 `;
 
-  if (!fs.existsSync(blogDir)) {
-    fs.mkdirSync(blogDir, { recursive: true });
+  // Local dev: write to disk so the file is the canonical source.
+  // In production the filesystem is read-only — try, but don't fail if so.
+  try {
+    if (!fs.existsSync(blogDir)) {
+      fs.mkdirSync(blogDir, { recursive: true });
+    }
+    fs.writeFileSync(filepath, content, "utf8");
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[admin/posts] disk write failed; relying on KV", err);
   }
 
-  fs.writeFileSync(filepath, content, "utf8");
+  // Mirror the snapshot to KV so production reads pick up the change.
+  if (isStorageWritable()) {
+    try {
+      const all = await getPosts();
+      const filtered = all.filter((p) => p.slug !== slug);
+      const next = [
+        ...filtered,
+        {
+          slug,
+          title,
+          date,
+          category,
+          excerpt,
+          content: postBody,
+          readingTime: estimateReadingTime(postBody),
+        },
+      ];
+      await setScope("blog", next);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[admin/posts] KV mirror failed", err);
+    }
+  }
 
   return NextResponse.json({ success: true, slug });
 }
@@ -288,6 +325,9 @@ export async function DELETE(req: NextRequest) {
   if (limited) return limited;
   if (!isSameOriginWrite(req)) {
     return NextResponse.json({ error: "Bad origin" }, { status: 403 });
+  }
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
   }
   if (!(req.headers.get("content-type") || "").includes("application/json")) {
     return NextResponse.json({ error: "Expected JSON" }, { status: 415 });
@@ -308,10 +348,34 @@ export async function DELETE(req: NextRequest) {
   if (!filepath) {
     return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
   }
-  if (!fs.existsSync(filepath)) {
-    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+
+  let removed = false;
+  try {
+    if (fs.existsSync(filepath)) {
+      fs.unlinkSync(filepath);
+      removed = true;
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[admin/posts] disk delete failed", err);
   }
 
-  fs.unlinkSync(filepath);
+  // Update the KV snapshot too — even when the file didn't exist on disk,
+  // the snapshot may have a copy in production.
+  if (isStorageWritable()) {
+    try {
+      const all = await getPosts();
+      const next = all.filter((p) => p.slug !== body.slug);
+      if (next.length !== all.length) removed = true;
+      await setScope("blog", next);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[admin/posts] KV mirror delete failed", err);
+    }
+  }
+
+  if (!removed) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  }
   return NextResponse.json({ success: true });
 }

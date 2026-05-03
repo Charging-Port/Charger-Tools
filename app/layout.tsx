@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Fraunces } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AdminProvider } from "@/components/admin/admin-context";
+import { EditBar } from "@/components/admin/edit-bar";
+import { isAuthenticated } from "@/lib/admin-auth";
+import { getStorageMode } from "@/lib/storage";
 import "./globals.css";
 
 const inter = Inter({
@@ -75,6 +79,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Server-side auth check so the EditBar never flashes for visitors.
+  // Cached as no-store on /admin and /api/admin paths via next.config.mjs;
+  // public pages are dynamic anyway because of the cookie read here.
+  const authed = isAuthenticated();
+  const storageMode = getStorageMode();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -86,7 +96,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AdminProvider initialAuthed={authed} storageMode={storageMode}>
+            {children}
+            <EditBar />
+          </AdminProvider>
         </ThemeProvider>
       </body>
     </html>

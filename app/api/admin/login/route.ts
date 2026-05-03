@@ -6,6 +6,8 @@ import {
   verifyPassword,
 } from "@/lib/admin-auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { createCsrfToken, setCsrfCookie } from "@/lib/csrf";
+import { logAdminAction } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +96,7 @@ export async function POST(req: NextRequest) {
   if (!verifyPassword(password)) {
     // Sleep ~250ms on bad password to discourage brute-force a tiny bit
     await new Promise((r) => setTimeout(r, 250));
+    await logAdminAction(req, "login", false, { reason: "bad-password" });
     return errorResponse(req, isForm, "Incorrect password", 401);
   }
 
@@ -118,6 +121,12 @@ export async function POST(req: NextRequest) {
     path: "/",
     maxAge: SESSION_MAX_AGE_SECONDS,
   });
+
+  // Mint a fresh CSRF token, dropped as a non-httpOnly cookie so the JS on
+  // our admin pages can echo it in the x-csrf-token header on writes.
+  setCsrfCookie(res, createCsrfToken());
+
+  await logAdminAction(req, "login", true);
 
   return res;
 }

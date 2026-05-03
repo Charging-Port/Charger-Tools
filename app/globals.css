@@ -263,3 +263,122 @@ html.cursor-text .cursor-dot {
   top: 0;
   pointer-events: auto;
 }
+
+/* ─── Inline editing — admin only ───────────────────────────
+   These styles are scoped to <html data-admin-edit="true">, which is set
+   by AdminProvider when an authed admin enables edit mode. Logged-out
+   visitors never see any of this chrome — the editable primitives render
+   identically to plain text in their visitor branch.
+*/
+[data-admin-edit="true"] .ct-editable {
+  position: relative;
+  outline: 1px dashed hsl(var(--accent) / 0.35);
+  outline-offset: 4px;
+  border-radius: 4px;
+  cursor: text;
+  transition: outline-color 0.15s ease, background-color 0.15s ease;
+}
+[data-admin-edit="true"] .ct-editable:hover {
+  outline-color: hsl(var(--accent) / 0.7);
+  background-color: hsl(var(--accent) / 0.04);
+}
+[data-admin-edit="true"] .ct-editable.ct-editing,
+[data-admin-edit="true"] .ct-editable:focus {
+  outline: 1px solid hsl(var(--accent));
+  background-color: hsl(var(--accent) / 0.05);
+}
+[data-admin-edit="true"] .ct-editable.ct-empty::before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground) / 0.4);
+  pointer-events: none;
+  font-style: italic;
+}
+[data-admin-edit="true"] .ct-editable.ct-empty.ct-editing::before,
+[data-admin-edit="true"] .ct-editable.ct-empty:focus::before {
+  display: none;
+}
+
+[data-admin-edit="true"] .ct-editable-block {
+  position: relative;
+}
+[data-admin-edit="true"] .ct-editable-textarea {
+  width: 100%;
+  background: hsl(var(--accent) / 0.04);
+  border: 1px solid hsl(var(--accent) / 0.5);
+  border-radius: 6px;
+  padding: 0.625rem 0.75rem;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 6rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+[data-admin-edit="true"] .ct-editable-textarea:focus {
+  border-color: hsl(var(--accent));
+  background: hsl(var(--accent) / 0.06);
+}
+
+[data-admin-edit="true"] .ct-editable-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+[data-admin-edit="true"] .ct-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  width: 22px;
+  border-radius: 6px;
+  background: transparent;
+  color: hsl(var(--muted-foreground) / 0.55);
+  border: 1px solid hsl(var(--border) / 0.6);
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+[data-admin-edit="true"] .ct-editable-row:hover .ct-row-action {
+  opacity: 1;
+}
+[data-admin-edit="true"] .ct-row-action:hover {
+  color: rgb(248 113 113);
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.4);
+}
+[data-admin-edit="true"] .ct-row-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px dashed hsl(var(--accent) / 0.55);
+  background: hsl(var(--accent) / 0.03);
+  color: hsl(var(--accent));
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+[data-admin-edit="true"] .ct-row-add:hover {
+  background: hsl(var(--accent) / 0.08);
+  border-color: hsl(var(--accent));
+}
+
+/* Subtle "edit mode is on" body marker so the user knows they're in admin. */
+[data-admin-edit="true"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid hsl(var(--accent) / 0.18);
+  z-index: 999;
+}
+
+/* Hide the floating bar when the user is on /admin/* itself — the admin
+   pages have their own controls and the bar would be redundant. */
+.ct-edit-bar-hide-on-admin {
+  display: var(--ct-bar-display, inline-flex);
+}

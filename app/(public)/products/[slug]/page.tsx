@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { getProductBySlug, getProductSlugs, getAllProducts } from "@/lib/products";
-import { formatDate, safeUrl } from "@/lib/utils";
+import { getProducts, getProductBySlug } from "@/lib/content";
+import { EditableProduct } from "@/components/admin/editable-product";
 import { ProductMockup } from "@/components/product-mockup";
 
 const BASE_URL =
@@ -13,21 +12,10 @@ interface Props {
   params: { slug: string };
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  released: "Released",
-  "in-development": "In development",
-  prototype: "Prototype",
-  concept: "Concept",
-};
-
 export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return getProductSlugs().map((slug) => ({ slug }));
-}
-
-export function generateMetadata({ params }: Props): Metadata {
-  const product = getProductBySlug(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const product = await getProductBySlug(params.slug);
   if (!product) return {};
   const url = `${BASE_URL}/products/${product.slug}`;
   return {
@@ -38,7 +26,9 @@ export function generateMetadata({ params }: Props): Metadata {
       description: product.shortDescription,
       url,
       type: "website",
-      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: product.name }],
+      images: [
+        { url: "/og-image.png", width: 1200, height: 630, alt: product.name },
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -50,134 +40,24 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function ProductPage({ params }: Props) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: Props) {
+  const [product, allProducts] = await Promise.all([
+    getProductBySlug(params.slug),
+    getProducts(),
+  ]);
   if (!product) notFound();
 
-  const allProducts = getAllProducts();
   const idx = allProducts.findIndex((p) => p.slug === product.slug);
   const prev = idx > 0 ? allProducts[idx - 1] : null;
   const next = idx < allProducts.length - 1 ? allProducts[idx + 1] : null;
 
-  // Sanitize URLs at the render boundary — defense in depth even though the
-  // admin API now rejects unsafe schemes on write.
-  const safeLinks = {
-    demo: safeUrl(product.links.demo),
-    website: safeUrl(product.links.website),
-    github: safeUrl(product.links.github),
-    download: safeUrl(product.links.download),
-  };
-  const hasLinks = Object.values(safeLinks).some(Boolean);
-
   return (
     <div className="pt-28 md:pt-36 pb-24">
       <article className="mx-auto max-w-5xl px-6">
-        <Link
-          href="/products"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
-        >
-          <ArrowLeft size={14} />
-          All work
-        </Link>
-
-        {/* Header — name + lead, then a wide mockup */}
-        <header className="mb-10">
-          <p className="font-mono text-xs text-muted-foreground mb-3">
-            {STATUS_LABEL[product.status]}{" "}
-            <span className="text-border">·</span>{" "}
-            {formatDate(product.dateCreated)}
-          </p>
-          <h1 className="font-serif text-4xl md:text-[3.5rem] tracking-tightest text-foreground leading-[1.02]">
-            {product.name}
-          </h1>
-          <p className="mt-5 font-serif italic text-xl md:text-2xl text-foreground/75 leading-snug max-w-2xl">
-            {product.shortDescription}
-          </p>
-          {hasLinks && (
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-sm">
-              {safeLinks.demo && (
-                <a
-                  href={safeLinks.demo}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="inline-flex items-center gap-1.5 font-medium text-foreground link-underline"
-                >
-                  Live demo <ArrowUpRight size={13} />
-                </a>
-              )}
-              {safeLinks.website && (
-                <a
-                  href={safeLinks.website}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                >
-                  Website <ArrowUpRight size={13} />
-                </a>
-              )}
-              {safeLinks.github && (
-                <a
-                  href={safeLinks.github}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                >
-                  GitHub <ArrowUpRight size={13} />
-                </a>
-              )}
-              {safeLinks.download && (
-                <a
-                  href={safeLinks.download}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors link-underline"
-                >
-                  Download <ArrowUpRight size={13} />
-                </a>
-              )}
-            </div>
-          )}
-        </header>
-
-        <div className="mb-12 max-w-3xl mx-auto">
-          <ProductMockup slug={product.slug} />
-        </div>
-
-        {/* Body — two-column layout: prose + sidebar */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-14 border-t border-border pt-10">
-          <div className="md:col-span-8 space-y-6 text-foreground/80 leading-[1.75] text-[17px]">
-            {product.description.split("\n\n").map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
-          </div>
-
-          <aside className="md:col-span-4 md:border-l md:border-border md:pl-8 space-y-10">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-4">
-                Stack
-              </p>
-              <ul className="space-y-1.5 text-sm font-mono text-foreground/80">
-                {product.techStack.map((tech) => (
-                  <li key={tech}>{tech}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-4">
-                Features
-              </p>
-              <ul className="space-y-2 text-[14px] text-foreground/75 leading-relaxed">
-                {product.features.map((feature) => (
-                  <li key={feature} className="flex gap-2">
-                    <span className="text-accent shrink-0">–</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-        </div>
+        <EditableProduct
+          initial={product}
+          allProductsForSnapshot={allProducts}
+        />
 
         {(prev || next) && (
           <nav className="mt-20 pt-10 border-t border-border grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
@@ -196,7 +76,13 @@ export default function ProductPage({ params }: Props) {
                         {prev.name}
                       </span>
                       <p className="mt-1 font-mono text-[10px] text-muted-foreground">
-                        {prev.status === "released" ? "Released" : prev.status === "in-development" ? "In development" : prev.status === "prototype" ? "Prototype" : "Concept"}
+                        {prev.status === "released"
+                          ? "Released"
+                          : prev.status === "in-development"
+                          ? "In development"
+                          : prev.status === "prototype"
+                          ? "Prototype"
+                          : "Concept"}
                       </p>
                     </div>
                     <div className="scale-[0.55] origin-top-right">
@@ -224,7 +110,13 @@ export default function ProductPage({ params }: Props) {
                         {next.name}
                       </span>
                       <p className="mt-1 font-mono text-[10px] text-muted-foreground">
-                        {next.status === "released" ? "Released" : next.status === "in-development" ? "In development" : next.status === "prototype" ? "Prototype" : "Concept"}
+                        {next.status === "released"
+                          ? "Released"
+                          : next.status === "in-development"
+                          ? "In development"
+                          : next.status === "prototype"
+                          ? "Prototype"
+                          : "Concept"}
                       </p>
                     </div>
                   </div>
