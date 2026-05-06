@@ -1,8 +1,67 @@
 import Link from "next/link";
 import { HeroCanvas } from "@/components/hero-canvas";
 import { StudioClock } from "@/components/studio-clock";
+import { getSiteText } from "@/lib/site-text";
+import type { ReactNode } from "react";
+
+/**
+ * Render a small inline-markup string. Supports:
+ *   {accent:text}    → emphasized accent run (italic-friendly headline word)
+ *   {italic:text}    → italic text in accent
+ *   {strong:text}    → bold foreground text
+ *   {link:/path:label} → internal Next.js link
+ */
+function renderInline(input: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  const regex = /\{(accent|italic|strong|link):([^}]+)\}/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+  while ((match = regex.exec(input)) !== null) {
+    if (match.index > lastIndex) out.push(input.slice(lastIndex, match.index));
+    const [, kind, payload] = match;
+    if (kind === "accent") {
+      out.push(
+        <em key={key++} className="text-accent not-italic">
+          {payload}
+        </em>
+      );
+    } else if (kind === "italic") {
+      out.push(
+        <em key={key++} className="text-accent italic">
+          {payload}
+        </em>
+      );
+    } else if (kind === "strong") {
+      out.push(
+        <span key={key++} className="text-foreground">
+          {payload}
+        </span>
+      );
+    } else if (kind === "link") {
+      const split = payload.indexOf(":");
+      if (split !== -1) {
+        const href = payload.slice(0, split);
+        const label = payload.slice(split + 1);
+        out.push(
+          <Link key={key++} href={href} className="text-foreground link-underline">
+            {label}
+          </Link>
+        );
+      } else {
+        out.push(payload);
+      }
+    }
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < input.length) out.push(input.slice(lastIndex));
+  return out;
+}
 
 export function Hero() {
+  const text = getSiteText();
+  const hero = text.hero;
+
   return (
     <section className="relative pt-36 md:pt-44 pb-12 md:pb-16 overflow-hidden">
       <HeroCanvas />
@@ -15,10 +74,7 @@ export function Hero() {
           className="font-serif text-4xl sm:text-5xl md:text-[3.75rem] leading-[1.05] tracking-tightest text-foreground max-w-4xl animate-fade-in-up"
           style={{ animationDelay: "0.05s" }}
         >
-          I build <em className="text-accent not-italic">native macOS apps</em>,{" "}
-          <em className="text-accent not-italic">computer-vision systems</em>,
-          and the occasional{" "}
-          <em className="text-accent italic">pair of AR glasses</em>.
+          {renderInline(hero.headline)}
         </h1>
 
         <div
@@ -26,39 +82,8 @@ export function Hero() {
           style={{ animationDelay: "0.15s" }}
         >
           <div className="md:col-span-8 space-y-4 text-foreground/75 leading-[1.7]">
-            <p>
-              Junior at Bellarmine College Prep. Co-founder and engineering
-              lead of{" "}
-              <Link
-                href="/products/hyperform-fitness"
-                className="text-foreground link-underline"
-              >
-                Hyperform Fitness
-              </Link>
-              , a CV platform that watches a lifter mid-set and corrects their
-              form before the rep is over — over a million reps analyzed
-              across pilot installations.
-            </p>
-            <p>
-              Under <span className="text-foreground">ChargerTools LLC</span> I
-              ship native Mac apps —{" "}
-              <Link href="/products/meridian" className="text-foreground link-underline">
-                Meridian
-              </Link>
-              ,{" "}
-              <Link href="/products/probe" className="text-foreground link-underline">
-                Probe
-              </Link>
-              ,{" "}
-              <Link href="/products/zenith" className="text-foreground link-underline">
-                Zenith
-              </Link>
-              ,{" "}
-              <Link href="/products/futz" className="text-foreground link-underline">
-                Futz
-              </Link>
-              {" "}— and tinker with wearable AR, optics, and RF on the side.
-            </p>
+            <p>{renderInline(hero.intro1)}</p>
+            <p>{renderInline(hero.intro2)}</p>
             <div className="pt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
               <Link
                 href="/products"
@@ -87,34 +112,28 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Currently sidebar — quietly pinned */}
           <aside className="md:col-span-4 md:border-l md:border-border md:pl-6">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
               Currently
             </p>
             <ul className="space-y-2 text-[13px]">
-              <li className="flex gap-3">
-                <span className="font-mono text-[10px] text-accent uppercase tracking-widest w-14 shrink-0 pt-0.5">
-                  Building
-                </span>
-                <Link href="/products/meridian" className="text-foreground link-underline">
-                  Meridian
-                </Link>
-              </li>
-              <li className="flex gap-3">
-                <span className="font-mono text-[10px] text-accent uppercase tracking-widest w-14 shrink-0 pt-0.5">
-                  Shipping
-                </span>
-                <Link href="/products/probe" className="text-foreground link-underline">
-                  Probe
-                </Link>
-              </li>
-              <li className="flex gap-3">
-                <span className="font-mono text-[10px] text-accent uppercase tracking-widest w-14 shrink-0 pt-0.5">
-                  Reading
-                </span>
-                <span className="text-foreground/85">Antenna theory</span>
-              </li>
+              {hero.currently.map((item) => (
+                <li key={item.label} className="flex gap-3">
+                  <span className="font-mono text-[10px] text-accent uppercase tracking-widest w-14 shrink-0 pt-0.5">
+                    {item.label}
+                  </span>
+                  {item.href ? (
+                    <Link
+                      href={item.href}
+                      className="text-foreground link-underline"
+                    >
+                      {item.text}
+                    </Link>
+                  ) : (
+                    <span className="text-foreground/85">{item.text}</span>
+                  )}
+                </li>
+              ))}
             </ul>
           </aside>
         </div>

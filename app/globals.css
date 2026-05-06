@@ -2,30 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Tokens ─────────────────────────────────────────────── */
+/* ─── Tokens ─────────────────────────────────────────────────
+   Off-white paper, dark-navy ink, forest-green accent.
+   Light mode is the canonical theme; dark mode keeps the same
+   navy/green relationship inverted on a deep-navy ground. */
 @layer base {
   :root {
-    --background: 38 22% 97%;
-    --foreground: 30 14% 12%;
-    --card: 38 18% 94%;
-    --card-foreground: 30 14% 12%;
-    --muted: 30 12% 90%;
-    --muted-foreground: 30 8% 38%;
-    --border: 30 10% 86%;
-    --accent: 18 78% 52%;
-    --accent-foreground: 38 22% 97%;
+    --background: 40 28% 96%;
+    --foreground: 218 48% 14%;
+    --card: 40 22% 93%;
+    --card-foreground: 218 48% 14%;
+    --muted: 40 16% 89%;
+    --muted-foreground: 218 18% 38%;
+    --border: 38 14% 82%;
+    --accent: 158 48% 26%;
+    --accent-foreground: 40 28% 96%;
   }
 
   .dark {
-    --background: 30 8% 6%;
-    --foreground: 30 12% 92%;
-    --card: 30 8% 9%;
-    --card-foreground: 30 12% 92%;
-    --muted: 30 6% 14%;
-    --muted-foreground: 30 6% 60%;
-    --border: 30 6% 18%;
-    --accent: 18 80% 62%;
-    --accent-foreground: 30 14% 8%;
+    --background: 218 48% 8%;
+    --foreground: 40 22% 92%;
+    --card: 218 42% 11%;
+    --card-foreground: 40 22% 92%;
+    --muted: 218 30% 17%;
+    --muted-foreground: 40 12% 62%;
+    --border: 218 26% 22%;
+    --accent: 158 52% 52%;
+    --accent-foreground: 218 48% 8%;
   }
 
   * {

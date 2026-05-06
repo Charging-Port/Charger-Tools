@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { Mail, Github, ArrowUpRight } from "lucide-react";
+import { getSiteText } from "@/lib/site-text";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -8,6 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
+  const text = getSiteText();
+  const contact = text.contact;
+
   return (
     <div className="pt-32 md:pt-40 pb-24">
       <div className="mx-auto max-w-3xl px-6">
@@ -16,8 +20,7 @@ export default function ContactPage() {
             Get in touch
           </h1>
           <p className="mt-5 text-foreground/70 leading-relaxed max-w-xl">
-            Have a project idea, technical question, or just want to say hi?
-            Send a message — I read everything and respond within 24–48 hours.
+            {contact.intro}
           </p>
         </header>
 
@@ -55,12 +58,7 @@ export default function ContactPage() {
                 Open to
               </h2>
               <ul className="space-y-2 text-sm text-foreground/70 leading-relaxed">
-                {[
-                  "Hardware / software collaborations",
-                  "Technical consulting or advising",
-                  "Speaking or demo opportunities",
-                  "Feedback on projects in flight",
-                ].map((item) => (
+                {contact.openTo.map((item) => (
                   <li key={item} className="flex gap-2">
                     <span className="text-accent">–</span>
                     {item}

@@ -4,16 +4,37 @@ import { ShippingLog } from "@/components/shipping-log";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { getAllProducts } from "@/lib/products";
 import { getAllPosts } from "@/lib/blog";
+import { getSiteText } from "@/lib/site-text";
 import { BlogCard } from "@/components/blog-card";
 import { ProjectGrid } from "@/components/project-grid";
 import { SectionMarker } from "@/components/section-marker";
 import Link from "next/link";
+
+function renderHomepageHeadline(input: string) {
+  const out: React.ReactNode[] = [];
+  const regex = /\{accent:([^}]+)\}/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+  while ((match = regex.exec(input)) !== null) {
+    if (match.index > lastIndex) out.push(input.slice(lastIndex, match.index));
+    out.push(
+      <em key={key++} className="text-accent">
+        {match[1]}
+      </em>
+    );
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < input.length) out.push(input.slice(lastIndex));
+  return out;
+}
 
 export default function Home() {
   const products = getAllProducts();
   const featured = products.slice(0, 4);
   const rest = products.slice(4);
   const posts = getAllPosts().slice(0, 3);
+  const text = getSiteText();
 
   return (
     <>
@@ -99,13 +120,10 @@ export default function Home() {
                 Get in touch
               </p>
               <h2 className="font-serif text-3xl md:text-4xl tracking-tight text-foreground leading-[1.1] mb-5">
-                The fastest way to make me smile is an{" "}
-                <em className="text-accent">interesting email</em>.
+                {renderHomepageHeadline(text.homepage.closerHeadline)}
               </h2>
               <p className="text-foreground/75 leading-relaxed mb-6 max-w-prose">
-                I read every message. Hardware, computer vision, native macOS,
-                what it&apos;s like to run a startup in high school — let&apos;s
-                talk.
+                {text.homepage.closerBody}
               </p>
               <Link
                 href="/contact"
@@ -119,8 +137,7 @@ export default function Home() {
                 Newsletter
               </p>
               <p className="text-sm text-foreground/70 leading-relaxed mb-5 max-w-sm">
-                Occasional notes when I ship something new. No noise, no
-                schedule.
+                {text.homepage.newsletterBody}
               </p>
               <NewsletterSignup />
             </div>

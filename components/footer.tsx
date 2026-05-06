@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { getSiteText } from "@/lib/site-text";
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const text = getSiteText();
 
   return (
     <footer className="border-t border-border mt-20">
@@ -12,10 +14,7 @@ export function Footer() {
               Kaden MacLean
             </p>
             <p className="text-sm text-foreground/65 leading-relaxed max-w-sm">
-              Building under{" "}
-              <span className="text-foreground">ChargerTools LLC</span> in
-              Soquel, CA. Usually at a workbench, a lathe, or a lifter&apos;s
-              squat rack; occasionally at a piano.
+              {text.footer.tagline}
             </p>
           </div>
 

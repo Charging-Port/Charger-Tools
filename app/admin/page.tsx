@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, Package, ArrowUpRight, LogOut } from "lucide-react";
+import { FileText, Package, ArrowUpRight, Type } from "lucide-react";
 import { requireAuth } from "@/lib/admin-auth";
 import { getAllProducts } from "@/lib/products";
 import { getAllPosts } from "@/lib/blog";
@@ -30,7 +30,7 @@ export default function AdminDashboardPage() {
               Dashboard
             </h1>
             <p className="mt-2 text-sm text-muted-foreground/60">
-              Manage your products and blog posts.
+              Edit your site text, products, and posts.
             </p>
           </div>
           <LogoutButton />
@@ -38,6 +38,30 @@ export default function AdminDashboardPage() {
 
         {/* Section cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Link
+            href="/admin/content"
+            className="group rounded-2xl border border-accent/30 bg-accent/5 p-6 hover:border-accent/60 hover:bg-accent/10 transition-all md:col-span-2"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <Type size={20} className="text-accent" />
+              <ArrowUpRight
+                size={14}
+                className="text-muted-foreground/40 group-hover:text-foreground transition-colors"
+              />
+            </div>
+            <h2 className="font-display font-bold text-foreground text-lg mb-1">
+              Site text
+            </h2>
+            <p className="text-xs text-muted-foreground/70 mb-4 max-w-prose">
+              Edit any text on the public site — hero, about, skills, now,
+              contact, footer. Saves to{" "}
+              <code className="font-mono">content/site-text.json</code>.
+            </p>
+            <p className="font-mono text-[10px] text-accent/70">
+              Hero · About · Skills · Now · Contact · Homepage · Footer
+            </p>
+          </Link>
+
           <Link
             href="/admin/products"
             className="group rounded-2xl border border-border/40 bg-card/50 p-6 hover:border-border/70 hover:bg-card/70 transition-all card-lift"

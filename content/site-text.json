@@ -1,0 +1,301 @@
+{
+  "hero": {
+    "headline": "I build {accent:native macOS apps}, {accent:computer-vision systems}, and the occasional {italic:pair of AR glasses}.",
+    "intro1": "Junior at Bellarmine College Prep. Co-founder and engineering lead of {link:/products/hyperform-fitness:Hyperform Fitness}, a CV platform that watches a lifter mid-set and corrects their form before the rep is over — over a million reps analyzed across pilot installations.",
+    "intro2": "Under {strong:ChargerTools LLC} I ship native Mac apps — {link:/products/meridian:Meridian}, {link:/products/probe:Probe}, {link:/products/zenith:Zenith}, {link:/products/futz:Futz} — and tinker with wearable AR, optics, and RF on the side.",
+    "currently": [
+      {
+        "label": "Building",
+        "text": "Meridian",
+        "href": "/products/meridian"
+      },
+      {
+        "label": "Shipping",
+        "text": "Probe",
+        "href": "/products/probe"
+      },
+      {
+        "label": "Reading",
+        "text": "Antenna theory"
+      }
+    ]
+  },
+  "about": {
+    "quote": "I'm Kaden MacLean — a junior at Bellarmine College Prep building at the intersection of hardware, software, and human movement.",
+    "bio": [
+      "I co-founded Hyperform Fitness, a computer-vision startup that tracks human movement in real time and delivers corrective feedback to athletes during their actual sets — not minutes later in a video review, but right then, while the bar is still on their back. We've analyzed over a million reps across gyms, rehab centers, and sports medicine programs.",
+      "I also run ChargerTools LLC, where I build native macOS applications and dive into hardware projects: ChargerAgent (a Swift AI agent with real tool use), Charger Mail (a privacy-first email client with local AI), Meridian (a calm, keyboard-first life-OS), Probe (a notch-anchored class copilot that runs entirely on-device), and a series of physics simulators that started as research tools for my AR glasses prototype.",
+      "I'm on FRC Team 254 (The Cheesy Poofs), where I work in manufacturing, assembly & wiring, and serve as Human Player. I was selected to the FIRST Hall of Fame Student Advisory Council and represent Team 254 for 2025–2026. I previously captained a CyberPatriot team to National Semi-Finalist in Linux security competition, and was an invited speaker at Georgetown's NSLC on nuclear-weapons threats to homeland security.",
+      "When I'm not in front of a screen or a lathe, I'm playing piano, cello, viola, or bass — principal bassist of BCP Chamber Orchestra and a classical pianist since I was four. There's a thread between practicing a Chopin etude and debugging a pose-estimation pipeline that I find hard to articulate but easy to feel."
+    ],
+    "quickFacts": [
+      {
+        "k": "Born",
+        "v": "2008"
+      },
+      {
+        "k": "School",
+        "v": "Bellarmine '27"
+      },
+      {
+        "k": "Based",
+        "v": "Soquel, CA"
+      },
+      {
+        "k": "Company",
+        "v": "ChargerTools LLC"
+      },
+      {
+        "k": "Co-founded",
+        "v": "Hyperform Fitness"
+      },
+      {
+        "k": "Team",
+        "v": "FRC 254 — Cheesy Poofs"
+      },
+      {
+        "k": "Instruments",
+        "v": "Piano · Cello · Viola · Bass"
+      },
+      {
+        "k": "Languages",
+        "v": "Swift · Python · TypeScript"
+      }
+    ],
+    "pullQuote": "The discipline carries over into engineering — both require obsession with detail, deliberate practice, and the patience to slow down on the parts that aren't working yet.",
+    "skills": [
+      {
+        "category": "Programming",
+        "items": [
+          {
+            "name": "Python",
+            "description": "General-purpose scripting, data work, and physics simulators.",
+            "whereLearned": "Self-taught starting around 2021; sharpened through computer-vision experiments at Hyperform and the optics / RF radar simulators."
+          },
+          {
+            "name": "Swift",
+            "description": "Apple's modern systems language — the daily driver for native macOS work.",
+            "whereLearned": "Self-taught while building Meridian, Probe, ChargerAgent, and Charger Mail at ChargerTools."
+          },
+          {
+            "name": "TypeScript",
+            "description": "Typed JavaScript for the web — server and client.",
+            "whereLearned": "Self-taught while building this site, the Hyperform admin dashboard, and internal tooling."
+          },
+          {
+            "name": "JavaScript",
+            "description": "The browser runtime — DOM, async, frontend logic.",
+            "whereLearned": "Picked up alongside TypeScript while building web tooling for ChargerTools and Hyperform."
+          },
+          {
+            "name": "Linux CLI",
+            "description": "Shell, system administration, scripting, and hardening.",
+            "whereLearned": "Trained competitively through CyberPatriot; used daily on Hyperform deployments and FRC dev boxes."
+          }
+        ]
+      },
+      {
+        "category": "Frameworks",
+        "items": [
+          {
+            "name": "SwiftUI",
+            "description": "Declarative UI framework for native Apple platforms.",
+            "whereLearned": "Daily driver across every ChargerTools macOS app — Meridian, Probe, Zenith, ChargerAgent, Charger Mail."
+          },
+          {
+            "name": "AppKit",
+            "description": "Apple's mature macOS UI toolkit — windows, menubars, the notch.",
+            "whereLearned": "Used for the parts of Meridian and Probe that SwiftUI can't reach — notch anchoring, menu-bar surfaces, keyboard hooks."
+          },
+          {
+            "name": "Anthropic API",
+            "description": "Claude integrations — tool use, streaming, prompt caching.",
+            "whereLearned": "ChargerAgent and Charger Mail — the core of both apps' AI behavior."
+          },
+          {
+            "name": "OAuth2/PKCE",
+            "description": "Modern auth flow for desktop and mobile clients.",
+            "whereLearned": "Implemented for Google sign-in inside Charger Mail."
+          },
+          {
+            "name": "OpenCV",
+            "description": "Open-source computer-vision library — image and video pipelines.",
+            "whereLearned": "Used at Hyperform Fitness for the early movement-tracking prototypes."
+          },
+          {
+            "name": "WhisperKit",
+            "description": "On-device speech-to-text via OpenAI Whisper, optimized for Apple silicon.",
+            "whereLearned": "Integrated into Probe for offline lecture capture."
+          }
+        ]
+      },
+      {
+        "category": "Manufacturing",
+        "items": [
+          {
+            "name": "CNC Router",
+            "description": "Computer-controlled cutting on plate stock.",
+            "whereLearned": "FRC Team 254 — manufacturing rotation."
+          },
+          {
+            "name": "Lathe",
+            "description": "Turning round stock — shafts, spacers, custom inserts.",
+            "whereLearned": "FRC Team 254 — manufacturing rotation."
+          },
+          {
+            "name": "TIG Welding",
+            "description": "Tungsten inert-gas welding on aluminum and steel.",
+            "whereLearned": "FRC Team 254 — manufacturing rotation."
+          },
+          {
+            "name": "Mill",
+            "description": "Manual milling — square stock, slots, hole patterns.",
+            "whereLearned": "FRC Team 254 — manufacturing rotation."
+          },
+          {
+            "name": "Brake",
+            "description": "Sheet-metal bending on a press brake.",
+            "whereLearned": "FRC Team 254 — manufacturing rotation."
+          },
+          {
+            "name": "Soldering",
+            "description": "Through-hole and surface-mount electronics assembly.",
+            "whereLearned": "Self-taught for AR-glasses, RF radar, and ChargerTools hardware projects."
+          },
+          {
+            "name": "PCB Design",
+            "description": "Schematic capture and board layout.",
+            "whereLearned": "Self-taught while prototyping the AR glasses and the chord-input glove."
+          },
+          {
+            "name": "CAD",
+            "description": "Parametric 3D modeling — parts and assemblies.",
+            "whereLearned": "Used for FRC fabrication drawings and personal hardware projects."
+          }
+        ]
+      },
+      {
+        "category": "Systems",
+        "items": [
+          {
+            "name": "Embedded Linux",
+            "description": "Stripped-down Linux on small ARM boards and SBCs.",
+            "whereLearned": "Used in the AR-glasses prototype and on Hyperform edge devices."
+          },
+          {
+            "name": "Cybersecurity",
+            "description": "System hardening, threat modeling, defensive operations.",
+            "whereLearned": "Captained a CyberPatriot team to National Semi-Finalist in Linux security competition."
+          },
+          {
+            "name": "Networking",
+            "description": "TCP/IP, DNS, firewalls, real-world packet behavior.",
+            "whereLearned": "CyberPatriot competition prep, then production work on Hyperform infra."
+          },
+          {
+            "name": "Computer Vision",
+            "description": "Detection, tracking, geometry, multi-camera sync.",
+            "whereLearned": "Built the Hyperform inference pipeline — over a million reps analyzed."
+          },
+          {
+            "name": "3D Pose Estimation",
+            "description": "Reconstructing human skeletons from camera input.",
+            "whereLearned": "Co-designed and shipped the Hyperform pose pipeline."
+          },
+          {
+            "name": "RF & Optics",
+            "description": "Radio-frequency propagation and lens-system math.",
+            "whereLearned": "Self-taught while building the optics simulator and RF radar simulator for the AR-glasses research."
+          }
+        ]
+      }
+    ],
+    "cta": "Want to collaborate, ask a question, or just chat? I'm open to hardware/software collaborations, technical advising, speaking, and the kind of email that starts with \"this is going to sound dumb but…\""
+  },
+  "now": {
+    "updatedLabel": "Now · Updated April 23, 2026",
+    "intro": "A snapshot of what's on my workbench, my desk, and my mind. Inspired by Derek Sivers' /now movement. I update this when something meaningfully changes.",
+    "sections": [
+      {
+        "label": "Building",
+        "items": [
+          {
+            "title": "Meridian",
+            "body": "Native macOS life-OS — calendar, tasks, Canvas LMS, all in one keyboard-first surface. The unified CalendarFeed architecture is finally solid; now I'm focused on the planning engine's slot-finder and getting the recurrence expander 100% deterministic.",
+            "href": "/products/meridian"
+          },
+          {
+            "title": "Probe",
+            "body": "Notch-anchored class copilot. The notch UI works; the prompt engineering for fidelity across five note styles is where the time is going. Small local LLMs love to fabricate structure, and I'm building anti-fabrication heuristics into every template.",
+            "href": "/products/probe"
+          },
+          {
+            "title": "Hyperform Fitness",
+            "body": "Edge-first computer-vision platform we co-founded. Past 1M reps. Currently focused on multi-camera sync improvements and pushing toward real-time corrective feedback at sub-100ms across more lift variations.",
+            "href": "/products/hyperform-fitness"
+          }
+        ]
+      },
+      {
+        "label": "Reading",
+        "items": [
+          {
+            "title": "Antenna theory & Maxwell's equations",
+            "body": "For the next iteration of the RF radar simulator — finally trying to understand the math under the propagation engine I built two years ago."
+          },
+          {
+            "title": "The Mythical Man-Month",
+            "body": "Re-reading after a year of managing interns at Hyperform. Lots of \"oh that's why\" moments."
+          },
+          {
+            "title": "Designing Data-Intensive Applications",
+            "body": "Background reading for the Meridian sync layer."
+          }
+        ]
+      },
+      {
+        "label": "Listening",
+        "items": [
+          {
+            "title": "Bach — Cello Suite No. 1, Prelude",
+            "body": "Practicing this on cello and piano simultaneously. They make different sense in each hand."
+          },
+          {
+            "title": "Bon Iver — SABLE,",
+            "body": "On heavy rotation in the workshop."
+          }
+        ]
+      },
+      {
+        "label": "Tinkering",
+        "items": [
+          {
+            "title": "Glove chord input",
+            "body": "Capacitive touch + ESP32, mapped to a stenotype-style chord set for the AR glasses."
+          },
+          {
+            "title": "Rebuilding my workshop",
+            "body": "Better dust collection on the lathe, a proper soldering station, and a CNC fixture plate that doesn't wobble."
+          }
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "intro": "Have a project idea, technical question, or just want to say hi? Send a message — I read everything and respond within 24–48 hours.",
+    "openTo": [
+      "Hardware / software collaborations",
+      "Technical consulting or advising",
+      "Speaking or demo opportunities",
+      "Feedback on projects in flight"
+    ]
+  },
+  "homepage": {
+    "closerHeadline": "The fastest way to make me smile is an {accent:interesting email}.",
+    "closerBody": "I read every message. Hardware, computer vision, native macOS, what it's like to run a startup in high school — let's talk.",
+    "newsletterBody": "Occasional notes when I ship something new. No noise, no schedule."
+  },
+  "footer": {
+    "tagline": "Building under ChargerTools LLC in Soquel, CA. Usually at a workbench, a lathe, or a lifter's squat rack; occasionally at a piano."
+  }
+}

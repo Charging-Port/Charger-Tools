@@ -1,30 +1,14 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Camera } from "lucide-react";
+import { getSiteText } from "@/lib/site-text";
+import { SkillsBoard } from "@/components/skills-board";
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "About Kaden MacLean — Hyperform Fitness co-founder, FRC Team 254, ChargerTools, computer vision, robotics, and music.",
 };
-
-const quickFacts = [
-  { k: "Born", v: "2008" },
-  { k: "School", v: "Bellarmine '27" },
-  { k: "Based", v: "Soquel, CA" },
-  { k: "Company", v: "ChargerTools LLC" },
-  { k: "Co-founded", v: "Hyperform Fitness" },
-  { k: "Team", v: "FRC 254 — Cheesy Poofs" },
-  { k: "Instruments", v: "Piano · Cello · Viola · Bass" },
-  { k: "Languages", v: "Swift · Python · TypeScript" },
-];
-
-const skills = [
-  { category: "Programming", items: ["Python", "Swift", "TypeScript", "JavaScript", "Linux CLI"] },
-  { category: "Frameworks", items: ["SwiftUI", "AppKit", "Anthropic API", "OAuth2/PKCE", "OpenCV", "WhisperKit"] },
-  { category: "Manufacturing", items: ["CNC Router", "Lathe", "TIG Welding", "Mill", "Brake", "Soldering", "PCB Design", "CAD"] },
-  { category: "Systems", items: ["Embedded Linux", "Cybersecurity", "Networking", "Computer Vision", "3D Pose Estimation", "RF & Optics"] },
-];
 
 const timeline = [
   {
@@ -76,7 +60,6 @@ function PhotoFrame({ caption }: { caption: string }) {
   return (
     <figure className="border border-border rounded-md bg-card/40 overflow-hidden">
       <div className="aspect-[4/3] grid place-items-center bg-card/40 relative overflow-hidden">
-        {/* Crosshatch pattern as a "no image yet" placeholder */}
         <svg
           aria-hidden="true"
           className="absolute inset-0 w-full h-full text-border/60"
@@ -100,6 +83,9 @@ function PhotoFrame({ caption }: { caption: string }) {
 }
 
 export default function AboutPage() {
+  const text = getSiteText();
+  const about = text.about;
+
   return (
     <div className="pt-32 md:pt-40 pb-24">
       <div className="mx-auto max-w-6xl px-6">
@@ -116,64 +102,22 @@ export default function AboutPage() {
         <div className="grid grid-cols-12 gap-6 md:gap-12 mb-24 border-t border-border pt-12">
           <div className="col-span-12 md:col-span-8">
             <p className="text-2xl md:text-3xl font-serif italic text-foreground leading-[1.2] mb-8">
-              I&apos;m Kaden MacLean — a junior at Bellarmine College Prep
-              building at the intersection of hardware, software, and human
-              movement.
+              {about.quote}
             </p>
             <div className="space-y-5 text-foreground/85 leading-[1.75] text-[17px]">
-              <p>
-                <span className="float-left font-serif italic text-accent text-7xl leading-[0.85] pr-3 pt-1.5 -mt-1">
-                  I
-                </span>
-                co-founded{" "}
-                <a
-                  href="https://hyperformfit.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-foreground link-underline"
-                >
-                  Hyperform Fitness
-                </a>
-                , a computer-vision startup that tracks human movement in real
-                time and delivers corrective feedback to athletes during their
-                actual sets — not minutes later in a video review, but right
-                then, while the bar is still on their back. We&apos;ve analyzed
-                over a million reps across gyms, rehab centers, and sports
-                medicine programs.
-              </p>
-              <p>
-                I also run{" "}
-                <span className="text-foreground">ChargerTools LLC</span>,
-                where I build native macOS applications and dive into hardware
-                projects: ChargerAgent (a Swift AI agent with real tool use),
-                Charger Mail (a privacy-first email client with local AI),
-                Meridian (a calm, keyboard-first life-OS), Probe (a
-                notch-anchored class copilot that runs entirely on-device), and
-                a series of physics simulators that started as research tools
-                for my AR glasses prototype.
-              </p>
-              <p>
-                I&apos;m on FRC Team 254 (The Cheesy Poofs), where I work in
-                manufacturing, assembly &amp; wiring, and serve as Human Player.
-                I was selected to the FIRST Hall of Fame Student Advisory
-                Council and represent Team 254 for 2025–2026. I previously
-                captained a CyberPatriot team to National Semi-Finalist in Linux
-                security competition, and was an invited speaker at
-                Georgetown&apos;s NSLC on nuclear-weapons threats to homeland
-                security.
-              </p>
-              <p>
-                When I&apos;m not in front of a screen or a lathe, I&apos;m
-                playing piano, cello, viola, or bass — principal bassist of BCP
-                Chamber Orchestra and a classical pianist since I was four.
-                There&apos;s a thread between practicing a Chopin etude and
-                debugging a pose-estimation pipeline that I find hard to
-                articulate but easy to feel.
-              </p>
+              {about.bio.map((paragraph, i) => (
+                <p key={i}>
+                  {i === 0 && (
+                    <span className="float-left font-serif italic text-accent text-7xl leading-[0.85] pr-3 pt-1.5 -mt-1">
+                      {paragraph.charAt(0)}
+                    </span>
+                  )}
+                  {i === 0 ? paragraph.slice(1) : paragraph}
+                </p>
+              ))}
             </div>
           </div>
 
-          {/* Marginalia column */}
           <aside className="col-span-12 md:col-span-4 space-y-8">
             <PhotoFrame caption="At the bench / 2026" />
             <div className="border-l-2 border-accent pl-5">
@@ -181,7 +125,7 @@ export default function AboutPage() {
                 Quick facts
               </p>
               <dl className="space-y-2.5 text-[13px]">
-                {quickFacts.map((f) => (
+                {about.quickFacts.map((f) => (
                   <div key={f.k} className="flex gap-3">
                     <dt className="font-mono text-[11px] text-muted-foreground/70 w-20 shrink-0">
                       {f.k}
@@ -192,10 +136,7 @@ export default function AboutPage() {
               </dl>
             </div>
             <p className="text-xs text-muted-foreground italic font-serif leading-relaxed">
-              &ldquo;The discipline carries over into engineering — both
-              require obsession with detail, deliberate practice, and the
-              patience to slow down on the parts that aren&apos;t working
-              yet.&rdquo;
+              &ldquo;{about.pullQuote}&rdquo;
             </p>
           </aside>
         </div>
@@ -235,24 +176,16 @@ export default function AboutPage() {
 
           {/* Skills */}
           <section className="py-12 border-t border-border">
-            <div className="flex items-baseline gap-3 mb-10">
+            <div className="flex items-baseline gap-3 mb-4">
               <span className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
                 Skills &amp; tools
               </span>
               <span className="h-px flex-1 bg-border" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {skills.map((group) => (
-                <div key={group.category}>
-                  <h3 className="font-serif text-xl text-foreground mb-3">
-                    {group.category}
-                  </h3>
-                  <p className="text-sm text-foreground/75 leading-relaxed">
-                    {group.items.join(" · ")}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-muted-foreground mb-10">
+              Tap a skill to see what it is and where I learned it.
+            </p>
+            <SkillsBoard groups={about.skills} />
           </section>
 
           {/* Music */}
@@ -293,10 +226,7 @@ export default function AboutPage() {
           {/* CTA */}
           <div className="py-12 border-t border-border">
             <p className="text-foreground/75 leading-relaxed mb-5">
-              Want to collaborate, ask a question, or just chat? I&apos;m open
-              to hardware/software collaborations, technical advising, speaking,
-              and the kind of email that starts with &ldquo;this is going to
-              sound dumb but…&rdquo;
+              {about.cta}
             </p>
             <Link
               href="/contact"
