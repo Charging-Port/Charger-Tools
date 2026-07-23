@@ -1,47 +1,61 @@
 // ============================================================
 // Charger — scripts
 // ------------------------------------------------------------
-// Everything about a work entry lives in the WORKS array below —
-// the single source of truth.
+// CONTENT lives in /content.json (works, about, contact) — the
+// single source of truth, editable from the dev dashboard. This
+// file fetches it and renders the page; if the fetch fails, the
+// FALLBACK works below and the baked-in HTML keep the page whole.
 //
 // PIPELINE:
-//   WORKS (data) → renderIndex() → <ol data-items> in index.html
-//   plus: header filters, footer count/years, © year.
+//   /content.json → render works / about / contact
+//   plus: header filters, footer meta, hover previews, scroll-spy,
+//   copy buttons, custom cursor, clock, reveals.
 //
-// To ADD a project: append an object to WORKS. Entries are
-// numbered 001..N in source order and displayed reversed
-// (highest number first). Nothing else to touch.
+// Text fields support minimal emphasis: *italic* and **bold**.
 // ============================================================
 
 /**
  * @typedef {Object} Work
  * @property {string} title  - Project name.
- * @property {string} role   - Your role / the client / the medium.
+ * @property {string} type   - Type / medium / client. (Column T.)
  * @property {number|string} year - Year (or "2024–25").
  * @property {string} [url]  - Optional link (live site, repo, case study).
+ * @property {string} [media] - Optional preview image (assets/images/…).
  * @property {string[]} [tags] - Optional filter tags (e.g. ["Web","Tool"]).
  */
 
-/** @type {Work[]} */
-const WORKS = [
-  // --- Placeholder entries. Replace with real work. -----------------
-  { title: "Placeholder Project One", role: "Design & Build", year: 2026, tags: ["Web"], url: "#" },
-  { title: "Placeholder Project Two", role: "Tool", year: 2025, tags: ["Tool"], url: "#" },
-  { title: "Placeholder Project Three", role: "Experiment", year: 2025, tags: ["Web"], url: "#" },
-  { title: "Placeholder Project Four", role: "Client Work", year: 2024, tags: ["Client"], url: "#" },
+/** @type {Work[]} Fallback if /content.json can't be fetched. */
+const FALLBACK_WORKS = [
+  { title: "Placeholder Project One", type: "Design & Build", year: 2026, tags: ["Web"], url: "#" },
+  { title: "Placeholder Project Two", type: "Tool", year: 2025, tags: ["Tool"], url: "#" },
+  { title: "Placeholder Project Three", type: "Experiment", year: 2025, tags: ["Web"], url: "#" },
+  { title: "Placeholder Project Four", type: "Client Work", year: 2024, tags: ["Client"], url: "#" },
 ];
 
 // ------------------------------------------------------------
-// RENDER
+// CONTENT
 // ------------------------------------------------------------
+async function loadContent() {
+  try {
+    const res = await fetch("/content.json", { cache: "no-cache" });
+    if (!res.ok) throw new Error(String(res.status));
+    const data = await res.json();
+    if (!Array.isArray(data.works)) throw new Error("bad shape");
+    return data;
+  } catch {
+    return { works: FALLBACK_WORKS, about: null, contact: null };
+  }
+}
 
-/** Zero-pad an index to 3 digits: 7 → "007". */
+// ------------------------------------------------------------
+// UTIL
+// ------------------------------------------------------------
 function pad(n) {
   return String(n).padStart(3, "0");
 }
 
 function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, (c) => ({
+  return String(str).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -50,11 +64,30 @@ function escapeHtml(str) {
   })[c]);
 }
 
-/**
- * One index row. The whole row is a link when `url` is present.
- * @param {Work} work
- * @param {number} num 1-based display number
- */
+/** Escape, then allow **bold** and *italic* only. */
+function richText(str) {
+  return escapeHtml(str)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+// ------------------------------------------------------------
+// RENDER — index rows
+// ------------------------------------------------------------
+
+/** Preview image for a work: its media, or a generated number card. */
+function thumbFor(work, num) {
+  if (work.media) return work.media;
+  const svg =
+    "<svg xmlns='http://www.w3.org/2000/svg' width='480' height='320'>" +
+    "<rect width='480' height='320' fill='#f4f3ef'/>" +
+    "<rect x='1' y='1' width='478' height='318' fill='none' stroke='#dddbd4' stroke-width='2'/>" +
+    "<text x='34' y='216' font-family='Space Grotesk, Helvetica, Arial, sans-serif' font-size='150' font-weight='500' fill='#d9d7d0'>" +
+    pad(num) +
+    "</text></svg>";
+  return "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
 function renderRow(work, num) {
   const li = document.createElement("li");
   li.className = "work";
@@ -71,11 +104,12 @@ function renderRow(work, num) {
     }
     row.setAttribute("aria-label", `${work.title}, ${work.year}`);
   }
+  row.dataset.thumb = thumbFor(work, num);
 
   row.innerHTML = `
     <span class="c-num">${pad(num)}</span>
     <span class="c-title">${escapeHtml(work.title)}</span>
-    <span class="c-role">${escapeHtml(work.role)}</span>
+    <span class="c-role">${escapeHtml(work.type || work.role || "")}</span>
     <span class="c-year">${escapeHtml(String(work.year))}</span>
   `;
 
@@ -83,15 +117,54 @@ function renderRow(work, num) {
   return li;
 }
 
-/** Render all rows into <ol data-items>, newest number first. */
-function renderIndex() {
+function renderIndex(works) {
   const list = document.querySelector("[data-items]");
   if (!list) return;
 
-  const rows = WORKS.map((work, i) => renderRow(work, i + 1)).reverse();
+  const rows = works.map((work, i) => renderRow(work, i + 1)).reverse();
   rows.forEach((li, i) => {
-    // Staggered entrance — delay set via CSSOM (CSP-safe).
     li.style.animationDelay = `${0.05 + i * 0.03}s`;
+    list.appendChild(li);
+  });
+}
+
+// ------------------------------------------------------------
+// RENDER — about + contact (leave baked HTML if content missing)
+// ------------------------------------------------------------
+function renderAbout(about) {
+  const body = document.querySelector("[data-about-body]");
+  if (!body || !about) return;
+  const parts = [];
+  if (about.lede) parts.push(`<p class="lede">${richText(about.lede)}</p>`);
+  (about.paragraphs || []).forEach((p) => parts.push(`<p>${richText(p)}</p>`));
+  if (parts.length) body.innerHTML = parts.join("");
+}
+
+function renderContact(contact) {
+  const list = document.querySelector("[data-contact-list]");
+  if (!list || !contact || !contact.length) return;
+  list.innerHTML = "";
+  contact.forEach((row) => {
+    const li = document.createElement("li");
+    const k = document.createElement("span");
+    k.className = "k";
+    k.textContent = row.label;
+    li.appendChild(k);
+
+    let v;
+    if (row.href) {
+      v = document.createElement("a");
+      v.href = row.href;
+      if (/^https?:/.test(row.href)) {
+        v.rel = "me noopener";
+        v.target = "_blank";
+      }
+    } else {
+      v = document.createElement("span");
+    }
+    v.textContent = row.value;
+    if (row.href && row.href.startsWith("mailto:")) v.dataset.copy = row.value;
+    li.appendChild(v);
     list.appendChild(li);
   });
 }
@@ -104,11 +177,11 @@ function set(selector, text) {
   if (el) el.textContent = text;
 }
 
-function renderMeta() {
-  set("[data-count]", pad(WORKS.length));
+function renderMeta(works) {
+  set("[data-count]", pad(works.length));
   set("[data-year]", String(new Date().getFullYear()));
 
-  const years = WORKS.map((w) => parseInt(String(w.year), 10)).filter(Boolean);
+  const years = works.map((w) => parseInt(String(w.year), 10)).filter(Boolean);
   if (years.length) {
     const lo = Math.min(...years);
     const hi = Math.max(...years);
@@ -117,14 +190,13 @@ function renderMeta() {
 }
 
 // ------------------------------------------------------------
-// FILTERS — a comma-separated word list in the header,
-// generated from tags; hidden if fewer than 2 distinct tags.
+// FILTERS — comma-separated word list from tags; hidden if < 2.
 // ------------------------------------------------------------
-function buildFilters() {
+function buildFilters(works) {
   const wrap = document.querySelector("[data-filters]");
   if (!wrap) return;
 
-  const tags = [...new Set(WORKS.flatMap((w) => w.tags || []))];
+  const tags = [...new Set(works.flatMap((w) => w.tags || []))];
   if (tags.length < 2) return;
 
   const makeBtn = (label, value, pressed) => {
@@ -135,7 +207,6 @@ function buildFilters() {
     b.setAttribute("aria-pressed", String(pressed));
     return b;
   };
-
   const makeSep = () => {
     const s = document.createElement("span");
     s.className = "sep";
@@ -165,8 +236,68 @@ function buildFilters() {
 }
 
 // ------------------------------------------------------------
-// SCROLL-SPY — darken the About/Contact header links while
-// their section is in view.
+// PREVIEW — a floating image that trails the cursor over index
+// rows, in the manner of the Watanabe / Archivio references.
+// Fine pointers only.
+// ------------------------------------------------------------
+function initPreview() {
+  if (!window.matchMedia("(pointer: fine)").matches) return;
+  const list = document.querySelector("[data-items]");
+  if (!list) return;
+
+  const box = document.createElement("div");
+  box.className = "preview";
+  box.setAttribute("aria-hidden", "true");
+  const img = document.createElement("img");
+  img.alt = "";
+  box.appendChild(img);
+  document.body.appendChild(box);
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let x = 0;
+  let y = 0;
+  let px = 0;
+  let py = 0;
+  let visible = false;
+  let raf = null;
+
+  function place() {
+    box.style.transform = `translate(${px}px, ${py}px)`;
+  }
+  function loop() {
+    px += (x - px) * (reduce ? 1 : 0.14);
+    py += (y - py) * (reduce ? 1 : 0.14);
+    place();
+    raf = visible ? requestAnimationFrame(loop) : null;
+  }
+
+  list.addEventListener("pointerover", (e) => {
+    const row = e.target.closest(".row");
+    if (!row || !list.contains(row)) return;
+    const src = row.dataset.thumb;
+    if (!src) return;
+    if (img.getAttribute("src") !== src) img.src = src;
+    if (!visible) {
+      visible = true;
+      px = x = e.clientX + 28;
+      py = y = e.clientY - 90;
+      place();
+      box.classList.add("on");
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+  });
+  list.addEventListener("pointermove", (e) => {
+    x = e.clientX + 28;
+    y = e.clientY - 90;
+  });
+  list.addEventListener("pointerleave", () => {
+    visible = false;
+    box.classList.remove("on");
+  });
+}
+
+// ------------------------------------------------------------
+// SCROLL-SPY
 // ------------------------------------------------------------
 function initSpy() {
   if (!("IntersectionObserver" in window)) return;
@@ -191,12 +322,12 @@ function initSpy() {
 }
 
 // ------------------------------------------------------------
-// COPY — progressive enhancement: a small "Copy" button after
-// any element with data-copy (used for the email address).
+// COPY — small "Copy" button after any [data-copy] element.
 // ------------------------------------------------------------
 function initCopy() {
   if (!navigator.clipboard) return;
   document.querySelectorAll("[data-copy]").forEach((el) => {
+    if (el.nextElementSibling && el.nextElementSibling.classList.contains("copy-btn")) return;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "copy-btn";
@@ -212,7 +343,7 @@ function initCopy() {
           btn.classList.remove("did");
         }, 1600);
       } catch {
-        /* clipboard unavailable — leave the button as-is */
+        /* clipboard unavailable */
       }
     });
     el.after(btn);
@@ -220,10 +351,7 @@ function initCopy() {
 }
 
 // ------------------------------------------------------------
-// CURSOR — a small dot with a trailing ring. Fine pointers only;
-// skipped entirely under prefers-reduced-motion. Blend-mode
-// difference (in CSS) keeps it visible over paper, chips, and
-// dark mode.
+// CURSOR — dot + trailing ring; fine pointers, no reduced motion.
 // ------------------------------------------------------------
 function initCursor() {
   if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -284,8 +412,7 @@ function initCursor() {
 }
 
 // ------------------------------------------------------------
-// CLOCK — a small live HH:MM in the footer; the colon blinks
-// via CSS. Purely a sign of life.
+// CLOCK — live HH:MM in the footer.
 // ------------------------------------------------------------
 function initClock() {
   const el = document.querySelector("[data-clock]");
@@ -305,8 +432,7 @@ function initClock() {
 }
 
 // ------------------------------------------------------------
-// REVEAL — sections fade up as they enter the viewport.
-// (CSS hides them only when html.js is set, so no-JS still works.)
+// REVEAL — sections fade up as they enter the viewport (fail-open).
 // ------------------------------------------------------------
 function initReveal() {
   const targets = [...document.querySelectorAll(".section, .footer")];
@@ -333,15 +459,11 @@ function initReveal() {
   );
 
   targets.forEach((el) => {
-    // Anything already in view reveals immediately — content must
-    // never wait on the observer.
     const r = el.getBoundingClientRect();
     if (r.top < innerHeight && r.bottom > 0) reveal(el);
     else io.observe(el);
   });
 
-  // Fail-open: a healthy engine always fires the initial callback.
-  // If it never comes (broken embedders), show everything.
   setTimeout(() => {
     if (!ioFired) targets.forEach(reveal);
   }, 1500);
@@ -352,10 +474,16 @@ function initReveal() {
 // ------------------------------------------------------------
 document.documentElement.classList.add("js");
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderIndex();
-  renderMeta();
-  buildFilters();
+document.addEventListener("DOMContentLoaded", async () => {
+  const content = await loadContent();
+
+  renderIndex(content.works);
+  renderMeta(content.works);
+  buildFilters(content.works);
+  renderAbout(content.about);
+  renderContact(content.contact);
+
+  initPreview();
   initSpy();
   initCopy();
   initCursor();

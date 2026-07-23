@@ -20,15 +20,25 @@ python3 -m http.server 3000   # static preview (middleware/auth won't run locall
 
 ## Edit content
 
-- **Work entries** → the `WORKS` array in `js/main.js` (single source of truth).
-- **About / contact** → `index.html`.
-- **Staff page** → `_private/dev/index.html` (self-contained file).
+All public content (works, about, contact) lives in **`content.json`** — the
+single source of truth. Two ways to edit:
+
+- **The dev dashboard** (`dev.charger.tools`, section E.) — edit in the
+  browser, hit Publish; it commits to GitHub and Vercel auto-deploys.
+- **By hand** — edit `content.json`, push to `main` (auto-deploys).
+
+The staff page itself is `_private/dev/index.html` (self-contained file).
+Work entries support an optional `media` image (drop files in
+`/assets/images/`) shown as a hover preview on the index.
 
 ## Deploy
+
+Pushes to `main` on GitHub **auto-deploy** (Vercel↔GitHub link, added
+2026-07). Manual fallback:
 
 ```bash
 npx -y vercel@latest --prod --yes
 ```
 
 Must be logged into Vercel as `charging-port` (not the personal Google
-account). Deploys are manual; pushing to GitHub alone changes nothing.
+account).

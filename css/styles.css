@@ -348,6 +348,42 @@ html.has-cursor * {
   display: none;
 }
 
+/* Floating preview — an image that trails the cursor over index
+   rows (the Watanabe/Archivio move). Injected by js/main.js;
+   entries without media get a generated number card. */
+.preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 150; /* under the grain (190) and cursor (200) */
+  width: min(21rem, 36vw);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+.preview img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 44px rgba(15, 15, 12, 0.16);
+  transform: scale(0.97);
+  transition: transform 0.22s var(--ease);
+}
+.preview.on {
+  opacity: 1;
+  transition: opacity 0.18s var(--ease);
+}
+.preview.on img {
+  transform: none;
+}
+@media (prefers-color-scheme: dark) {
+  .preview img {
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  }
+}
+
 /* External rows hint at leaving the site on hover. */
 .row.ext .c-title::after {
   content: " ↗";

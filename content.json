@@ -1,0 +1,48 @@
+{
+  "works": [
+    {
+      "title": "Placeholder Project One",
+      "type": "Design & Build",
+      "year": 2026,
+      "url": "#",
+      "media": "",
+      "tags": ["Web"]
+    },
+    {
+      "title": "Placeholder Project Two",
+      "type": "Tool",
+      "year": 2025,
+      "url": "#",
+      "media": "",
+      "tags": ["Tool"]
+    },
+    {
+      "title": "Placeholder Project Three",
+      "type": "Experiment",
+      "year": 2025,
+      "url": "#",
+      "media": "",
+      "tags": ["Web"]
+    },
+    {
+      "title": "Placeholder Project Four",
+      "type": "Client Work",
+      "year": 2024,
+      "url": "#",
+      "media": "",
+      "tags": ["Client"]
+    }
+  ],
+  "about": {
+    "lede": "Small tools over big promises — *make it, use it, file it*.",
+    "paragraphs": [
+      "**Charger** is the personal pseudonym of a builder of small tools, sites, and experiments. Everything above was made by hand; most of it is in use somewhere right now.",
+      "Requests, questions, and collaborations are welcome — the fastest way to reach me is below."
+    ]
+  },
+  "contact": [
+    { "label": "Email", "value": "kaden@charger.tools", "href": "mailto:kaden@charger.tools" },
+    { "label": "GitHub", "value": "github.com/Charging-Port", "href": "https://github.com/Charging-Port" },
+    { "label": "Site", "value": "charger.tools", "href": "" }
+  ]
+}

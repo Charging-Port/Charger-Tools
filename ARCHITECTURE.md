@@ -23,21 +23,27 @@ Hand-coded static site. No framework, no build step, no dependencies.
 
 ## Content model
 
-- **Work entries** → the `WORKS` array in `js/main.js`. Single source of
-  truth. Entries are numbered `001..N` in source order and printed reversed
-  (highest number first). An entry:
+- **All public content** → `content.json` (works, about, contact) — the
+  single source of truth, fetched by `js/main.js` at load (with a baked-in
+  fallback if the fetch fails). Editable from the dev dashboard's editor
+  (section E.), which commits it to GitHub via the contents API;
+  the Vercel↔GitHub link then auto-deploys. A work entry:
 
-  ```js
+  ```json
   {
-    title: "Project Name",   // required
-    role:  "Design & Build", // required — role / client / medium
-    year:  2026,             // required — number or "2024–25"
-    url:   "https://…",      // optional — links the line item
-    tags:  ["Web", "Tool"],  // optional — powers the DEPT filter row
+    "title": "Project Name",
+    "type": "Design & Build",
+    "year": 2026,
+    "url": "https://…",
+    "media": "/assets/images/x.jpg",
+    "tags": ["Web", "Tool"]
   }
   ```
 
-- **About copy, contact links** → edit `index.html` directly.
+  Entries are numbered `001..N` in array order and printed reversed
+  (highest number first). `media` powers the cursor-trailing hover
+  preview (entries without one get a generated number card). Text fields
+  support `*italic*` and `**bold**`.
 - **Staff dashboard content** → edit `_private/dev/index.html` directly.
   Its notes + todo "register" persist to localStorage in the viewer's
   browser only — nothing is stored server-side.
@@ -106,8 +112,10 @@ dev.* host, or apex /_private/*, /dev/login, /dev/logout
 
 ## Deploy
 
-Vercel, project `charger-tools`, team `charging-ports-projects`. Deploys are
-**manual** (no git integration):
+Vercel, project `charger-tools`, team `charging-ports-projects`. The project
+is **linked to GitHub** (added 2026-07): pushes to `main` auto-deploy to
+production, which is what makes the dev editor's publish loop work.
+Manual fallback:
 
 ```bash
 npx -y vercel@latest --prod --yes
