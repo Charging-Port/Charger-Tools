@@ -18,6 +18,19 @@
    ============================================================ */
 
 /* ============================================================
+   0 — TYPE
+   Space Grotesk (variable, OFL — see assets/fonts/OFL.txt),
+   self-hosted so the strict CSP stays font-src 'self'.
+   ============================================================ */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/SpaceGrotesk-var.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
    1 — TOKENS
    ============================================================ */
 :root {
@@ -27,10 +40,15 @@
   --muted-dark: #6e6c66;  /* prose-adjacent gray */
   --line: #e9e8e3;
 
-  --font: "Helvetica Neue", "Inter", "Arial", system-ui, sans-serif;
+  --font: "Space Grotesk", "Helvetica Neue", "Inter", "Arial", system-ui,
+    sans-serif;
+  --font-serif: "Georgia", "Times New Roman", serif; /* italic accents */
 
-  --fs: 0.875rem;      /* 14px — everything lives at this size */
+  --fs: 0.875rem;      /* 14px — the working size */
+  --fs-title: 0.9375rem; /* 15px — index row titles */
+  --fs-lede: 1.125rem; /* 18px — about lede */
   --fs-sm: 0.75rem;    /* 12px — colophon */
+  --fs-hero: clamp(2.1rem, 5.5vw, 4.25rem);
 
   /* The shared grid: number / title / role / year */
   --col-num: 3.5rem;
@@ -92,6 +110,24 @@ body {
   padding: var(--pad-y) var(--pad-x) 0;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* A whisper of print grain over everything — material, not skeuomorph. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 190; /* above content, below the cursor (200) */
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+}
+@media (prefers-color-scheme: dark) {
+  body::after {
+    mix-blend-mode: screen;
+    opacity: 0.05;
+  }
 }
 
 h1,
@@ -250,19 +286,54 @@ html.has-cursor * {
 }
 
 /* ============================================================
+   4.5 — HERO
+   The one display moment: an oversized statement aligned to the
+   title column, with serif-italic accents.
+   ============================================================ */
+.hero {
+  margin-top: clamp(4rem, 13vh, 8rem);
+}
+.hero-line {
+  grid-column: 2 / -1;
+  font-size: var(--fs-hero);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.hero-line em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.hero-sub {
+  grid-column: 2 / -1;
+  margin-top: 1.1rem;
+  color: var(--muted-dark);
+  max-width: 34rem;
+}
+
+/* ============================================================
    5 — INDEX
    ============================================================ */
 .colheads {
-  margin-top: clamp(3rem, 9vh, 5.5rem);
-  margin-bottom: 1.6rem;
+  margin-top: clamp(3.5rem, 10vh, 6rem);
+  margin-bottom: 0;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
   color: var(--muted);
 }
 
 .work + .work {
-  margin-top: 0.1rem;
+  margin-top: 0;
+}
+.work {
+  border-bottom: 1px solid var(--line);
 }
 .row {
-  padding-block: 0.22rem;
+  padding-block: 0.75rem;
   transition: color 0.15s var(--ease);
 }
 .c-num,
@@ -279,6 +350,8 @@ html.has-cursor * {
 }
 .c-title {
   color: var(--ink);
+  font-size: var(--fs-title);
+  font-weight: 500;
   transition: color 0.15s var(--ease);
 }
 
@@ -341,6 +414,18 @@ html.has-cursor * {
 .section-body p + p {
   margin-top: 0.9rem;
 }
+/* The about lede sits a register above the working size. */
+.section-body .lede {
+  font-size: var(--fs-lede);
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.section-body .lede em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
 .section-body,
 .section-body a {
   color: var(--muted-dark);
@@ -389,15 +474,52 @@ html.has-cursor * {
 }
 
 /* ============================================================
+   6.5 — TICKER
+   A slow editorial marquee above the footer. Decorative only
+   (aria-hidden); pauses on hover; static under reduced motion.
+   ============================================================ */
+.ticker {
+  margin-top: clamp(6rem, 18vh, 11rem);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  user-select: none;
+}
+.ticker__track {
+  display: flex;
+  width: max-content;
+  white-space: nowrap;
+}
+.ticker__track span {
+  padding-block: 0.55rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ticker__track {
+    animation: ticker 55s linear infinite;
+  }
+  .ticker:hover .ticker__track {
+    animation-play-state: paused;
+  }
+  @keyframes ticker {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* ============================================================
    7 — FOOTER
    ============================================================ */
 .footer {
-  margin-top: clamp(6rem, 20vh, 12rem);
+  margin-top: 0; /* the ticker above provides the separation */
   padding-block: 1.1rem calc(var(--pad-y) + 0.2rem);
   display: flex;
   justify-content: space-between;
   gap: var(--col-gap);
-  border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: var(--fs-sm);
 }

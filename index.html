@@ -19,7 +19,16 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161613'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='17' fill='%23fbfbf9'%3EC.%3C/text%3E%3C/svg%3E"
     />
+    <link
+      rel="preload"
+      href="/assets/fonts/SpaceGrotesk-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="stylesheet" href="/css/styles.css" />
+    <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)" />
   </head>
 
   <body>
@@ -51,11 +60,23 @@
     </header>
 
     <main>
+      <!-- The one display moment — aligned to the title column. -->
+      <section class="hero grid" aria-label="Introduction">
+        <h1 class="hero-line">
+          An index of <em>tools</em>, <em>sites</em> &amp;
+          <em>experiments</em> — built by hand.
+        </h1>
+        <p class="hero-sub">
+          Charger is the working archive of one builder. Numbered, dated,
+          and in use.
+        </p>
+      </section>
+
       <section id="index" aria-label="Selected work">
         <div class="colheads grid" aria-hidden="true">
           <span class="c-num" title="Number">N.</span>
           <span class="c-title" title="Project">P.</span>
-          <span class="c-role" title="Role">R.</span>
+          <span class="c-role" title="Type">T.</span>
           <span class="c-year" title="Year">Y.</span>
         </div>
 
@@ -65,8 +86,7 @@
 
         <noscript>
           <p class="index-fallback">
-            The index renders with JavaScript — enable it to browse the work,
-            or read the <code>WORKS</code> array in <code>js/main.js</code>.
+            The index renders with JavaScript — enable it to browse the works.
           </p>
         </noscript>
       </section>
@@ -77,8 +97,11 @@
       <section id="about" class="section grid" aria-labelledby="about-label">
         <h2 class="section-label" id="about-label">A.</h2>
         <div class="section-body">
+          <p class="lede">
+            Small tools over big promises — <em>make it, use it, file it</em>.
+          </p>
           <p>
-            <strong>Charger</strong> is the personal index of a builder of
+            <strong>Charger</strong> is the personal pseudonym of a builder of
             small tools, sites, and experiments. Everything above was made by
             hand; most of it is in use somewhere right now.
           </p>
@@ -114,6 +137,21 @@
         </ul>
       </section>
     </main>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <span>
+          Charger&nbsp;&nbsp;·&nbsp;&nbsp;Personal index&nbsp;&nbsp;·&nbsp;&nbsp;Tools
+          — Sites — Experiments&nbsp;&nbsp;·&nbsp;&nbsp;charger.tools&nbsp;&nbsp;·&nbsp;&nbsp;
+          Made by hand&nbsp;&nbsp;·&nbsp;&nbsp;
+        </span>
+        <span>
+          Charger&nbsp;&nbsp;·&nbsp;&nbsp;Personal index&nbsp;&nbsp;·&nbsp;&nbsp;Tools
+          — Sites — Experiments&nbsp;&nbsp;·&nbsp;&nbsp;charger.tools&nbsp;&nbsp;·&nbsp;&nbsp;
+          Made by hand&nbsp;&nbsp;·&nbsp;&nbsp;
+        </span>
+      </div>
+    </div>
 
     <footer class="footer">
       <p class="footer-meta">
