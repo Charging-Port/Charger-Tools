@@ -48,7 +48,6 @@
   --fs-title: 0.9375rem; /* 15px — index row titles */
   --fs-lede: 1.125rem; /* 18px — about lede */
   --fs-sm: 0.75rem;    /* 12px — colophon */
-  --fs-hero: clamp(2.1rem, 5.5vw, 4.25rem);
 
   /* The shared grid: number / title / role / year */
   --col-num: 3.5rem;
@@ -286,36 +285,6 @@ html.has-cursor * {
 }
 
 /* ============================================================
-   4.5 — HERO
-   The one display moment: an oversized statement aligned to the
-   title column, with serif-italic accents.
-   ============================================================ */
-.hero {
-  margin-top: clamp(4rem, 13vh, 8rem);
-}
-.hero-line {
-  grid-column: 2 / -1;
-  font-size: var(--fs-hero);
-  font-weight: 500;
-  line-height: 1.04;
-  letter-spacing: -0.025em;
-  max-width: 16ch;
-  text-wrap: balance;
-}
-.hero-line em {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-}
-.hero-sub {
-  grid-column: 2 / -1;
-  margin-top: 1.1rem;
-  color: var(--muted-dark);
-  max-width: 34rem;
-}
-
-/* ============================================================
    5 — INDEX
    ============================================================ */
 .colheads {
@@ -474,52 +443,15 @@ html.has-cursor * {
 }
 
 /* ============================================================
-   6.5 — TICKER
-   A slow editorial marquee above the footer. Decorative only
-   (aria-hidden); pauses on hover; static under reduced motion.
-   ============================================================ */
-.ticker {
-  margin-top: clamp(6rem, 18vh, 11rem);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  overflow: hidden;
-  user-select: none;
-}
-.ticker__track {
-  display: flex;
-  width: max-content;
-  white-space: nowrap;
-}
-.ticker__track span {
-  padding-block: 0.55rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ticker__track {
-    animation: ticker 55s linear infinite;
-  }
-  .ticker:hover .ticker__track {
-    animation-play-state: paused;
-  }
-  @keyframes ticker {
-    to {
-      transform: translateX(-50%);
-    }
-  }
-}
-
-/* ============================================================
    7 — FOOTER
    ============================================================ */
 .footer {
-  margin-top: 0; /* the ticker above provides the separation */
+  margin-top: clamp(6rem, 20vh, 12rem);
   padding-block: 1.1rem calc(var(--pad-y) + 0.2rem);
   display: flex;
   justify-content: space-between;
   gap: var(--col-gap);
+  border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: var(--fs-sm);
 }
