@@ -2,15 +2,15 @@
 // Charger — Vercel Edge Middleware (the staff door)
 // ------------------------------------------------------------
 // Runs on EVERY request, before routing/rewrites. Public traffic
-// falls through untouched. Private traffic — /hq, /_private, or
-// any host on PRIVATE_HOSTS (e.g. hq.charger.tools) — requires a
+// falls through untouched. Private traffic — /dev, /_private, or
+// any host on PRIVATE_HOSTS (e.g. dev.charger.tools) — requires a
 // signed session cookie, obtained by POSTing the password to
-// /hq/login (the login page is rendered right here).
+// /dev/login (the login page is rendered right here).
 //
 // Auth model:
-//   • HQ_PASSWORD          — the password (Vercel env var)
-//   • HQ_SESSION_SECRET    — HMAC key for session cookies (env var)
-//   • Cookie: chg_hq=<expiryMs>.<hmacSHA256(secret, "hq1:"+expiryMs)>
+//   • DEV_PASSWORD          — the password (Vercel env var)
+//   • DEV_SESSION_SECRET    — HMAC key for session cookies (env var)
+//   • Cookie: chg_dev=<expiryMs>.<hmacSHA256(secret, "hq1:"+expiryMs)>
 //     HttpOnly, SameSite=Lax, Secure, 7-day expiry,
 //     Domain=.charger.tools in prod so it spans subdomains.
 //
@@ -21,10 +21,10 @@
 // add "<name>." below, and add a host rewrite in vercel.json.
 // ============================================================
 
-const COOKIE = "chg_hq";
+const COOKIE = "chg_dev";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-const PRIVATE_HOSTS = ["hq."]; // host prefixes that are staff-only
-const PRIVATE_PATH = /^\/(hq|_private)(\/|$)/;
+const PRIVATE_HOSTS = ["dev."]; // host prefixes that are staff-only
+const PRIVATE_PATH = /^\/(dev|_private)(\/|$)/;
 const APEX = "charger.tools"; // cookies span *.charger.tools
 
 export default async function middleware(request) {
@@ -35,24 +35,24 @@ export default async function middleware(request) {
 
   if (!privateHost && !privatePath) return; // public — pass through
 
-  const password = process.env.HQ_PASSWORD;
-  const secret = process.env.HQ_SESSION_SECRET;
+  const password = process.env.DEV_PASSWORD;
+  const secret = process.env.DEV_SESSION_SECRET;
   if (!password || !secret) {
     // Fail closed: no credentials configured, no door.
-    return loginPage(503, "REGISTER CLOSED — SET HQ_PASSWORD + HQ_SESSION_SECRET", "/", true);
+    return loginPage(503, "Login is disabled — DEV_PASSWORD and DEV_SESSION_SECRET are not configured.", "/", true);
   }
 
-  const home = privateHost ? "/" : "/hq";
+  const home = privateHost ? "/" : "/dev";
 
   // --- Log out -------------------------------------------------------
-  if (url.pathname === "/hq/logout") {
+  if (url.pathname === "/dev/logout") {
     return redirect(home === "/" ? "https://" + APEX + "/" : "/", {
       "Set-Cookie": buildCookie("", 0, url, host),
     });
   }
 
   // --- Log in --------------------------------------------------------
-  if (url.pathname === "/hq/login" && request.method === "POST") {
+  if (url.pathname === "/dev/login" && request.method === "POST") {
     // Same-origin form posts only (CSRF).
     const origin = request.headers.get("origin");
     if (origin) {
@@ -60,7 +60,7 @@ export default async function middleware(request) {
       try {
         originHost = new URL(origin).hostname.toLowerCase();
       } catch {}
-      if (originHost !== host) return loginPage(403, "CROSS-ORIGIN POST REFUSED", home);
+      if (originHost !== host) return loginPage(403, "Cross-origin request refused.", home);
     }
 
     let attempt = "";
@@ -71,7 +71,7 @@ export default async function middleware(request) {
       const rawNext = String(form.get("next") || "");
       if (/^\/(?!\/)/.test(rawNext)) next = rawNext; // internal paths only
     } catch {
-      return loginPage(400, "MALFORMED REQUEST", home);
+      return loginPage(400, "Malformed request.", home);
     }
 
     if (await safeEqual(attempt, password)) {
@@ -83,7 +83,7 @@ export default async function middleware(request) {
     }
 
     await sleep(400); // mildly slow down brute force
-    return loginPage(401, "INCORRECT PASSWORD — TRY AGAIN", home, false, nextPathFor(url, privateHost));
+    return loginPage(401, "Incorrect password — try again.", home, false, nextPathFor(url, privateHost));
   }
 
   // --- Session check -------------------------------------------------
@@ -119,8 +119,8 @@ function buildCookie(value, maxAgeMs, url, host) {
 }
 
 function nextPathFor(url, privateHost) {
-  if (url.pathname === "/hq/login" || url.pathname === "/hq/logout") {
-    return privateHost ? "/" : "/hq";
+  if (url.pathname === "/dev/login" || url.pathname === "/dev/logout") {
+    return privateHost ? "/" : "/dev";
   }
   return url.pathname + url.search;
 }
@@ -168,7 +168,7 @@ function loginPage(status, notice, home, disabled = false, next = "") {
   const noticeHtml = notice ? '<p class="notice">' + escapeHtml(notice) + "</p>" : "";
   const form = disabled
     ? ""
-    : '<form method="post" action="/hq/login">' +
+    : '<form method="post" action="/dev/login">' +
       '<input type="hidden" name="next" value="' + escapeHtml(next || home) + '" />' +
       '<label for="pw">Password</label>' +
       '<input id="pw" type="password" name="password" autocomplete="current-password" autofocus required />' +

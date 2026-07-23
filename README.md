@@ -5,7 +5,7 @@ column grid, monochrome, lots of whitespace (after satoshiwatanabe.org and
 archivio-uno.com). Hand-coded static HTML/CSS/JS, no framework, no build step.
 
 - **Public:** `charger.tools` — the numbered work index, about, contact.
-- **Private:** `charger.tools/hq` (and `hq.charger.tools` once DNS is set) —
+- **Private:** `charger.tools/dev` (and `dev.charger.tools` once DNS is set) —
   password-protected staff page: quick links, deploy checklist, notes, list.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full map: content model,
@@ -21,7 +21,7 @@ python3 -m http.server 3000   # static preview (middleware/auth won't run locall
 
 - **Work entries** → the `WORKS` array in `js/main.js` (single source of truth).
 - **About / contact** → `index.html`.
-- **Staff page** → `_private/hq/index.html` (self-contained file).
+- **Staff page** → `_private/dev/index.html` (self-contained file).
 
 ## Deploy
 

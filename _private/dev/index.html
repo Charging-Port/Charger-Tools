@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
 
-    <title>Charger — HQ</title>
+    <title>Charger — Dev</title>
 
     <link
       rel="icon"
@@ -13,13 +13,13 @@
     />
 
     <!-- ==========================================================
-         HQ — private back office.
+         DEV — private back office.
          This page is deliberately SELF-CONTAINED (inline CSS + JS):
-         it is served at charger.tools/hq AND at the root of the
-         hq.charger.tools subdomain, so it can't rely on any
+         it is served at charger.tools/dev AND at the root of the
+         dev.charger.tools subdomain, so it can't rely on any
          relative asset paths. Access is enforced by middleware.js.
          Notes + list live in *this browser's* localStorage —
-         nothing is sent anywhere.
+         nothing is sent anywhere. Export makes a JSON backup.
          ========================================================== -->
     <style>
       :root {
@@ -91,11 +91,10 @@
       .kv-list a { color: var(--ink); }
       .kv-list a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-      .steps { color: var(--muted-dark); }
+      .steps { color: var(--muted-dark); counter-reset: step; }
       .steps li { display: flex; gap: 0.9rem; }
       .steps li + li { margin-top: 0.35rem; }
       .steps li::before { content: counter(step, decimal-leading-zero); counter-increment: step; color: var(--muted); }
-      .steps { counter-reset: step; }
       .steps code {
         font-family: ui-monospace, "SF Mono", "Menlo", monospace;
         font-size: 0.8125rem;
@@ -115,10 +114,13 @@
       }
       textarea::placeholder { color: var(--muted); }
       textarea:focus { outline: 1px solid var(--ink); outline-offset: 0; border-color: var(--ink); }
-      .save-state {
-        color: var(--muted);
-        font-size: var(--fs-sm);
+      .note-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
         margin-top: 0.4rem;
+        font-size: var(--fs-sm);
+        color: var(--muted);
         min-height: 1.2em;
       }
 
@@ -146,6 +148,9 @@
       .todo-list li:hover .todo-del, .todo-del:focus-visible { visibility: visible; }
       .todo-del:hover { color: var(--ink); }
       .todo-empty { color: var(--muted); }
+      .todo-foot { margin-top: 0.9rem; font-size: var(--fs-sm); }
+      .todo-foot button { color: var(--muted); }
+      .todo-foot button:hover { color: var(--ink); }
 
       .footer {
         margin-top: clamp(5rem, 16vh, 9rem);
@@ -157,8 +162,9 @@
         color: var(--muted);
         font-size: var(--fs-sm);
       }
-      .footer a { color: var(--muted); }
-      .footer a:hover { color: var(--ink); }
+      .footer a, .footer button { color: var(--muted); font-size: inherit; }
+      .footer a:hover, .footer button:hover { color: var(--ink); }
+      .footer-meta { display: flex; gap: 1.6rem; }
 
       @media (max-width: 40rem) {
         .grid { grid-template-columns: 2.6rem minmax(0, 1fr); }
@@ -169,9 +175,9 @@
 
   <body>
     <header class="top grid">
-      <a class="wordmark" href="/hq">C.</a>
-      <span class="where">HQ — staff only</span>
-      <a class="out" href="/hq/logout">Log out</a>
+      <a class="wordmark" href="/dev">C.</a>
+      <span class="where">Dev — private</span>
+      <a class="out" href="/dev/logout">Log out</a>
     </header>
 
     <main>
@@ -222,7 +228,10 @@
             aria-label="Private notes (stored in this browser)"
             placeholder="Notes — saved in this browser only."
           ></textarea>
-          <p class="save-state" data-notes-state></p>
+          <p class="note-foot">
+            <span data-notes-state></span>
+            <span data-notes-hint hidden>&#8984;S saves now</span>
+          </p>
         </div>
       </section>
 
@@ -244,54 +253,86 @@
 
           <ul class="todo-list" data-todo-list></ul>
           <p class="todo-empty" data-todo-empty>Nothing here.</p>
+          <p class="todo-foot">
+            <button type="button" data-todo-clear hidden>Clear done</button>
+          </p>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <a href="/">← Public site</a>
+      <p class="footer-meta">
+        <a href="/">← Public site</a>
+        <button type="button" data-export>Export data</button>
+      </p>
       <span data-date>—</span>
     </footer>
 
     <script>
-      // All state is localStorage in THIS browser — nothing leaves the page.
+      // All state is localStorage in THIS browser — nothing leaves the
+      // page. "Export data" downloads a JSON backup.
       (function () {
         var p2 = function (n) { return String(n).padStart(2, "0"); };
         var now = new Date();
+        var stamp = function (d) {
+          return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate());
+        };
         var dateEl = document.querySelector("[data-date]");
         if (dateEl) {
-          dateEl.textContent =
-            now.getFullYear() + "-" + p2(now.getMonth() + 1) + "-" + p2(now.getDate()) +
-            " " + p2(now.getHours()) + ":" + p2(now.getMinutes());
+          dateEl.textContent = stamp(now) + " " + p2(now.getHours()) + ":" + p2(now.getMinutes());
         }
 
-        // --- Notes (autosave, debounced) ---
-        var NOTES_KEY = "chg_hq_notes";
+        // --- Storage keys (migrate from the old chg_hq_* names) ---
+        var NOTES_KEY = "chg_dev_notes";
+        var TODO_KEY = "chg_dev_todo";
+        try {
+          if (!localStorage.getItem(NOTES_KEY) && localStorage.getItem("chg_hq_notes")) {
+            localStorage.setItem(NOTES_KEY, localStorage.getItem("chg_hq_notes"));
+          }
+          if (!localStorage.getItem(TODO_KEY) && localStorage.getItem("chg_hq_todo")) {
+            localStorage.setItem(TODO_KEY, localStorage.getItem("chg_hq_todo"));
+          }
+        } catch (e) {}
+
+        // --- Notes (debounced autosave + Cmd/Ctrl+S) ---
         var notes = document.querySelector("[data-notes]");
         var state = document.querySelector("[data-notes-state]");
+        var hint = document.querySelector("[data-notes-hint]");
         var timer = null;
+
+        function saveNotes() {
+          clearTimeout(timer);
+          try {
+            localStorage.setItem(NOTES_KEY, notes.value);
+            var t = new Date();
+            state.textContent = "Saved " + p2(t.getHours()) + ":" + p2(t.getMinutes()) + ":" + p2(t.getSeconds());
+          } catch (e) {
+            state.textContent = "Save failed — storage unavailable.";
+          }
+        }
+
         if (notes) {
           try { notes.value = localStorage.getItem(NOTES_KEY) || ""; } catch (e) {}
           notes.addEventListener("input", function () {
             clearTimeout(timer);
             state.textContent = "Saving…";
-            timer = setTimeout(function () {
-              try {
-                localStorage.setItem(NOTES_KEY, notes.value);
-                var t = new Date();
-                state.textContent = "Saved " + p2(t.getHours()) + ":" + p2(t.getMinutes()) + ":" + p2(t.getSeconds());
-              } catch (e) {
-                state.textContent = "Save failed — storage unavailable.";
-              }
-            }, 400);
+            timer = setTimeout(saveNotes, 400);
+          });
+          notes.addEventListener("focus", function () { hint.hidden = false; });
+          notes.addEventListener("blur", function () { hint.hidden = true; });
+          notes.addEventListener("keydown", function (e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+              e.preventDefault();
+              saveNotes();
+            }
           });
         }
 
         // --- List (todo) ---
-        var TODO_KEY = "chg_hq_todo";
         var form = document.querySelector("[data-todo-form]");
         var list = document.querySelector("[data-todo-list]");
         var empty = document.querySelector("[data-todo-empty]");
+        var clearBtn = document.querySelector("[data-todo-clear]");
         if (!form || !list) return;
 
         function load() {
@@ -305,6 +346,7 @@
           var items = load();
           list.textContent = "";
           empty.hidden = items.length > 0;
+          clearBtn.hidden = !items.some(function (i) { return i.done; });
           items.forEach(function (item, i) {
             var li = document.createElement("li");
             if (item.done) li.className = "done";
@@ -361,7 +403,32 @@
           render();
         });
 
+        clearBtn.addEventListener("click", function () {
+          save(load().filter(function (i) { return !i.done; }));
+          render();
+        });
+
         render();
+
+        // --- Export (JSON backup of notes + list) ---
+        var exportBtn = document.querySelector("[data-export]");
+        if (exportBtn) {
+          exportBtn.addEventListener("click", function () {
+            var payload = {
+              exported: new Date().toISOString(),
+              notes: (notes && notes.value) || "",
+              list: load(),
+            };
+            var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "charger-dev-" + stamp(new Date()) + ".json";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(a.href);
+          });
+        }
       })();
     </script>
   </body>

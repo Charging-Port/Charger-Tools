@@ -172,6 +172,10 @@ button {
 .top .contact-link {
   justify-self: end;
 }
+/* Scroll-spy: the header link darkens while its section is in view. */
+.top a.active {
+  color: var(--ink);
+}
 
 /* Filters — a comma-separated word list, Watanabe-style. */
 .filters {
@@ -232,6 +236,18 @@ button {
   display: none;
 }
 
+/* External rows hint at leaving the site on hover. */
+.row.ext .c-title::after {
+  content: " ↗";
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.15s var(--ease);
+}
+.row.ext:hover .c-title::after,
+.row.ext:focus-within .c-title::after {
+  opacity: 1;
+}
+
 .index-fallback {
   color: var(--muted-dark);
   max-width: 34rem;
@@ -283,6 +299,23 @@ button {
 .contact-list a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Copy affordance (injected by JS) — appears on row hover. */
+.copy-btn {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  margin-left: 1rem;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease), color 0.15s var(--ease);
+}
+.contact-list li:hover .copy-btn,
+.copy-btn:focus-visible,
+.copy-btn.did {
+  opacity: 1;
+}
+.copy-btn:hover {
+  color: var(--ink);
 }
 
 /* ============================================================

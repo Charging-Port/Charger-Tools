@@ -5,14 +5,18 @@
   "installCommand": null,
   "outputDirectory": ".",
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/hq", "destination": "/dev", "permanent": false },
+    { "source": "/hq/:path+", "destination": "/dev/:path+", "permanent": false }
+  ],
   "rewrites": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "hq.charger.tools" }],
-      "destination": "/_private/hq/:path*"
+      "has": [{ "type": "host", "value": "dev.charger.tools" }],
+      "destination": "/_private/dev/:path*"
     },
-    { "source": "/hq", "destination": "/_private/hq" },
-    { "source": "/hq/:path+", "destination": "/_private/hq/:path+" }
+    { "source": "/dev", "destination": "/_private/dev" },
+    { "source": "/dev/:path+", "destination": "/_private/dev/:path+" }
   ],
   "headers": [
     {
@@ -26,8 +30,8 @@
       ]
     },
     {
-      "source": "/((?!hq|_private).*)",
-      "missing": [{ "type": "host", "value": "hq.charger.tools" }],
+      "source": "/((?!dev|_private).*)",
+      "missing": [{ "type": "host", "value": "dev.charger.tools" }],
       "headers": [
         {
           "key": "Content-Security-Policy",
@@ -37,7 +41,7 @@
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "hq.charger.tools" }],
+      "has": [{ "type": "host", "value": "dev.charger.tools" }],
       "headers": [
         {
           "key": "Content-Security-Policy",
@@ -48,7 +52,7 @@
       ]
     },
     {
-      "source": "/(hq|_private)(.*)",
+      "source": "/(dev|_private)(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",

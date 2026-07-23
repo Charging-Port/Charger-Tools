@@ -67,6 +67,7 @@ function renderRow(work, num) {
     if (/^https?:/.test(work.url)) {
       row.target = "_blank";
       row.rel = "noopener";
+      row.classList.add("ext"); // shows the ↗ hint on hover
     }
     row.setAttribute("aria-label", `${work.title}, ${work.year}`);
   }
@@ -153,10 +154,67 @@ function buildFilters() {
 }
 
 // ------------------------------------------------------------
+// SCROLL-SPY — darken the About/Contact header links while
+// their section is in view.
+// ------------------------------------------------------------
+function initSpy() {
+  if (!("IntersectionObserver" in window)) return;
+  const pairs = [
+    ["about", ".about-link"],
+    ["contact", ".contact-link"],
+  ];
+  const spy = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const pair = pairs.find(([id]) => id === entry.target.id);
+        const link = pair && document.querySelector(pair[1]);
+        if (link) link.classList.toggle("active", entry.isIntersecting);
+      });
+    },
+    { rootMargin: "-25% 0px -25% 0px" }
+  );
+  pairs.forEach(([id]) => {
+    const el = document.getElementById(id);
+    if (el) spy.observe(el);
+  });
+}
+
+// ------------------------------------------------------------
+// COPY — progressive enhancement: a small "Copy" button after
+// any element with data-copy (used for the email address).
+// ------------------------------------------------------------
+function initCopy() {
+  if (!navigator.clipboard) return;
+  document.querySelectorAll("[data-copy]").forEach((el) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "copy-btn";
+    btn.textContent = "Copy";
+    btn.setAttribute("aria-label", `Copy ${el.dataset.copy}`);
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(el.dataset.copy);
+        btn.textContent = "Copied";
+        btn.classList.add("did");
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("did");
+        }, 1600);
+      } catch {
+        /* clipboard unavailable — leave the button as-is */
+      }
+    });
+    el.after(btn);
+  });
+}
+
+// ------------------------------------------------------------
 // BOOT
 // ------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   renderIndex();
   renderMeta();
   buildFilters();
+  initSpy();
+  initCopy();
 });
