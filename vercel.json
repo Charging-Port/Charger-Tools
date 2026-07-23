@@ -11,8 +11,8 @@
       "has": [{ "type": "host", "value": "hq.charger.tools" }],
       "destination": "/_private/hq/:path*"
     },
-    { "source": "/hq", "destination": "/_private/hq/index.html" },
-    { "source": "/hq/:path*", "destination": "/_private/hq/:path*" }
+    { "source": "/hq", "destination": "/_private/hq" },
+    { "source": "/hq/:path+", "destination": "/_private/hq/:path+" }
   ],
   "headers": [
     {
