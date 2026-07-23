@@ -87,7 +87,22 @@ export default async function middleware(request) {
   }
 
   // --- Session check -------------------------------------------------
-  if (await hasValidSession(request, secret)) return; // continue to static files
+  if (await hasValidSession(request, secret)) {
+    if (privateHost) {
+      // Serve the private tree for this host from the middleware itself.
+      // The vercel.json host rewrite can't do it: the filesystem is
+      // checked before rewrites, so "/" would ship the public index.html.
+      let path = url.pathname;
+      if (path === "/dev" || path.startsWith("/dev/")) {
+        path = path.slice(4) || "/"; // normalize apex-style /dev links
+      }
+      const dest = new URL("/_private/dev" + (path === "/" ? "/" : path), url);
+      return new Response(null, {
+        headers: { "x-middleware-rewrite": dest.toString() },
+      });
+    }
+    return; // apex — continue to static files (vercel.json maps /dev)
+  }
 
   return loginPage(401, null, home, false, nextPathFor(url, privateHost));
 }
