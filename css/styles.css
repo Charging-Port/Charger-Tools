@@ -1,0 +1,28 @@
+/* ============================================================
+   Charger Tools — styles
+   Edit this file to change how the site looks.
+   It's linked from index.html via <link rel="stylesheet" ...>.
+   ============================================================ */
+
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --accent: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--fg);
+}

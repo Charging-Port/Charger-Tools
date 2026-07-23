@@ -1,0 +1,3 @@
+# This file just keeps the (otherwise empty) assets/images/ folder in git.
+# Put logos, photos, icons, etc. here. Reference them from HTML like:
+#   <img src="assets/images/logo.png" alt="Charger Tools" />
