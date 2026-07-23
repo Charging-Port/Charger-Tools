@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <title>Charger — HQ (Staff Copy)</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 2h24v26l-3-2-3 2-3-2-3 2-3-2-3 2-3-2-3 2z' fill='%2326231b' stroke='%23faf7ef' stroke-width='2'/%3E%3Cpath d='M9 9h14M9 14h14M9 19h9' stroke='%23faf7ef' stroke-width='2'/%3E%3C/svg%3E"
+    />
+
+    <!-- ==========================================================
+         STAFF COPY — private back office.
+         This page is deliberately SELF-CONTAINED (inline CSS + JS):
+         it is served at charger.tools/hq AND at the root of the
+         hq.charger.tools subdomain, so it can't rely on any
+         relative asset paths. Access is enforced by middleware.js.
+         Notes + register live in *this browser's* localStorage —
+         nothing is sent anywhere.
+         ========================================================== -->
+    <style>
+      :root {
+        --desk: #17161a;
+        --desk-deep: #0d0c10;
+        --paper: #faf7ef;
+        --ink: #26231b;
+        --ink-soft: #5d5849;
+        --ink-faint: #948d7b;
+        --ink-line: color-mix(in srgb, var(--ink) 45%, transparent);
+        --font-mono: ui-monospace, "SF Mono", "Menlo", "Cascadia Mono",
+          "Consolas", "Courier New", monospace;
+        --fs-tiny: 0.7rem;
+        --fs-small: 0.8rem;
+        --fs-base: 0.92rem;
+        --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100svh;
+        font-family: var(--font-mono);
+        font-size: var(--fs-base);
+        line-height: 1.55;
+        letter-spacing: 0.03em;
+        color: var(--ink);
+        background: var(--desk)
+          radial-gradient(120% 90% at 50% 0%, var(--desk) 40%, var(--desk-deep) 100%)
+          fixed;
+        padding: clamp(1.5rem, 6vh, 4rem) 0.9rem clamp(3rem, 9vh, 6rem);
+      }
+      h1, h2, p, ul { margin: 0; }
+      ul { list-style: none; padding: 0; }
+      a { color: inherit; text-decoration: none; }
+      button {
+        font: inherit; letter-spacing: inherit; color: inherit;
+        background: none; border: none; padding: 0; cursor: pointer;
+      }
+      :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+      ::selection { background: var(--ink); color: var(--paper); }
+
+      .receipt-wrap {
+        max-width: 32rem;
+        margin-inline: auto;
+        transform: rotate(0.3deg);
+        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
+          drop-shadow(0 28px 46px rgba(0, 0, 0, 0.45));
+      }
+      .tear { height: 12px; background-repeat: repeat-x; }
+      .tear--top {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Cpath d='M0 12L7 0l7 12z' fill='%23faf7ef'/%3E%3C/svg%3E");
+      }
+      .tear--bottom {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Cpath d='M0 0l7 12L14 0z' fill='%23faf7ef'/%3E%3C/svg%3E");
+      }
+      .receipt {
+        background-color: var(--paper);
+        background-image: repeating-linear-gradient(
+          0deg, rgba(38, 35, 27, 0.016) 0 2px, transparent 2px 5px);
+        padding: 1.9rem clamp(1.35rem, 5vw, 2.3rem) 2.1rem;
+      }
+
+      .r-logo {
+        font-size: clamp(1.5rem, 5vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: 0.24em;
+        text-indent: 0.24em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+      .r-tagline {
+        text-align: center;
+        font-size: var(--fs-small);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        margin-top: 0.35rem;
+      }
+      .stars {
+        overflow: hidden; white-space: nowrap; text-align: center;
+        letter-spacing: 0.55ch; color: var(--ink-soft);
+        margin: 1.1rem 0; user-select: none;
+      }
+      .rule { border: 0; border-top: 1px dashed var(--ink-line); margin: 1.3rem 0; }
+      .sect-title {
+        font-size: var(--fs-base); font-weight: 800; text-align: center;
+        text-transform: uppercase; letter-spacing: 0.18em; margin: 1.4rem 0 1rem;
+      }
+
+      .kv { display: flex; align-items: baseline; gap: 0.6ch; }
+      .kv + .kv { margin-top: 0.32rem; }
+      .kv__k {
+        color: var(--ink-soft); font-size: var(--fs-small);
+        letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+      }
+      .kv__leader {
+        flex: 1; min-width: 2ch;
+        border-bottom: 2px dotted color-mix(in srgb, var(--ink) 32%, transparent);
+        transform: translateY(-0.3em);
+      }
+      .kv__v {
+        white-space: nowrap; max-width: 60%;
+        overflow: hidden; text-overflow: ellipsis;
+      }
+      a.kv:hover .kv__v, a.kv:focus-visible .kv__v {
+        background: var(--ink); color: var(--paper); box-shadow: 0 0 0 2px var(--ink);
+      }
+
+      .bracket {
+        font-size: var(--fs-small); letter-spacing: 0.12em;
+        text-transform: uppercase; color: var(--ink-soft);
+        transition: color 0.15s var(--ease);
+      }
+      .bracket::before { content: "[ "; }
+      .bracket::after { content: " ]"; }
+      .bracket:hover { color: var(--ink); }
+
+      .steps { counter-reset: step; font-size: var(--fs-small); }
+      .steps li { counter-increment: step; display: flex; gap: 1ch; }
+      .steps li + li { margin-top: 0.3rem; }
+      .steps li::before { content: counter(step, decimal-leading-zero); color: var(--ink-faint); }
+      .steps code {
+        font-family: inherit;
+        background: color-mix(in srgb, var(--ink) 8%, transparent);
+        padding: 0 0.4ch;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 9rem;
+        font: inherit;
+        letter-spacing: inherit;
+        color: var(--ink);
+        background: transparent;
+        border: 1px dashed var(--ink-line);
+        padding: 0.7rem 0.8rem;
+        resize: vertical;
+      }
+      textarea:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+      .save-state {
+        text-align: right; font-size: var(--fs-tiny); color: var(--ink-faint);
+        letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.3rem;
+      }
+
+      .todo-form { display: flex; gap: 0.8ch; margin-bottom: 0.8rem; }
+      .todo-form input {
+        flex: 1; font: inherit; letter-spacing: inherit; color: var(--ink);
+        background: transparent; border: 0;
+        border-bottom: 2px dotted color-mix(in srgb, var(--ink) 32%, transparent);
+        padding: 0.15rem 0.2rem;
+      }
+      .todo-form input:focus { outline: none; border-bottom-color: var(--ink); }
+      .todo-list li { display: flex; align-items: baseline; gap: 1ch; }
+      .todo-list li + li { margin-top: 0.35rem; }
+      .todo-toggle { flex: 1; text-align: left; display: flex; gap: 1ch; align-items: baseline; }
+      .todo-mark { color: var(--ink-faint); }
+      .todo-list .done .todo-label {
+        text-decoration: line-through;
+        text-decoration-style: double;
+        color: var(--ink-faint);
+      }
+      .todo-del { color: var(--ink-faint); font-size: var(--fs-small); }
+      .todo-del:hover { color: var(--ink); }
+      .todo-empty { color: var(--ink-faint); font-size: var(--fs-small); text-align: center; }
+
+      .fineprint {
+        display: flex; justify-content: space-between; flex-wrap: wrap;
+        gap: 0.3rem 1rem; margin-top: 1.7rem;
+        font-size: var(--fs-tiny); letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--ink-faint);
+      }
+      .fineprint a { text-decoration: underline dotted; text-underline-offset: 3px; }
+      .fineprint a:hover { color: var(--ink); }
+    </style>
+  </head>
+
+  <body>
+    <div class="receipt-wrap">
+      <div class="tear tear--top" aria-hidden="true"></div>
+
+      <main class="receipt">
+        <header>
+          <h1 class="r-logo">Charger HQ</h1>
+          <p class="r-tagline">*** Staff Copy ***</p>
+
+          <div class="stars" aria-hidden="true">* * * * * * * * * * * * * * * *</div>
+
+          <p class="kv">
+            <span class="kv__k">Date</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v" data-date>&mdash;</span>
+          </p>
+          <p class="kv">
+            <span class="kv__k">Register</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">HQ-01</span>
+          </p>
+          <p class="kv">
+            <span class="kv__k">Clearance</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">Staff</span>
+          </p>
+        </header>
+
+        <hr class="rule" />
+
+        <!-- Quick links -->
+        <section aria-labelledby="links-heading">
+          <h2 class="sect-title" id="links-heading">Quick Links</h2>
+
+          <a class="kv" href="https://charger.tools" target="_blank" rel="noopener">
+            <span class="kv__k">Live site</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">charger.tools</span>
+          </a>
+          <a class="kv" href="https://vercel.com/charging-ports-projects/charger-tools" target="_blank" rel="noopener">
+            <span class="kv__k">Vercel</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">charger-tools</span>
+          </a>
+          <a class="kv" href="https://github.com/Charging-Port/Charger-Tools" target="_blank" rel="noopener">
+            <span class="kv__k">GitHub</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">Charger-Tools</span>
+          </a>
+          <a class="kv" href="https://account.squarespace.com/domains" target="_blank" rel="noopener">
+            <span class="kv__k">DNS</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">Squarespace</span>
+          </a>
+          <a class="kv" href="https://mail.google.com" target="_blank" rel="noopener">
+            <span class="kv__k">Mail</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">Gmail</span>
+          </a>
+        </section>
+
+        <hr class="rule" />
+
+        <!-- Deploy ticket -->
+        <section aria-labelledby="deploy-heading">
+          <h2 class="sect-title" id="deploy-heading">Deploy Ticket</h2>
+          <ol class="steps">
+            <li><span>Commit, then push to the <code>charging-port</code> remote.</span></li>
+            <li><span>Be logged into Vercel as <code>charging-port</code> — the Google login is the wrong account (403).</span></li>
+            <li><span>Run <code>npx -y vercel@latest --prod --yes</code> from the site folder.</span></li>
+            <li><span>Deploys are manual — pushing alone changes nothing.</span></li>
+          </ol>
+        </section>
+
+        <hr class="rule" />
+
+        <!-- Notes -->
+        <section aria-labelledby="notes-heading">
+          <h2 class="sect-title" id="notes-heading">Notes</h2>
+          <textarea
+            data-notes
+            aria-label="Private notes (stored in this browser)"
+            placeholder="** STAFF NOTES — SAVED IN THIS BROWSER ONLY **"
+          ></textarea>
+          <p class="save-state" data-notes-state>&nbsp;</p>
+        </section>
+
+        <hr class="rule" />
+
+        <!-- Register (todo) -->
+        <section aria-labelledby="todo-heading">
+          <h2 class="sect-title" id="todo-heading">Register</h2>
+
+          <form class="todo-form" data-todo-form>
+            <input
+              type="text"
+              name="label"
+              maxlength="140"
+              autocomplete="off"
+              aria-label="New register item"
+              placeholder="RING UP A NEW ITEM…"
+            />
+            <button type="submit" class="bracket">Add</button>
+          </form>
+
+          <ul class="todo-list" data-todo-list></ul>
+          <p class="todo-empty" data-todo-empty>** REGISTER EMPTY **</p>
+        </section>
+
+        <footer>
+          <p class="fineprint">
+            <span>Not for resale</span>
+            <a href="/">Public site</a>
+            <a href="/hq/logout">Log out</a>
+          </p>
+        </footer>
+      </main>
+
+      <div class="tear tear--bottom" aria-hidden="true"></div>
+    </div>
+
+    <script>
+      // All state is localStorage in THIS browser — nothing leaves the page.
+      (function () {
+        var p2 = function (n) { return String(n).padStart(2, "0"); };
+        var now = new Date();
+        var dateEl = document.querySelector("[data-date]");
+        if (dateEl) {
+          dateEl.textContent =
+            now.getFullYear() + "-" + p2(now.getMonth() + 1) + "-" + p2(now.getDate()) +
+            " " + p2(now.getHours()) + ":" + p2(now.getMinutes());
+        }
+
+        // --- Notes (autosave, debounced) ---
+        var NOTES_KEY = "chg_hq_notes";
+        var notes = document.querySelector("[data-notes]");
+        var state = document.querySelector("[data-notes-state]");
+        var timer = null;
+        if (notes) {
+          try { notes.value = localStorage.getItem(NOTES_KEY) || ""; } catch (e) {}
+          notes.addEventListener("input", function () {
+            clearTimeout(timer);
+            state.textContent = "PRINTING…";
+            timer = setTimeout(function () {
+              try {
+                localStorage.setItem(NOTES_KEY, notes.value);
+                var t = new Date();
+                state.textContent = "SAVED " + p2(t.getHours()) + ":" + p2(t.getMinutes()) + ":" + p2(t.getSeconds());
+              } catch (e) {
+                state.textContent = "SAVE FAILED — STORAGE UNAVAILABLE";
+              }
+            }, 400);
+          });
+        }
+
+        // --- Register (todo list) ---
+        var TODO_KEY = "chg_hq_todo";
+        var form = document.querySelector("[data-todo-form]");
+        var list = document.querySelector("[data-todo-list]");
+        var empty = document.querySelector("[data-todo-empty]");
+        if (!form || !list) return;
+
+        function load() {
+          try { return JSON.parse(localStorage.getItem(TODO_KEY)) || []; }
+          catch (e) { return []; }
+        }
+        function save(items) {
+          try { localStorage.setItem(TODO_KEY, JSON.stringify(items)); } catch (e) {}
+        }
+        function render() {
+          var items = load();
+          list.textContent = "";
+          empty.hidden = items.length > 0;
+          items.forEach(function (item, i) {
+            var li = document.createElement("li");
+            if (item.done) li.className = "done";
+
+            var toggle = document.createElement("button");
+            toggle.type = "button";
+            toggle.className = "todo-toggle";
+            toggle.setAttribute("aria-pressed", String(!!item.done));
+
+            var mark = document.createElement("span");
+            mark.className = "todo-mark";
+            mark.textContent = item.done ? "[x]" : "[ ]";
+
+            var label = document.createElement("span");
+            label.className = "todo-label";
+            label.textContent = item.label;
+
+            toggle.appendChild(mark);
+            toggle.appendChild(label);
+            toggle.addEventListener("click", function () {
+              var next = load();
+              next[i].done = !next[i].done;
+              save(next);
+              render();
+            });
+
+            var del = document.createElement("button");
+            del.type = "button";
+            del.className = "todo-del";
+            del.setAttribute("aria-label", "Void " + item.label);
+            del.textContent = "VOID";
+            del.addEventListener("click", function () {
+              var next = load();
+              next.splice(i, 1);
+              save(next);
+              render();
+            });
+
+            li.appendChild(toggle);
+            li.appendChild(del);
+            list.appendChild(li);
+          });
+        }
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var input = form.elements.label;
+          var label = input.value.trim();
+          if (!label) return;
+          var items = load();
+          items.push({ label: label, done: false });
+          save(items);
+          input.value = "";
+          render();
+        });
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

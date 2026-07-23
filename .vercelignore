@@ -1,0 +1,6 @@
+# Keep repo/tooling files out of the deployment upload.
+.claude
+.git
+.gitignore
+README.md
+ARCHITECTURE.md

@@ -1,42 +1,34 @@
-# Charger Tools Website
+# charger.tools
 
-[charger.tools](https://charger.tools) — a hand-coded static site (no framework, no build step).
+A personal site printed as a **thermal receipt** — one long strip of paper on
+a dark counter. Hand-coded static HTML/CSS/JS, no framework, no build step.
 
-## Folder structure
+- **Public:** `charger.tools` — the receipt: numbered work index, about,
+  contact, barcode, `TOTAL ..... NO CHARGE`.
+- **Private:** `charger.tools/hq` (and `hq.charger.tools` once DNS is set) —
+  password-protected staff dashboard: quick links, deploy checklist, notes,
+  todo register.
 
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full map: content model,
+design system, auth flow, env vars, and deploy steps.
+
+## Quick start
+
+```bash
+python3 -m http.server 3000   # static preview (middleware/auth won't run locally)
 ```
-index.html          The page itself. Must stay at the root.
-css/
-  styles.css        All styling. Linked from index.html.
-js/
-  main.js           All JavaScript. Loaded from index.html.
-assets/
-  images/           Logos, photos, icons. Reference as assets/images/<file>.
-vercel.json         Vercel config — serves the files statically. Leave as-is.
-```
 
-## Editing
+## Edit content
 
-Open the files in any editor and edit them directly. To preview locally,
-just open `index.html` in a browser (double-click it) — no server needed.
-
-- Change **content** → edit `index.html`
-- Change **look** → edit `css/styles.css`
-- Add **interactivity** → edit `js/main.js`
-- Add **images** → drop files into `assets/images/`
-
-Paths in `index.html` are relative (e.g. `css/styles.css`), so previewing
-by double-clicking the file works the same as the live site.
+- **Work entries** → the `WORKS` array in `js/main.js` (single source of truth).
+- **About / contact** → `index.html`.
+- **Staff dashboard** → `_private/hq/index.html` (self-contained file).
 
 ## Deploy
-
-Hosted on Vercel (project `charger-tools`, account `charging-port`).
 
 ```bash
 npx -y vercel@latest --prod --yes
 ```
 
-## History
-
-The previous full site (Next.js portfolio + blog + admin panel) is archived in git
-at branch `archive/v1-site` and tag `v1-site`. Restore with `git checkout v1-site`.
+Must be logged into Vercel as `charging-port` (not the personal Google
+account). Deploys are manual; pushing to GitHub alone changes nothing.

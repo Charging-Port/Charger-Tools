@@ -1,28 +1,508 @@
 /* ============================================================
-   Charger Tools — styles
-   Edit this file to change how the site looks.
-   It's linked from index.html via <link rel="stylesheet" ...>.
+   Charger — receipt styles
+   ------------------------------------------------------------
+   The whole site is one thermal receipt lying on a counter.
+
+     1. TOKENS      — paper, ink, desk, mono type.
+     2. RESET       — minimal.
+     3. THE DESK    — page backdrop, centering, vignette.
+     4. THE RECEIPT — paper, torn edges, banding, shadow.
+     5. PARTS       — logo, kv lines, rules, items, totals,
+                      depts (filters), barcode, fineprint.
+     6. MOTION / THEME / PRINT.
+
+   References: satoshiwatanabe.org (numbered index, mono meta),
+   archivio-uno.com (dense tabular archive). Rendered here as a
+   point-of-sale receipt: ALL CAPS labels, dotted leaders,
+   dashed rules, a barcode, and "NO CHARGE".
    ============================================================ */
 
+/* ============================================================
+   1 — TOKENS
+   ============================================================ */
 :root {
-  --bg: #ffffff;
-  --fg: #111111;
-  --accent: #2563eb;
+  /* The counter the receipt lies on */
+  --desk: #c9c3b6;
+  --desk-deep: #aaa294;
+
+  /* Paper + ink (paper stays paper in dark mode; only the desk dims) */
+  --paper: #faf7ef;
+  --ink: #26231b;
+  --ink-soft: #5d5849;
+  --ink-faint: #948d7b;
+  --ink-line: color-mix(in srgb, var(--ink) 45%, transparent);
+
+  --font-mono: ui-monospace, "SF Mono", "Menlo", "Cascadia Mono",
+    "Consolas", "Courier New", monospace;
+
+  --fs-tiny: 0.7rem;
+  --fs-small: 0.8rem;
+  --fs-base: 0.92rem;
+  --fs-total: 1.08rem;
+  --fs-logo: clamp(1.9rem, 6vw, 2.6rem);
+
+  --track: 0.03em;
+  --track-wide: 0.18em;
+
+  --w-receipt: 30rem;
+  --pad: clamp(1.35rem, 5vw, 2.5rem);
+
+  --tilt: -0.4deg;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-* {
+@media (prefers-color-scheme: dark) {
+  :root {
+    --desk: #17161a;
+    --desk-deep: #0d0c10;
+  }
+}
+
+/* ============================================================
+   2 — RESET
+   ============================================================ */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  line-height: 1.5;
-  background: var(--bg);
-  color: var(--fg);
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  letter-spacing: var(--track);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+p,
+ol,
+ul,
+figure {
+  margin: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ============================================================
+   3 — THE DESK
+   ============================================================ */
+body {
+  background: var(--desk)
+    radial-gradient(120% 90% at 50% 0%, var(--desk) 40%, var(--desk-deep) 100%)
+    fixed;
+  padding: clamp(1.5rem, 6vh, 4.5rem) 0.9rem clamp(3rem, 9vh, 6rem);
+}
+
+/* Skip link — hidden until focused. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.3rem 0.8rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+.skip-link:focus {
+  left: 0.9rem;
+  top: 0.9rem;
+}
+
+/* ============================================================
+   4 — THE RECEIPT
+   ============================================================ */
+.receipt-wrap {
+  max-width: var(--w-receipt);
+  margin-inline: auto;
+  transform: rotate(var(--tilt));
+  filter: drop-shadow(0 2px 3px rgba(20, 16, 8, 0.18))
+    drop-shadow(0 28px 46px rgba(20, 16, 8, 0.32));
+}
+
+/* Torn edges — sawtooth SVG strips (paper color is fixed on purpose). */
+.tear {
+  height: 12px;
+  background-repeat: repeat-x;
+}
+.tear--top {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Cpath d='M0 12L7 0l7 12z' fill='%23faf7ef'/%3E%3C/svg%3E");
+}
+.tear--bottom {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Cpath d='M0 0l7 12L14 0z' fill='%23faf7ef'/%3E%3C/svg%3E");
+}
+
+.receipt {
+  background-color: var(--paper);
+  /* faint thermal-printer banding */
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(38, 35, 27, 0.016) 0 2px,
+    transparent 2px 5px
+  );
+  padding: 1.9rem var(--pad) 2.1rem;
+}
+
+/* ============================================================
+   5 — PARTS
+   ============================================================ */
+
+/* --- masthead ----------------------------------------------------- */
+.r-logo {
+  font-size: var(--fs-logo);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em; /* re-center the letterspaced text */
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.r-tagline {
+  text-align: center;
+  font-size: var(--fs-small);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 0.35rem;
+}
+
+/* --- rules & ornaments -------------------------------------------- */
+.rule {
+  border: 0;
+  border-top: 1px dashed var(--ink-line);
+  margin: 1.3rem 0;
+}
+.stars {
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  letter-spacing: 0.55ch;
+  color: var(--ink-soft);
+  margin: 1.1rem 0;
+  user-select: none;
+}
+
+.sect-title {
+  font-size: var(--fs-base);
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: var(--track-wide);
+  margin: 1.4rem 0 1rem;
+}
+
+/* --- kv line: LABEL....VALUE (the receipt workhorse) --------------- */
+.kv {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6ch;
+}
+.kv + .kv {
+  margin-top: 0.28rem;
+}
+.kv__k {
+  color: var(--ink-soft);
+  font-size: var(--fs-small);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.kv__leader {
+  flex: 1;
+  min-width: 2ch;
+  border-bottom: 2px dotted color-mix(in srgb, var(--ink) 32%, transparent);
+  transform: translateY(-0.3em);
+}
+.kv__v {
+  white-space: nowrap;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+a.kv:hover .kv__v,
+a.kv:focus-visible .kv__v {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* --- bracket buttons/links: [ LABEL ] ------------------------------ */
+.bracket {
+  font-size: var(--fs-small);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  transition: color 0.15s var(--ease);
+}
+.bracket::before {
+  content: "[ ";
+}
+.bracket::after {
+  content: " ]";
+}
+.bracket:hover {
+  color: var(--ink);
+}
+.bracket[aria-pressed="true"],
+.bracket[aria-current] {
+  color: var(--paper);
+  background: var(--ink);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.r-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.4rem;
+}
+
+/* --- items (the index) --------------------------------------------- */
+.depts {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.items {
+  display: block;
+}
+.item + .item {
+  margin-top: 0.95rem;
+}
+.item[hidden] {
+  display: none;
+}
+.item__row {
+  display: block;
+}
+.item__line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9ch;
+}
+.item__num {
+  color: var(--ink-faint);
+  font-size: var(--fs-small);
+}
+.item__title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.item__leader {
+  flex: 1;
+  min-width: 2ch;
+  border-bottom: 2px dotted color-mix(in srgb, var(--ink) 32%, transparent);
+  transform: translateY(-0.3em);
+}
+.item__year {
+  font-size: var(--fs-small);
+}
+.item__sub {
+  display: flex;
+  justify-content: space-between;
+  gap: 1ch;
+  padding-left: calc(3ch + 0.9ch); /* clear the 3-digit number */
+  color: var(--ink-soft);
+  font-size: var(--fs-small);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+a.item__row:hover .item__title,
+a.item__row:focus-visible .item__title {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.items-fallback {
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 0.6rem 0;
+}
+
+/* --- totals -------------------------------------------------------- */
+.totals {
+  margin-top: 1.4rem;
+}
+.kv--total {
+  border-top: 4px double var(--ink);
+  padding-top: 0.55rem;
+  margin-top: 0.55rem;
+}
+.kv--total .kv__k,
+.kv--total .kv__v {
+  font-size: var(--fs-total);
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* --- prose (customer notice / about) ------------------------------- */
+.prose {
+  font-size: var(--fs-small);
+  line-height: 1.7;
+}
+.prose p + p {
+  margin-top: 0.8rem;
+}
+
+/* --- barcode + thanks ---------------------------------------------- */
+.barcode {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  height: 46px;
+  margin: 1.6rem auto 0.4rem;
+}
+.barcode span {
+  background: var(--ink);
+  margin-right: 2px;
+}
+.barcode-label {
+  text-align: center;
+  font-size: var(--fs-small);
+  letter-spacing: 0.5ch;
+  text-indent: 0.5ch;
+  text-transform: uppercase;
+}
+
+.thanks {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+}
+.thanks-sub {
+  text-align: center;
+  font-size: var(--fs-small);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 0.3rem;
+}
+
+/* --- fineprint ------------------------------------------------------ */
+.fineprint {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  margin-top: 1.7rem;
+  font-size: var(--fs-tiny);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.fineprint a {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.fineprint a:hover {
+  color: var(--ink);
+}
+
+/* ============================================================
+   6 — MOTION / THEME / PRINT
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .receipt-wrap {
+    animation: feed-in 0.7s var(--ease) both;
+  }
+  .item {
+    animation: line-in 0.4s var(--ease) both;
+    /* per-item delay set from js/main.js via el.style.animationDelay */
+  }
+}
+@keyframes feed-in {
+  from {
+    transform: translateY(-22px) rotate(var(--tilt));
+    opacity: 0;
+  }
+  to {
+    transform: rotate(var(--tilt));
+  }
+}
+@keyframes line-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 26rem) {
+  :root {
+    --tilt: 0deg; /* no rotation when the receipt fills the screen */
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    padding: 0;
+  }
+  .receipt-wrap {
+    max-width: none;
+    transform: none;
+    filter: none;
+    animation: none;
+  }
+  .tear {
+    display: none;
+  }
+  .receipt {
+    background: #fff;
+  }
+  .depts,
+  .skip-link {
+    display: none;
+  }
 }

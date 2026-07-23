@@ -3,24 +3,207 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Charger Tools</title>
 
-    <!-- Styles live in css/styles.css -->
-    <link rel="stylesheet" href="css/styles.css" />
+    <title>Charger — Receipt</title>
+    <meta
+      name="description"
+      content="Charger — a personal index of selected work, printed as a receipt. charger.tools"
+    />
+
+    <meta property="og:title" content="Charger — Receipt" />
+    <meta
+      property="og:description"
+      content="A personal index of selected work, printed as a receipt."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://charger.tools/" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 2h24v26l-3-2-3 2-3-2-3 2-3-2-3 2-3-2-3 2z' fill='%23faf7ef' stroke='%2326231b' stroke-width='2'/%3E%3Cpath d='M9 9h14M9 14h14M9 19h9' stroke='%2326231b' stroke-width='2'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
   </head>
 
   <body>
     <!-- ============================================================
-         Your page content goes here.
-         Example to get started (delete this comment and uncomment):
+         The whole site is ONE RECEIPT. Regions, top to bottom:
 
-         <main>
-           <h1>Charger Tools</h1>
-           <p>Something new is being built here.</p>
-         </main>
+           masthead   — logo, tagline, printed date/time/order meta
+           r-nav      — [ INDEX ] [ ABOUT ] [ CONTACT ] anchors
+           #index     — the work archive as line items (from js/main.js)
+           totals     — items / years / TOTAL: NO CHARGE
+           #about     — "customer notice" bio
+           #contact   — label....value link lines
+           footer     — barcode, thanks, fineprint (staff login → /hq)
+
+         CONTENT LIVES IN TWO PLACES:
+           • Work entries → the WORKS array in js/main.js (single source)
+           • Everything else (about copy, contact links) → this file.
          ============================================================ -->
 
-    <!-- JavaScript lives in js/main.js -->
-    <script src="js/main.js"></script>
+    <a class="skip-link" href="#index">Skip to index</a>
+
+    <div class="receipt-wrap">
+      <div class="tear tear--top" aria-hidden="true"></div>
+
+      <main class="receipt" id="top">
+        <!-- masthead -->
+        <header>
+          <h1 class="r-logo">Charger</h1>
+          <p class="r-tagline">Personal Index &mdash; charger.tools</p>
+
+          <div class="stars" aria-hidden="true">* * * * * * * * * * * * * * * *</div>
+
+          <div class="r-meta">
+            <p class="kv">
+              <span class="kv__k">Date</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v" data-date>&mdash;</span>
+            </p>
+            <p class="kv">
+              <span class="kv__k">Time</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v" data-time>&mdash;</span>
+            </p>
+            <p class="kv">
+              <span class="kv__k">Terminal</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v">WEB-01</span>
+            </p>
+            <p class="kv">
+              <span class="kv__k">Order&nbsp;#</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v" data-order>CT-&mdash;</span>
+            </p>
+          </div>
+
+          <hr class="rule" />
+
+          <nav class="r-nav" aria-label="Primary">
+            <a class="bracket" href="#index">Index</a>
+            <a class="bracket" href="#about">About</a>
+            <a class="bracket" href="#contact">Contact</a>
+          </nav>
+
+          <hr class="rule" />
+        </header>
+
+        <!-- ============================================================
+             1 — THE INDEX (line items, rendered from WORKS in js/main.js)
+             ============================================================ -->
+        <section id="index" aria-labelledby="index-heading">
+          <h2 class="sect-title" id="index-heading">
+            *** Selected Work ***
+          </h2>
+
+          <!-- Dept filter row — generated from WORKS tags; hides itself
+               when there are fewer than 2 distinct tags. -->
+          <div class="depts" data-depts hidden aria-label="Filter by department"></div>
+
+          <ol class="items" data-items reversed>
+            <!-- Line items render here. See js/main.js. -->
+          </ol>
+
+          <noscript>
+            <p class="items-fallback">
+              ** ITEMS PRINT WITH JAVASCRIPT ** — enable it to browse the
+              index, or read the <code>WORKS</code> array in
+              <code>js/main.js</code>.
+            </p>
+          </noscript>
+
+          <!-- totals -->
+          <div class="totals">
+            <p class="kv">
+              <span class="kv__k">Items</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v" data-items-count>&mdash;</span>
+            </p>
+            <p class="kv">
+              <span class="kv__k">Years</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v" data-items-years>&mdash;</span>
+            </p>
+            <p class="kv">
+              <span class="kv__k">Tax</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v">0.00</span>
+            </p>
+            <p class="kv kv--total">
+              <span class="kv__k">Total</span>
+              <span class="kv__leader" aria-hidden="true"></span>
+              <span class="kv__v">No Charge</span>
+            </p>
+          </div>
+        </section>
+
+        <div class="stars" aria-hidden="true">* * * * * * * * * * * * * * * *</div>
+
+        <!-- ============================================================
+             2 — ABOUT ("customer notice")
+             Charger / Kaden: replace this placeholder copy with a real bio.
+             ============================================================ -->
+        <section id="about" aria-labelledby="about-heading">
+          <h2 class="sect-title" id="about-heading">*** Customer Notice ***</h2>
+          <div class="prose">
+            <p>
+              Charger is the personal index of a builder of small tools,
+              sites, and experiments. Everything above was made by hand;
+              most of it is in use somewhere right now.
+            </p>
+            <p>
+              This receipt is the whole site. Keep it for your records —
+              returns are not accepted, but requests, questions, and
+              collaborations are. See below.
+            </p>
+          </div>
+        </section>
+
+        <hr class="rule" />
+
+        <!-- ============================================================
+             3 — CONTACT
+             ============================================================ -->
+        <section id="contact" aria-labelledby="contact-heading">
+          <h2 class="sect-title" id="contact-heading">Contact</h2>
+
+          <a class="kv" href="mailto:kadenmac0077@gmail.com">
+            <span class="kv__k">Email</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">kadenmac0077@gmail.com</span>
+          </a>
+          <a class="kv" href="https://github.com/Charging-Port" rel="me noopener" target="_blank">
+            <span class="kv__k">GitHub</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">github.com/Charging-Port</span>
+          </a>
+          <p class="kv">
+            <span class="kv__k">Site</span>
+            <span class="kv__leader" aria-hidden="true"></span>
+            <span class="kv__v">charger.tools</span>
+          </p>
+        </section>
+
+        <!-- footer -->
+        <footer>
+          <div class="barcode" data-barcode aria-hidden="true"></div>
+          <p class="barcode-label">charger.tools</p>
+
+          <p class="thanks">Thank you for visiting</p>
+          <p class="thanks-sub">Please come again</p>
+
+          <p class="fineprint">
+            <span>Customer copy</span>
+            <span>&copy; <span data-year>2026</span> Charger</span>
+            <a href="/hq">Staff only</a>
+          </p>
+        </footer>
+      </main>
+
+      <div class="tear tear--bottom" aria-hidden="true"></div>
+    </div>
+
+    <script src="/js/main.js"></script>
   </body>
 </html>
