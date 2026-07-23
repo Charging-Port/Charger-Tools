@@ -7,9 +7,7 @@
   "cleanUrls": true,
   "redirects": [
     { "source": "/hq", "destination": "https://dev.charger.tools/", "permanent": false },
-    { "source": "/hq/:path+", "destination": "https://dev.charger.tools/", "permanent": false },
-    { "source": "/dev", "destination": "https://dev.charger.tools/", "permanent": false },
-    { "source": "/dev/:path+", "destination": "https://dev.charger.tools/:path+", "permanent": false }
+    { "source": "/hq/:path+", "destination": "https://dev.charger.tools/", "permanent": false }
   ],
   "rewrites": [
     {

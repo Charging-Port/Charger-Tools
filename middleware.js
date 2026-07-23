@@ -39,7 +39,17 @@ export default async function middleware(request) {
   // form posts to /dev/login on the apex).
   const authPath = url.pathname === "/dev/login" || url.pathname === "/dev/logout";
 
-  if (!privateHost && !privatePath && !authPath) return; // public — pass through
+  if (!privateHost && !privatePath && !authPath) {
+    // Apex /dev is just a signpost: the private area lives on the
+    // subdomain. Redirected here (not in vercel.json) because
+    // vercel.json redirects run BEFORE middleware and would also
+    // swallow the /dev/login + /dev/logout endpoints.
+    if (/^\/dev(\/|$)/.test(url.pathname)) {
+      const rest = url.pathname.slice(4) || "/";
+      return redirect("https://dev." + APEX + rest + url.search, {}, 307);
+    }
+    return; // public — pass through
+  }
 
   const password = process.env.DEV_PASSWORD;
   const secret = process.env.DEV_SESSION_SECRET;
@@ -178,9 +188,9 @@ function sleep(ms) {
 // ------------------------------------------------------------
 // Responses
 // ------------------------------------------------------------
-function redirect(location, extraHeaders = {}) {
+function redirect(location, extraHeaders = {}, status = 303) {
   return new Response(null, {
-    status: 303,
+    status,
     headers: { Location: location, "Cache-Control": "no-store", ...extraHeaders },
   });
 }
