@@ -1,36 +1,19 @@
 # Charger Tools Website
 
-A fresh build of [charger.tools](https://charger.tools). Next.js 14 (App Router) + React 18 + TypeScript + Tailwind CSS.
+[charger.tools](https://charger.tools) — currently a single blank static HTML page.
 
-> The previous version of the site (portfolio + blog + admin panel) is archived in git
-> at branch `archive/v1-site` and tag `v1-site`. Restore with `git checkout v1-site`.
-
-## Develop
-
-```bash
-npm install
-npm run dev        # http://localhost:3000
-```
-
-## Build
-
-```bash
-npm run build && npm start
-```
+- `index.html` — the entire site.
+- `vercel.json` — tells Vercel to serve the files statically (no build).
 
 ## Deploy
 
-Hosted on Vercel (project `charger-tools`). Deploy the current directory to production:
+Hosted on Vercel (project `charger-tools`).
 
 ```bash
 npx -y vercel@latest --prod --yes
 ```
 
-## Structure
+## History
 
-```
-app/
-  layout.tsx     root layout + metadata
-  page.tsx       homepage
-  globals.css    Tailwind + base tokens
-```
+The previous full site (Next.js portfolio + blog + admin panel) is archived in git
+at branch `archive/v1-site` and tag `v1-site`. Restore with `git checkout v1-site`.
