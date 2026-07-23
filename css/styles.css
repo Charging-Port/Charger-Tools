@@ -1,60 +1,57 @@
 /* ============================================================
-   Charger — receipt styles
+   Charger — styles
    ------------------------------------------------------------
-   The whole site is one thermal receipt lying on a counter.
+   A quiet editorial index in the manner of satoshiwatanabe.org
+   and archivio-uno.com: small type, one shared column grid from
+   the header down through every row, monochrome, and a lot of
+   whitespace. No ornament — alignment and spacing do the work.
 
-     1. TOKENS      — paper, ink, desk, mono type.
-     2. RESET       — minimal.
-     3. THE DESK    — page backdrop, centering, vignette.
-     4. THE RECEIPT — paper, torn edges, banding, shadow.
-     5. PARTS       — logo, kv lines, rules, items, totals,
-                      depts (filters), barcode, fineprint.
-     6. MOTION / THEME / PRINT.
-
-   References: satoshiwatanabe.org (numbered index, mono meta),
-   archivio-uno.com (dense tabular archive). Rendered here as a
-   point-of-sale receipt: ALL CAPS labels, dotted leaders,
-   dashed rules, a barcode, and "NO CHARGE".
+     1. TOKENS
+     2. RESET
+     3. THE GRID   — one column template shared by header,
+                     column heads, and index rows.
+     4. HEADER
+     5. INDEX
+     6. SECTIONS   — about, contact
+     7. FOOTER
+     8. MOTION / THEME / RESPONSIVE
    ============================================================ */
 
 /* ============================================================
    1 — TOKENS
    ============================================================ */
 :root {
-  /* The counter the receipt lies on */
-  --desk: #c9c3b6;
-  --desk-deep: #aaa294;
+  --bg: #fbfbf9;
+  --ink: #161613;
+  --muted: #a4a29a;       /* secondary columns, idle nav */
+  --muted-dark: #6e6c66;  /* prose-adjacent gray */
+  --line: #e9e8e3;
 
-  /* Paper + ink (paper stays paper in dark mode; only the desk dims) */
-  --paper: #faf7ef;
-  --ink: #26231b;
-  --ink-soft: #5d5849;
-  --ink-faint: #948d7b;
-  --ink-line: color-mix(in srgb, var(--ink) 45%, transparent);
+  --font: "Helvetica Neue", "Inter", "Arial", system-ui, sans-serif;
 
-  --font-mono: ui-monospace, "SF Mono", "Menlo", "Cascadia Mono",
-    "Consolas", "Courier New", monospace;
+  --fs: 0.875rem;      /* 14px — everything lives at this size */
+  --fs-sm: 0.75rem;    /* 12px — colophon */
 
-  --fs-tiny: 0.7rem;
-  --fs-small: 0.8rem;
-  --fs-base: 0.92rem;
-  --fs-total: 1.08rem;
-  --fs-logo: clamp(1.9rem, 6vw, 2.6rem);
+  /* The shared grid: number / title / role / year */
+  --col-num: 3.5rem;
+  --col-title: 21rem;
+  --col-role: 13rem;
+  --col-year: 4rem;
+  --col-gap: 2rem;
 
-  --track: 0.03em;
-  --track-wide: 0.18em;
+  --pad-x: clamp(1.25rem, 4vw, 2.5rem);
+  --pad-y: clamp(1.25rem, 3.5vh, 2rem);
 
-  --w-receipt: 30rem;
-  --pad: clamp(1.35rem, 5vw, 2.5rem);
-
-  --tilt: -0.4deg;
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease: cubic-bezier(0.25, 0.6, 0.25, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --desk: #17161a;
-    --desk-deep: #0d0c10;
+    --bg: #131312;
+    --ink: #e9e8e4;
+    --muted: #63625c;
+    --muted-dark: #93918a;
+    --line: #262623;
   }
 }
 
@@ -75,21 +72,25 @@ html {
 body {
   margin: 0;
   min-height: 100svh;
-  font-family: var(--font-mono);
-  font-size: var(--fs-base);
-  line-height: 1.55;
-  letter-spacing: var(--track);
+  background: var(--bg);
   color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs);
+  font-weight: 400;
+  line-height: 1.5;
+  padding: var(--pad-y) var(--pad-x) 0;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
 p,
 ol,
-ul,
-figure {
+ul {
   margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 ol,
@@ -105,7 +106,6 @@ a {
 
 button {
   font: inherit;
-  letter-spacing: inherit;
   color: inherit;
   background: none;
   border: none;
@@ -114,23 +114,13 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
 }
 
 ::selection {
   background: var(--ink);
-  color: var(--paper);
-}
-
-/* ============================================================
-   3 — THE DESK
-   ============================================================ */
-body {
-  background: var(--desk)
-    radial-gradient(120% 90% at 50% 0%, var(--desk) 40%, var(--desk-deep) 100%)
-    fixed;
-  padding: clamp(1.5rem, 6vh, 4.5rem) 0.9rem clamp(3rem, 9vh, 6rem);
+  color: var(--bg);
 }
 
 /* Skip link — hidden until focused. */
@@ -139,337 +129,205 @@ body {
   left: -9999px;
   top: 0;
   z-index: 100;
-  padding: 0.3rem 0.8rem;
+  padding: 0.35rem 0.8rem;
   background: var(--ink);
-  color: var(--paper);
+  color: var(--bg);
 }
 .skip-link:focus {
-  left: 0.9rem;
-  top: 0.9rem;
+  left: var(--pad-x);
+  top: var(--pad-y);
 }
 
 /* ============================================================
-   4 — THE RECEIPT
+   3 — THE GRID
+   Header, column heads, and rows all share this template, so
+   the whole page reads as one aligned system.
    ============================================================ */
-.receipt-wrap {
-  max-width: var(--w-receipt);
-  margin-inline: auto;
-  transform: rotate(var(--tilt));
-  filter: drop-shadow(0 2px 3px rgba(20, 16, 8, 0.18))
-    drop-shadow(0 28px 46px rgba(20, 16, 8, 0.32));
-}
-
-/* Torn edges — sawtooth SVG strips (paper color is fixed on purpose). */
-.tear {
-  height: 12px;
-  background-repeat: repeat-x;
-}
-.tear--top {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Cpath d='M0 12L7 0l7 12z' fill='%23faf7ef'/%3E%3C/svg%3E");
-}
-.tear--bottom {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Cpath d='M0 0l7 12L14 0z' fill='%23faf7ef'/%3E%3C/svg%3E");
-}
-
-.receipt {
-  background-color: var(--paper);
-  /* faint thermal-printer banding */
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(38, 35, 27, 0.016) 0 2px,
-    transparent 2px 5px
-  );
-  padding: 1.9rem var(--pad) 2.1rem;
-}
-
-/* ============================================================
-   5 — PARTS
-   ============================================================ */
-
-/* --- masthead ----------------------------------------------------- */
-.r-logo {
-  font-size: var(--fs-logo);
-  font-weight: 800;
-  letter-spacing: 0.3em;
-  text-indent: 0.3em; /* re-center the letterspaced text */
-  text-align: center;
-  text-transform: uppercase;
-  line-height: 1.15;
-}
-.r-tagline {
-  text-align: center;
-  font-size: var(--fs-small);
-  letter-spacing: var(--track-wide);
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-top: 0.35rem;
-}
-
-/* --- rules & ornaments -------------------------------------------- */
-.rule {
-  border: 0;
-  border-top: 1px dashed var(--ink-line);
-  margin: 1.3rem 0;
-}
-.stars {
-  overflow: hidden;
-  white-space: nowrap;
-  text-align: center;
-  letter-spacing: 0.55ch;
-  color: var(--ink-soft);
-  margin: 1.1rem 0;
-  user-select: none;
-}
-
-.sect-title {
-  font-size: var(--fs-base);
-  font-weight: 800;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: var(--track-wide);
-  margin: 1.4rem 0 1rem;
-}
-
-/* --- kv line: LABEL....VALUE (the receipt workhorse) --------------- */
-.kv {
-  display: flex;
+.grid {
+  display: grid;
+  grid-template-columns: var(--col-num) var(--col-title) var(--col-role) var(--col-year);
+  column-gap: var(--col-gap);
   align-items: baseline;
-  gap: 0.6ch;
-}
-.kv + .kv {
-  margin-top: 0.28rem;
-}
-.kv__k {
-  color: var(--ink-soft);
-  font-size: var(--fs-small);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.kv__leader {
-  flex: 1;
-  min-width: 2ch;
-  border-bottom: 2px dotted color-mix(in srgb, var(--ink) 32%, transparent);
-  transform: translateY(-0.3em);
-}
-.kv__v {
-  white-space: nowrap;
-  max-width: 60%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-a.kv:hover .kv__v,
-a.kv:focus-visible .kv__v {
-  background: var(--ink);
-  color: var(--paper);
-  box-shadow: 0 0 0 2px var(--ink);
 }
 
-/* --- bracket buttons/links: [ LABEL ] ------------------------------ */
-.bracket {
-  font-size: var(--fs-small);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
+/* ============================================================
+   4 — HEADER
+   C. | filters | About | Contact (far right)
+   ============================================================ */
+.top {
+  grid-template-columns: var(--col-num) var(--col-title) var(--col-role) 1fr;
+}
+.wordmark {
+  font-weight: 500;
+}
+.top a,
+.top .filter {
+  color: var(--muted);
   transition: color 0.15s var(--ease);
 }
-.bracket::before {
-  content: "[ ";
-}
-.bracket::after {
-  content: " ]";
-}
-.bracket:hover {
+.top a:hover,
+.top .filter:hover {
   color: var(--ink);
 }
-.bracket[aria-pressed="true"],
-.bracket[aria-current] {
-  color: var(--paper);
-  background: var(--ink);
-  box-shadow: 0 0 0 2px var(--ink);
+.top .contact-link {
+  justify-self: end;
 }
 
-.r-nav {
+/* Filters — a comma-separated word list, Watanabe-style. */
+.filters {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 0.9rem 1.4rem;
 }
-
-/* --- items (the index) --------------------------------------------- */
-.depts {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.7rem 1.2rem;
-  margin-bottom: 1.2rem;
-}
-
-.items {
-  display: block;
-}
-.item + .item {
-  margin-top: 0.95rem;
-}
-.item[hidden] {
-  display: none;
-}
-.item__row {
-  display: block;
-}
-.item__line {
-  display: flex;
-  align-items: baseline;
-  gap: 0.9ch;
-}
-.item__num {
-  color: var(--ink-faint);
-  font-size: var(--fs-small);
-}
-.item__title {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.item__leader {
-  flex: 1;
-  min-width: 2ch;
-  border-bottom: 2px dotted color-mix(in srgb, var(--ink) 32%, transparent);
-  transform: translateY(-0.3em);
-}
-.item__year {
-  font-size: var(--fs-small);
-}
-.item__sub {
-  display: flex;
-  justify-content: space-between;
-  gap: 1ch;
-  padding-left: calc(3ch + 0.9ch); /* clear the 3-digit number */
-  color: var(--ink-soft);
-  font-size: var(--fs-small);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-a.item__row:hover .item__title,
-a.item__row:focus-visible .item__title {
-  background: var(--ink);
-  color: var(--paper);
-  box-shadow: 0 0 0 2px var(--ink);
-}
-
-.items-fallback {
-  color: var(--ink-soft);
-  text-align: center;
-  padding: 0.6rem 0;
-}
-
-/* --- totals -------------------------------------------------------- */
-.totals {
-  margin-top: 1.4rem;
-}
-.kv--total {
-  border-top: 4px double var(--ink);
-  padding-top: 0.55rem;
-  margin-top: 0.55rem;
-}
-.kv--total .kv__k,
-.kv--total .kv__v {
-  font-size: var(--fs-total);
-  font-weight: 800;
+.filter[aria-pressed="true"] {
   color: var(--ink);
 }
-
-/* --- prose (customer notice / about) ------------------------------- */
-.prose {
-  font-size: var(--fs-small);
-  line-height: 1.7;
-}
-.prose p + p {
-  margin-top: 0.8rem;
-}
-
-/* --- barcode + thanks ---------------------------------------------- */
-.barcode {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  height: 46px;
-  margin: 1.6rem auto 0.4rem;
-}
-.barcode span {
-  background: var(--ink);
-  margin-right: 2px;
-}
-.barcode-label {
-  text-align: center;
-  font-size: var(--fs-small);
-  letter-spacing: 0.5ch;
-  text-indent: 0.5ch;
-  text-transform: uppercase;
-}
-
-.thanks {
-  text-align: center;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-indent: 0.22em;
-  text-transform: uppercase;
-  margin-top: 1.5rem;
-}
-.thanks-sub {
-  text-align: center;
-  font-size: var(--fs-small);
-  letter-spacing: var(--track-wide);
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-top: 0.3rem;
-}
-
-/* --- fineprint ------------------------------------------------------ */
-.fineprint {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.3rem 1rem;
-  margin-top: 1.7rem;
-  font-size: var(--fs-tiny);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-.fineprint a {
-  text-decoration: underline dotted;
-  text-underline-offset: 3px;
-}
-.fineprint a:hover {
-  color: var(--ink);
+.filter:not(:last-child)::after {
+  content: ",";
+  color: var(--muted);
+  margin-right: 0.45em;
 }
 
 /* ============================================================
-   6 — MOTION / THEME / PRINT
+   5 — INDEX
+   ============================================================ */
+.colheads {
+  margin-top: clamp(3rem, 9vh, 5.5rem);
+  margin-bottom: 1.6rem;
+  color: var(--muted);
+}
+
+.work + .work {
+  margin-top: 0.1rem;
+}
+.row {
+  padding-block: 0.22rem;
+  transition: color 0.15s var(--ease);
+}
+.c-num,
+.c-role,
+.c-year {
+  color: var(--muted);
+  transition: color 0.15s var(--ease);
+}
+.c-title {
+  color: var(--ink);
+  transition: color 0.15s var(--ease);
+}
+
+/* Hover: the list recedes, the hovered row stays. */
+.work-list:hover .c-title {
+  color: var(--muted);
+}
+.work-list .row:hover .c-title,
+.work-list .row:focus-visible .c-title {
+  color: var(--ink);
+}
+.work-list a.row:hover .c-num,
+.work-list a.row:hover .c-year,
+.work-list a.row:hover .c-role {
+  color: var(--muted-dark);
+}
+
+.work[hidden] {
+  display: none;
+}
+
+.index-fallback {
+  color: var(--muted-dark);
+  max-width: 34rem;
+}
+
+/* ============================================================
+   6 — SECTIONS (about, contact)
+   Letter label in the number column, content in the title
+   column and beyond — same grid, quieter register.
+   ============================================================ */
+.section {
+  margin-top: clamp(6rem, 18vh, 11rem);
+}
+.section-label {
+  color: var(--muted);
+}
+.section-body {
+  grid-column: 2 / 4;
+  max-width: 32rem;
+}
+.section-body p + p {
+  margin-top: 0.9rem;
+}
+.section-body,
+.section-body a {
+  color: var(--muted-dark);
+}
+.section-body strong {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+/* Contact rows: label + value pairs. */
+.contact-list li {
+  display: flex;
+  gap: var(--col-gap);
+}
+.contact-list li + li {
+  margin-top: 0.2rem;
+}
+.contact-list .k {
+  width: 5.5rem;
+  flex: none;
+  color: var(--muted);
+}
+.contact-list a {
+  color: var(--ink);
+}
+.contact-list a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ============================================================
+   7 — FOOTER
+   ============================================================ */
+.footer {
+  margin-top: clamp(6rem, 20vh, 12rem);
+  padding-block: 1.1rem calc(var(--pad-y) + 0.2rem);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--col-gap);
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+.footer a {
+  color: var(--muted);
+}
+.footer a:hover {
+  color: var(--ink);
+}
+.footer-meta {
+  display: flex;
+  gap: 1.6rem;
+}
+
+/* ============================================================
+   8 — MOTION / THEME / RESPONSIVE
    ============================================================ */
 @media (prefers-reduced-motion: no-preference) {
-  .receipt-wrap {
-    animation: feed-in 0.7s var(--ease) both;
+  .work {
+    animation: rise 0.45s var(--ease) both;
+    /* per-row delay set from js/main.js */
   }
-  .item {
-    animation: line-in 0.4s var(--ease) both;
-    /* per-item delay set from js/main.js via el.style.animationDelay */
-  }
-}
-@keyframes feed-in {
-  from {
-    transform: translateY(-22px) rotate(var(--tilt));
-    opacity: 0;
-  }
-  to {
-    transform: rotate(var(--tilt));
+  .top,
+  .colheads,
+  .section,
+  .footer {
+    animation: rise 0.6s var(--ease) both;
   }
 }
-@keyframes line-in {
+@keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(7px);
+    transform: translateY(4px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -478,31 +336,50 @@ a.item__row:focus-visible .item__title {
   }
 }
 
-@media (max-width: 26rem) {
+@media (max-width: 56rem) {
   :root {
-    --tilt: 0deg; /* no rotation when the receipt fills the screen */
+    --col-title: minmax(0, 1fr);
+    --col-role: 9rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .grid {
+    grid-template-columns: 2.6rem minmax(0, 1fr) 3.2rem;
+  }
+  .top {
+    grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  }
+  .top .about-link {
+    display: none; /* reachable by scroll; header stays one line */
+  }
+  .colheads .c-role,
+  .row .c-role {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: var(--fs-sm);
+  }
+  .row {
+    padding-block: 0.35rem;
+  }
+  .section-body {
+    grid-column: 2 / -1;
+  }
+  .contact-list .k {
+    width: 4.2rem;
+  }
+  .footer {
+    flex-direction: column;
+    gap: 0.4rem;
   }
 }
 
 @media print {
   body {
     background: #fff;
-    padding: 0;
   }
-  .receipt-wrap {
-    max-width: none;
-    transform: none;
-    filter: none;
-    animation: none;
-  }
-  .tear {
-    display: none;
-  }
-  .receipt {
-    background: #fff;
-  }
-  .depts,
-  .skip-link {
+  .skip-link,
+  .filters {
     display: none;
   }
 }

@@ -1,12 +1,11 @@
 # Architecture — charger.tools
 
-A personal site designed as a **thermal receipt**: one narrow strip of paper
-lying on a dark counter. Inspired by
-[satoshiwatanabe.org](https://satoshiwatanabe.org/) (numbered index, mono
-metadata, whitespace) and [archivio-uno.com](https://archivio-uno.com/)
-(dense tabular archive) — reinterpreted as a point-of-sale receipt: ALL-CAPS
-labels, dotted leaders, dashed rules, torn edges, a barcode, and
-`TOTAL ..... NO CHARGE`.
+A personal site built as a quiet **editorial index** in the manner of
+[satoshiwatanabe.org](https://satoshiwatanabe.org/) and
+[archivio-uno.com](https://archivio-uno.com/): small type (everything at
+14px), one shared column grid running from the header down through every
+index row, monochrome, and a lot of whitespace. No ornament — alignment and
+spacing do the work.
 
 Hand-coded static site. No framework, no build step, no dependencies.
 
@@ -14,10 +13,10 @@ Hand-coded static site. No framework, no build step, no dependencies.
 
 | File                     | Role                                                       |
 | ------------------------ | ---------------------------------------------------------- |
-| `index.html`             | The public receipt (masthead → index → about → contact).   |
-| `css/styles.css`         | Design system: tokens → desk → receipt → parts.            |
-| `js/main.js`             | `WORKS` data + render, meta lines, filters, barcode.       |
-| `_private/hq/index.html` | Staff dashboard (self-contained: inline CSS + JS).         |
+| `index.html`             | The public page (header → index → about → contact).        |
+| `css/styles.css`         | Design system: tokens → shared grid → components.          |
+| `js/main.js`             | `WORKS` data + row render, header filters, footer meta.    |
+| `_private/hq/index.html` | Staff page (self-contained: inline CSS + JS).              |
 | `middleware.js`          | Vercel Edge Middleware — the password gate + login page.   |
 | `vercel.json`            | Rewrites (`/hq`, subdomain), security headers, cleanUrls.  |
 | `assets/`                | Images/media if ever needed (currently empty).             |
@@ -45,15 +44,18 @@ Hand-coded static site. No framework, no build step, no dependencies.
 
 ## Design system (css/styles.css)
 
-- **Tokens** — `--paper`/`--ink` (the receipt), `--desk` (the backdrop).
-  Dark mode dims the desk only; paper stays paper.
-- **Parts** — `.kv` (LABEL....VALUE line with dotted leader — the receipt
-  workhorse), `.rule` (dashed), `.stars`, `.bracket` (`[ LABEL ]` buttons),
-  `.item` (work line items), `.kv--total`, `.barcode`, `.tear` (sawtooth
-  SVG edges), `.fineprint`.
-- **Motion** — the receipt "feeds in" on load; items print staggered
-  (delays set from JS). Disabled under `prefers-reduced-motion`.
-- **Print stylesheet** — the receipt prints cleanly on white.
+- **Tokens** — `--bg`/`--ink`/`--muted` (monochrome; dark mode inverts),
+  one type size (`--fs`, 14px) for everything, and the shared column
+  template `--col-num / --col-title / --col-role / --col-year`.
+- **The grid** — `.grid` applies the column template. The header
+  (`C. | filters | About | Contact`), the column heads (`N. P. R. Y.`),
+  and every work row all use it, so the page reads as one aligned system.
+  Sections reuse it with a letter label (`A.` about, `C.` contact) in the
+  number column.
+- **Hierarchy by color, not size** — titles are ink, everything secondary
+  is `--muted`. Hovering the list dims the other rows.
+- **Motion** — rows rise in with a small stagger (delays set from JS).
+  Disabled under `prefers-reduced-motion`.
 
 ## Private area (the "staff door")
 
