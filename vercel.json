@@ -6,17 +6,17 @@
   "outputDirectory": ".",
   "cleanUrls": true,
   "redirects": [
-    { "source": "/hq", "destination": "/dev", "permanent": false },
-    { "source": "/hq/:path+", "destination": "/dev/:path+", "permanent": false }
+    { "source": "/hq", "destination": "https://dev.charger.tools/", "permanent": false },
+    { "source": "/hq/:path+", "destination": "https://dev.charger.tools/", "permanent": false },
+    { "source": "/dev", "destination": "https://dev.charger.tools/", "permanent": false },
+    { "source": "/dev/:path+", "destination": "https://dev.charger.tools/:path+", "permanent": false }
   ],
   "rewrites": [
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "dev.charger.tools" }],
       "destination": "/_private/dev/:path*"
-    },
-    { "source": "/dev", "destination": "/_private/dev" },
-    { "source": "/dev/:path+", "destination": "/_private/dev/:path+" }
+    }
   ],
   "headers": [
     {

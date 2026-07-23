@@ -24,7 +24,10 @@
 const COOKIE = "chg_dev";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const PRIVATE_HOSTS = ["dev."]; // host prefixes that are staff-only
-const PRIVATE_PATH = /^\/(dev|_private)(\/|$)/;
+// On the apex only the raw file tree is gated; /dev there is NOT
+// intercepted, so the vercel.json redirect can bounce it to the
+// dev.charger.tools subdomain (the private area's real home).
+const PRIVATE_PATH = /^\/_private(\/|$)/;
 const APEX = "charger.tools"; // cookies span *.charger.tools
 
 export default async function middleware(request) {
@@ -32,8 +35,11 @@ export default async function middleware(request) {
   const host = (request.headers.get("host") || url.hostname).toLowerCase().split(":")[0];
   const privateHost = PRIVATE_HOSTS.some((p) => host.startsWith(p));
   const privatePath = PRIVATE_PATH.test(url.pathname);
+  // Login/logout endpoints work on any host (the apex /_private login
+  // form posts to /dev/login on the apex).
+  const authPath = url.pathname === "/dev/login" || url.pathname === "/dev/logout";
 
-  if (!privateHost && !privatePath) return; // public — pass through
+  if (!privateHost && !privatePath && !authPath) return; // public — pass through
 
   const password = process.env.DEV_PASSWORD;
   const secret = process.env.DEV_SESSION_SECRET;

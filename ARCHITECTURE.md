@@ -62,18 +62,20 @@ Hand-coded static site. No framework, no build step, no dependencies.
 Request flow (all enforced in `middleware.js`, which runs before routing):
 
 ```
-public path, public host  → untouched
-/dev, /_private/*, or dev.* host
-  ├─ env vars missing     → 503 "login disabled" (fails closed)
-  ├─ no/invalid cookie    → login page (401)
-  ├─ POST /dev/login      → verify password → set signed cookie → 303
-  ├─ /dev/logout          → clear cookie → 303
-  └─ valid cookie         → fall through to static files
-       vercel.json then routes:
-         /hq, /hq/*        → 307 redirect to /dev, /dev/*  (legacy path)
-         /dev              → /_private/dev
-         /dev/:path+       → /_private/dev/:path+
-         dev.charger.tools → /_private/dev/:path*
+public path, public host   → untouched
+apex /dev, /hq             → untouched by middleware; vercel.json
+                             307-redirects them to https://dev.charger.tools
+dev.* host, or apex /_private/*, /dev/login, /dev/logout
+  ├─ env vars missing      → 503 "login disabled" (fails closed)
+  ├─ no/invalid cookie     → login page (401)
+  ├─ POST /dev/login       → verify password → set signed cookie → 303
+  ├─ /dev/logout           → clear cookie → 303
+  └─ valid cookie
+       ├─ dev.* host       → middleware rewrites into /_private/dev/*
+       │                     (the filesystem is checked before vercel.json
+       │                      rewrites, so "/" would otherwise serve the
+       │                      public index.html)
+       └─ apex /_private/* → falls through to the static file
 ```
 
 - **Session** — cookie `chg_dev=<expiryMs>.<HMAC-SHA256(secret, tag+expiry)>`,

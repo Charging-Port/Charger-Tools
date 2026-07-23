@@ -5,8 +5,9 @@ column grid, monochrome, lots of whitespace (after satoshiwatanabe.org and
 archivio-uno.com). Hand-coded static HTML/CSS/JS, no framework, no build step.
 
 - **Public:** `charger.tools` — the numbered work index, about, contact.
-- **Private:** `charger.tools/dev` (and `dev.charger.tools` once DNS is set) —
-  password-protected staff page: quick links, deploy checklist, notes, list.
+- **Private:** `dev.charger.tools` — password-protected staff page: quick
+  links, deploy checklist, notes, list. (`/dev` and the old `/hq` on the
+  main site just redirect there.)
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full map: content model,
 design system, auth flow, env vars, and deploy steps.
