@@ -7,25 +7,6 @@ const nextConfig = {
 
   async headers() {
     return [
-      // Admin pages and admin API: never cache. Prevents shared caches (CDN,
-      // browser, intermediate proxies) from holding onto authenticated
-      // responses that could leak across users.
-      {
-        source: "/admin/:path*",
-        headers: [
-          { key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" },
-          { key: "Pragma", value: "no-cache" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-        ],
-      },
-      {
-        source: "/api/admin/:path*",
-        headers: [
-          { key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" },
-          { key: "Pragma", value: "no-cache" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-        ],
-      },
       {
         source: "/(.*)",
         headers: [
@@ -47,36 +28,23 @@ const nextConfig = {
           // Disable unused browser features
           {
             key: "Permissions-Policy",
-            value:
-              "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
           },
 
-          // Content Security Policy
-          // NOTE: 'unsafe-inline' on script-src is required by Next.js 14 because it
-          // injects inline <script id="__NEXT_DATA__"> for hydration. A nonce-based
-          // approach would require middleware rewriting every response — too costly for
-          // this static site. When migrating to Next.js 15+ with Partial Prerendering,
-          // revisit this and add a per-request nonce via middleware.
+          // Content Security Policy.
+          // 'unsafe-inline' on script-src is required by Next.js 14's inline
+          // hydration script. In dev, HMR needs 'unsafe-eval'.
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // Next.js hydration requires unsafe-inline for inline script tags.
-              // In dev, webpack's HMR uses eval(), so we allow 'unsafe-eval' only there.
               `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
-              // Tailwind and next-themes inject runtime inline styles
               "style-src 'self' 'unsafe-inline'",
-              // next/font self-hosts fonts at /_next/static — no external font CDN needed
               "font-src 'self'",
-              // Allow data URIs for inline SVGs/images and blob for future media
               "img-src 'self' data: blob:",
-              // Only talk to self (API routes are same-origin)
               "connect-src 'self'",
-              // Disallow all frames
               "frame-ancestors 'none'",
-              // Restrict <base> tag abuse
               "base-uri 'self'",
-              // Forms can only submit to same origin
               "form-action 'self'",
             ].join("; "),
           },

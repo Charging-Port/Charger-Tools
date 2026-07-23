@@ -2,11 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dev",
-      "runtimeExecutable": "/bin/bash",
-      "runtimeArgs": ["-c", "export PATH=/usr/local/bin:$PATH && cd '/Users/charger/Charger Tools/Website' && npx next dev --port $PORT"],
-      "port": 3000,
-      "autoPort": true
+      "name": "charger-tools-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
     }
   ]
 }
