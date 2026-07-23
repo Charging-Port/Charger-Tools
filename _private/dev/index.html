@@ -68,6 +68,40 @@
       :focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
       ::selection { background: var(--ink); color: var(--bg); }
 
+      html { scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-thumb { background: var(--muted); }
+      ::-webkit-scrollbar-track { background: transparent; }
+
+      /* The "selection" hover, same as the public site. */
+      .kv-list a:hover,
+      .top a.out:hover,
+      .wordmark:hover,
+      .todo-form button:hover,
+      .todo-del:hover,
+      .todo-foot button:hover,
+      .footer a:hover,
+      .footer button:hover {
+        background: var(--ink);
+        color: var(--bg);
+        box-shadow: 0 0 0 3px var(--ink);
+        text-decoration: none;
+      }
+
+      /* Custom cursor (fine pointers; disabled under reduced motion). */
+      .cursor-dot, .cursor-ring {
+        position: fixed; top: 0; left: 0; pointer-events: none; z-index: 200;
+        border-radius: 50%; opacity: 0; will-change: transform;
+        mix-blend-mode: difference;
+      }
+      .cursor-dot { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; background: #fff; }
+      .cursor-ring {
+        width: 30px; height: 30px; margin: -15px 0 0 -15px;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        transition: opacity 0.25s var(--ease);
+      }
+      html.has-cursor, html.has-cursor * { cursor: none !important; }
+
       .grid {
         display: grid;
         grid-template-columns: var(--col-num) minmax(0, 34rem);
@@ -409,6 +443,45 @@
         });
 
         render();
+
+        // --- Custom cursor (same behavior as the public site) ---
+        (function () {
+          if (!window.matchMedia("(pointer: fine)").matches) return;
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          var dot = document.createElement("div");
+          dot.className = "cursor-dot";
+          var ring = document.createElement("div");
+          ring.className = "cursor-ring";
+          document.body.append(dot, ring);
+          document.documentElement.classList.add("has-cursor");
+
+          var HOVER = "a, button, input, textarea, label";
+          var x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y;
+          var ringScale = 1, overLink = false, pressed = false, shown = false;
+
+          addEventListener("pointermove", function (e) {
+            x = e.clientX; y = e.clientY;
+            if (!shown) {
+              shown = true; rx = x; ry = y;
+              dot.style.opacity = "1"; ring.style.opacity = "1";
+            }
+            dot.style.transform = "translate(" + x + "px," + y + "px)";
+            overLink = !!(e.target.closest && e.target.closest(HOVER));
+          }, { passive: true });
+          document.documentElement.addEventListener("pointerleave", function () {
+            shown = false; dot.style.opacity = "0"; ring.style.opacity = "0";
+          });
+          addEventListener("pointerdown", function () { pressed = true; });
+          addEventListener("pointerup", function () { pressed = false; });
+
+          (function loop() {
+            var target = (overLink ? 1.7 : 1) * (pressed ? 0.8 : 1);
+            rx += (x - rx) * 0.16; ry += (y - ry) * 0.16;
+            ringScale += (target - ringScale) * 0.16;
+            ring.style.transform = "translate(" + rx + "px," + ry + "px) scale(" + ringScale + ")";
+            requestAnimationFrame(loop);
+          })();
+        })();
 
         // --- Export (JSON backup of notes + list) ---
         var exportBtn = document.querySelector("[data-export]");

@@ -136,8 +136,19 @@ function buildFilters() {
     return b;
   };
 
+  const makeSep = () => {
+    const s = document.createElement("span");
+    s.className = "sep";
+    s.setAttribute("aria-hidden", "true");
+    s.textContent = ",";
+    return s;
+  };
+
   wrap.appendChild(makeBtn("All", "*", true));
-  tags.forEach((t) => wrap.appendChild(makeBtn(t, t, false)));
+  tags.forEach((t) => {
+    wrap.appendChild(makeSep());
+    wrap.appendChild(makeBtn(t, t, false));
+  });
 
   wrap.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-filter]");
@@ -209,12 +220,145 @@ function initCopy() {
 }
 
 // ------------------------------------------------------------
+// CURSOR — a small dot with a trailing ring. Fine pointers only;
+// skipped entirely under prefers-reduced-motion. Blend-mode
+// difference (in CSS) keeps it visible over paper, chips, and
+// dark mode.
+// ------------------------------------------------------------
+function initCursor() {
+  if (!window.matchMedia("(pointer: fine)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const dot = document.createElement("div");
+  dot.className = "cursor-dot";
+  const ring = document.createElement("div");
+  ring.className = "cursor-ring";
+  dot.setAttribute("aria-hidden", "true");
+  ring.setAttribute("aria-hidden", "true");
+  document.body.append(dot, ring);
+  document.documentElement.classList.add("has-cursor");
+
+  const HOVER = "a, button, input, textarea, label, [role='button']";
+  let x = innerWidth / 2;
+  let y = innerHeight / 2;
+  let rx = x;
+  let ry = y;
+  let ringScale = 1;
+  let overLink = false;
+  let pressed = false;
+  let shown = false;
+
+  addEventListener(
+    "pointermove",
+    (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!shown) {
+        shown = true;
+        rx = x;
+        ry = y;
+        dot.style.opacity = "1";
+        ring.style.opacity = "1";
+      }
+      dot.style.transform = `translate(${x}px, ${y}px)`;
+      overLink = !!(e.target.closest && e.target.closest(HOVER));
+    },
+    { passive: true }
+  );
+  document.documentElement.addEventListener("pointerleave", () => {
+    shown = false;
+    dot.style.opacity = "0";
+    ring.style.opacity = "0";
+  });
+  addEventListener("pointerdown", () => (pressed = true));
+  addEventListener("pointerup", () => (pressed = false));
+
+  (function loop() {
+    const target = (overLink ? 1.7 : 1) * (pressed ? 0.8 : 1);
+    rx += (x - rx) * 0.16;
+    ry += (y - ry) * 0.16;
+    ringScale += (target - ringScale) * 0.16;
+    ring.style.transform = `translate(${rx}px, ${ry}px) scale(${ringScale})`;
+    requestAnimationFrame(loop);
+  })();
+}
+
+// ------------------------------------------------------------
+// CLOCK — a small live HH:MM in the footer; the colon blinks
+// via CSS. Purely a sign of life.
+// ------------------------------------------------------------
+function initClock() {
+  const el = document.querySelector("[data-clock]");
+  if (!el) return;
+  const p2 = (n) => String(n).padStart(2, "0");
+  const tick = () => {
+    const now = new Date();
+    el.innerHTML = "";
+    el.append(p2(now.getHours()));
+    const colon = document.createElement("span");
+    colon.className = "clock-colon";
+    colon.textContent = ":";
+    el.append(colon, p2(now.getMinutes()));
+  };
+  tick();
+  setInterval(tick, 20 * 1000);
+}
+
+// ------------------------------------------------------------
+// REVEAL — sections fade up as they enter the viewport.
+// (CSS hides them only when html.js is set, so no-JS still works.)
+// ------------------------------------------------------------
+function initReveal() {
+  const targets = [...document.querySelectorAll(".section, .footer")];
+  if (!targets.length) return;
+  const reveal = (el) => el.classList.add("in");
+
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach(reveal);
+    return;
+  }
+
+  let ioFired = false;
+  const io = new IntersectionObserver(
+    (entries) => {
+      ioFired = true;
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          reveal(entry.target);
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.08 }
+  );
+
+  targets.forEach((el) => {
+    // Anything already in view reveals immediately — content must
+    // never wait on the observer.
+    const r = el.getBoundingClientRect();
+    if (r.top < innerHeight && r.bottom > 0) reveal(el);
+    else io.observe(el);
+  });
+
+  // Fail-open: a healthy engine always fires the initial callback.
+  // If it never comes (broken embedders), show everything.
+  setTimeout(() => {
+    if (!ioFired) targets.forEach(reveal);
+  }, 1500);
+}
+
+// ------------------------------------------------------------
 // BOOT
 // ------------------------------------------------------------
+document.documentElement.classList.add("js");
+
 document.addEventListener("DOMContentLoaded", () => {
   renderIndex();
   renderMeta();
   buildFilters();
   initSpy();
   initCopy();
+  initCursor();
+  initClock();
+  initReveal();
 });

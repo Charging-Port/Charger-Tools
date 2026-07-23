@@ -67,6 +67,17 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 body {
@@ -123,6 +134,53 @@ button {
   color: var(--bg);
 }
 
+/* The "selection" hover — interactive text inverts like a text
+   selection. Resting states stay quiet; the flourish is on touch. */
+.top a:hover,
+.filter:hover,
+.contact-list a:hover,
+.footer a:hover,
+.copy-btn:hover,
+.section-body a:hover {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 0 0 3px var(--ink);
+  text-decoration: none;
+}
+
+/* Custom cursor — a dot with a trailing ring, blend-mode difference
+   so it reads over paper, ink chips, and dark mode alike. Enabled by
+   js/main.js only for fine pointers without reduced-motion. */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 200;
+  border-radius: 50%;
+  opacity: 0;
+  will-change: transform;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  background: #fff;
+}
+.cursor-ring {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  transition: opacity 0.25s var(--ease);
+}
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+
 /* Skip link — hidden until focused. */
 .skip-link {
   position: absolute;
@@ -177,7 +235,8 @@ button {
   color: var(--ink);
 }
 
-/* Filters — a comma-separated word list, Watanabe-style. */
+/* Filters — a comma-separated word list, Watanabe-style. The commas
+   are separator spans (from JS) so hover chips wrap the word only. */
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -185,8 +244,7 @@ button {
 .filter[aria-pressed="true"] {
   color: var(--ink);
 }
-.filter:not(:last-child)::after {
-  content: ",";
+.filters .sep {
   color: var(--muted);
   margin-right: 0.45em;
 }
@@ -213,23 +271,35 @@ button {
   color: var(--muted);
   transition: color 0.15s var(--ease);
 }
+.c-num,
+.c-year,
+.colheads,
+.footer-meta {
+  font-variant-numeric: tabular-nums;
+}
 .c-title {
   color: var(--ink);
   transition: color 0.15s var(--ease);
 }
 
-/* Hover: the list recedes, the hovered row stays. */
+/* Hover: the list recedes; the hovered title inverts like a selection. */
 .work-list:hover .c-title {
   color: var(--muted);
 }
 .work-list .row:hover .c-title,
 .work-list .row:focus-visible .c-title {
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 0 0 3px var(--ink);
 }
 .work-list a.row:hover .c-num,
 .work-list a.row:hover .c-year,
 .work-list a.row:hover .c-role {
   color: var(--muted-dark);
+}
+/* The ↗ hint sits outside the chip, so keep it legible on hover. */
+.row.ext:hover .c-title::after {
+  color: var(--bg);
 }
 
 .work[hidden] {
@@ -351,10 +421,30 @@ button {
     /* per-row delay set from js/main.js */
   }
   .top,
-  .colheads,
-  .section,
-  .footer {
+  .colheads {
     animation: rise 0.6s var(--ease) both;
+  }
+  /* Sections reveal as they scroll into view (html.js is set by
+     main.js, so everything stays visible without JavaScript). */
+  html.js .section,
+  html.js .footer {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+  }
+  html.js .section.in,
+  html.js .footer.in {
+    opacity: 1;
+    transform: none;
+  }
+  /* The footer clock's colon breathes. */
+  .clock-colon {
+    animation: blink 2.4s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.25;
+    }
   }
 }
 @keyframes rise {

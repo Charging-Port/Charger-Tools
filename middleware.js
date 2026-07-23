@@ -230,10 +230,9 @@ function loginPage(status, notice, home, disabled = false, next = "") {
     "input[type=password]:focus{outline:none;border-bottom-color:var(--ink)}" +
     "button{font:inherit;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;" +
     "justify-self:start;margin-top:.6rem;transition:color .15s}" +
-    "button:hover{color:var(--ink)}" +
+    "button:hover,.fine a:hover,.wordmark:hover{background:var(--ink);color:var(--bg);box-shadow:0 0 0 3px var(--ink)}" +
     ".fine{margin-top:clamp(4rem,14vh,7rem);font-size:.75rem}" +
     ".fine a{color:var(--muted);text-decoration:none}" +
-    ".fine a:hover{color:var(--ink)}" +
     "</style></head><body>" +
     '<header class="top"><a class="wordmark" href="https://' + APEX + '/">C.</a>' +
     '<span class="where">Staff</span></header>' +
